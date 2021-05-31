@@ -47,7 +47,7 @@ const client = new tmi.Client({
 		username: username,
 		password: password
 	},
-	channels: [ 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol' ]
+	channels: [ 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol', 'huwobot' ]
 });
 
 let channelsChatters = {};
@@ -68,8 +68,10 @@ client.on('message', (channel, tags, message, self) => {
 		console.log("ignored whisper");
 		return;
 	}
-
 	let cleanMessage = message.replace(blankchar, '').trim();
+
+	checkIfRaid(tags, cleanMessage);
+	
 	if(self) return;
 	if(cleanMessage.toLowerCase() === '&ping') {
 		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
@@ -134,8 +136,33 @@ client.on("join", (channel, username, self) => {
     getChatters(channel);
 });
 
+function checkIfRaid(tags, message) {
+	let notifyChannel = '#hackmagic';
+	let peopleToNotify = [ 'hackmagic' ];
+	if(tags.username === 'huwobot') {
+		if(/A Raid Event at Level \[[0-9]+\] has appeared./.test(message)) {
+			console.log("Raid detected");
+			let notifMessage = "DinkDonk +join";
+			for(p of peopleToNotify) {
+				notifMessage += ' @' + p ;
+			}
+			sendMessageRetry(notifyChannel, notifMessage)
+		}
+	} else {
+		return;
+	}
+}
+
 let modSpamMessageCounter = 0;
 let modSpamCounterTimeStampMs = 0;
+
+// Retries to send messages if they fail
+function sendMessageRetry(channel, message) {
+	if(!sendMessage(channel, message)) {
+		// retry after 300ms
+		setTimeout(sendMessageRetry, 300, channel, message);
+	}
+}
 
 function sendMessage(channel, message) {
 	// TODO implement banphrase api
@@ -163,7 +190,7 @@ function sendMessage(channel, message) {
 
 	if(!modSpam && Date.now() - lastMessageTimeStampMs < currentRate * 1000) {
 		console.log("Dropped message cause of rate limit Sadge");
-		return;
+		return false;
 	} else {
 		if(modSpam) {
 			if(Date.now() - modSpamCounterTimeStampMs > 30 * 1000) {
@@ -173,7 +200,7 @@ function sendMessage(channel, message) {
 			if(modSpamMessageCounter >= rateLimitMessagesMod - 5) {
 				// We keep a margin of a few messages to try to not get shadowbanned
 				console.log("Dropped cause of mod rate limit Sadeg");
-				return;
+				return false;
 			} else {
 				modSpamMessageCounter++;
 			}
@@ -185,6 +212,7 @@ function sendMessage(channel, message) {
 		}
 		lastSentMessage = message;
 		client.say(channel, message);
+		return true;
 	}
 }
 
