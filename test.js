@@ -47,7 +47,7 @@ const client = new tmi.Client({
 		username: username,
 		password: password
 	},
-	channels: [ 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika' ]
+	channels: [ 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol' ]
 });
 
 let channelsChatters = {};
@@ -75,17 +75,24 @@ client.on('message', (channel, tags, message, self) => {
 		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
 		sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${timeSeconds.toFixed(2)}s`);
 	}
+	if(cleanMessage.toLowerCase() === '&code') {
+		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
+		sendMessage(channel, `@${tags.username}, lidl code is here https://github.com/MagicHack/twitchbot`);
+	}
 	
 	if(tags.username !== client.getUsername()) {
+		let channelsNoPriority = [ '#pepto__bismol'];
 		donkUsername = '';
-		for(donk of donkRepliesPriority) {
-			if(typeof channelsChatters[channel] !== 'undefined') {
-				if(channelsChatters[channel].includes(donk)) {
-					donkUsername = donk;
-					break;
+		if(!channelsNoPriority.includes(channel)) {
+			for(donk of donkRepliesPriority) {
+				if(typeof channelsChatters[channel] !== 'undefined') {
+					if(channelsChatters[channel].includes(donk)) {
+						donkUsername = donk;
+						break;
+					}
+				} else {
+					console.log("chatter list not present yet");
 				}
-			} else {
-				console.log("chatter list not present yet");
 			}
 		}
 
@@ -97,12 +104,15 @@ client.on('message', (channel, tags, message, self) => {
 				sendMessage(channel, `TeaTime FeelsDonkMan`);
 			}
 		}
-
-		let sameReplies = ['DinkDonk', 'YEAHBUTBTTV', 'TrollDespair', 'MODS', 'monkaE', 'POGGERS', 'VeryPog', 'MegaLUL FBBlock', 'hackerCD', ':)'];
-		for(reply of sameReplies) {
-			if(cleanMessage.startsWith(reply)) {
-				sendMessage(channel, reply);
-				return;
+		let sameRepliesChannel = [ '#hackmagic', '#minusinsanity', '#pepto__bismol' ];
+		let sameReplies = ['DinkDonk', 'YEAHBUTBTTV', 'TrollDespair', 'MODS', 'monkaE', 'POGGERS', 'VeryPog', 
+		'MegaLUL FBBlock', 'hackerCD', ':)'];
+		if(sameRepliesChannel.includes(channel)) {
+			for(reply of sameReplies) {
+				if(cleanMessage.startsWith(reply)) {
+					sendMessage(channel, reply);
+					return;
+				}
 			}
 		}
 		
@@ -124,15 +134,50 @@ client.on("join", (channel, username, self) => {
     getChatters(channel);
 });
 
+let modSpamMessageCounter = 0;
+let modSpamCounterTimeStampMs = 0;
+
 function sendMessage(channel, message) {
 	// TODO implement banphrase api
 	// Currently we treat the rate limit as global...
 	// TODO, implement per channel and mod/vip rate limit
+	let modSpamChannels = [ '#pepto__bismol' ]
 
-	if(Date.now() - lastMessageTimeStampMs < rateLimitDelay * 1000) {
+	let isMod = false;
+	if(typeof chattersRoles[channel].chatters.moderators !== 'undefined') {
+		isMod = chattersRoles[channel].chatters.moderators.includes(client.getUsername());
+	} else {
+		console.log("Couldn't check role");
+	}
+	let modSpam = false;
+	let currentRate = rateLimitDelay;
+
+	if(isMod) {
+		console.log("using mod rate limit");
+		currentRate = rateLimitDelayMod;
+		if(modSpamChannels.includes(channel)) {
+			modSpam = true;
+			console.log("Mod spam enabled TriHard");
+		}
+	}
+
+	if(!modSpam && Date.now() - lastMessageTimeStampMs < currentRate * 1000) {
 		console.log("Dropped message cause of rate limit Sadge");
 		return;
 	} else {
+		if(modSpam) {
+			if(Date.now() - modSpamCounterTimeStampMs > 30 * 1000) {
+				modSpamMessageCounter = 0;
+				modSpamCounterTimeStampMs = Date.now();
+			}
+			if(modSpamMessageCounter >= rateLimitMessagesMod - 5) {
+				// We keep a margin of a few messages to try to not get shadowbanned
+				console.log("Dropped cause of mod rate limit Sadeg");
+				return;
+			} else {
+				modSpamMessageCounter++;
+			}
+		}
 		lastMessageTimeStampMs = Date.now();
 		// Add random char after to not trigger same message protection
 		if(lastSentMessage === message) {
