@@ -75,7 +75,8 @@ client.on('message', (channel, tags, message, self) => {
 	if(self) return;
 	if(cleanMessage.toLowerCase() === '&ping') {
 		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
-		sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${timeSeconds.toFixed(2)}s`);
+
+		sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}s`);
 	}
 	if(cleanMessage.toLowerCase() === '&code') {
 		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
@@ -106,7 +107,7 @@ client.on('message', (channel, tags, message, self) => {
 				sendMessage(channel, `TeaTime FeelsDonkMan`);
 			}
 		}
-		let sameRepliesChannel = [ '#hackmagic', '#minusinsanity', '#pepto__bismol' ];
+		let sameRepliesChannel = [ '#hackmagic', '#pepto__bismol' ];
 		let sameReplies = ['DinkDonk', 'YEAHBUTBTTV', 'TrollDespair', 'MODS', 'monkaE', 'POGGERS', 'VeryPog', 
 		'MegaLUL FBBlock', 'hackerCD', ':)'];
 		if(sameRepliesChannel.includes(channel)) {
@@ -133,23 +134,29 @@ client.on('message', (channel, tags, message, self) => {
 });
 
 client.on("join", (channel, username, self) => {
-    getChatters(channel);
+	if(typeof channelsChatters[channel] === 'undefined') {
+		getChatters(channel);
+	}
 });
 
 function checkIfRaid(tags, message) {
-	let notifyChannel = '#hackmagic';
+	let notifyChannel = '#minusinsanity';
 	let peopleToNotify = [ 'hackmagic' ];
 	if(tags.username === 'huwobot') {
 		if(/A Raid Event at Level \[[0-9]+\] has appeared./.test(message)) {
 			console.log("Raid detected");
-			let notifMessage = "DinkDonk +join";
+			let notifMessage = '';
 			for(p of peopleToNotify) {
-				notifMessage += ' @' + p ;
+				if(channelsChatters[notifyChannel].includes(p)) {
+					notifMessage += ' @' + p ;
+				}
 			}
-			sendMessageRetry(notifyChannel, notifMessage)
+			if(notifMessage.length !== 0) {
+				sendMessageRetry(notifyChannel, 'DinkDonk +join' + notifMessage);
+			} else {
+				console.log("No one to notify Sadge");
+			}
 		}
-	} else {
-		return;
 	}
 }
 
@@ -223,18 +230,10 @@ function getAllChatters() {
 	lastChatterRefreshTimeStampMs = Date.now();
 	console.log("Updating all channel chatters");
 
-	channels = [];
+	let channels = client.getChannels();
+	console.log(channels);
+	channels.forEach(getChatters);
 
-	// Remove duplicates, still weird mutliple refresh in a row FeelsDankMan
-	for(c of client.getChannels()) {
-		if(!channels.includes(c)) {
-			channels.push(c);
-		}
-	}
-
-	for(channelName of channels) {
-		getChatters(channelName);	
-	}
 }
 
 function getChatters(channelName) {
@@ -272,4 +271,9 @@ function getChatters(channelName) {
 		channelsChatters[channelName] = chatters;
 		chattersRoles[channelName] = json;
 	});
+}
+
+function prettySeconds(seconds) {
+	// return a formatted string days, hours, minutes, seconds
+	return new Date(1000 * seconds).toISOString().substr(11, 8).replace(/^[0:]+/, "");
 }
