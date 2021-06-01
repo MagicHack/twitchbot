@@ -47,7 +47,7 @@ const client = new tmi.Client({
 		username: username,
 		password: password
 	},
-	channels: [ 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol', 'huwobot' ]
+	channels: [ 'swushwoi', 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol', 'huwobot' ]
 });
 
 let channelsChatters = {};
@@ -60,6 +60,7 @@ let lastChatterRefreshTimeStampMs = 0;
 
 client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {
+	if(self) return;
 	// refresh chatter list if needed
 	getAllChatters();
 
@@ -71,8 +72,11 @@ client.on('message', (channel, tags, message, self) => {
 	let cleanMessage = message.replace(blankchar, '').trim();
 
 	checkIfRaid(tags, cleanMessage);
+
+	// console.log(tags);
+	console.log(tags.emotes);
 	
-	if(self) return;
+	
 	if(cleanMessage.toLowerCase() === '&ping') {
 		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
 
@@ -114,7 +118,7 @@ client.on('message', (channel, tags, message, self) => {
 			for(reply of sameReplies) {
 				if(cleanMessage.startsWith(reply)) {
 					sendMessage(channel, reply);
-					return;
+					break;
 				}
 			}
 		}
@@ -130,6 +134,20 @@ client.on('message', (channel, tags, message, self) => {
 			}
 		}
 
+		if(tags.emotes !== null) {
+			channelEmotes(Object.keys(tags.emotes)).then((res) => {
+				let cemotes = res;
+				console.log(cemotes);
+				/*
+				if(channel === '#ron__bot') {
+					sendMessageRetry(channel, String(cemotes));
+				}
+				if(channel === '#swushwoi' && cemotes.includes('xqcow')) {
+					sendMessageRetry(channel, "MODS xqc emote detected MrDestructoid");
+				}
+				*/
+			})
+		}
 	}
 });
 
@@ -276,4 +294,24 @@ function getChatters(channelName) {
 function prettySeconds(seconds) {
 	// return a formatted string days, hours, minutes, seconds
 	return new Date(1000 * seconds).toISOString().substr(11, 8).replace(/^[0:]+/, "");
+}
+
+function channelEmotes(emotes) {
+	// check which channels emotes come from and return them
+	let apiUrl = 'https://api.twitchemotes.com/api/v4/emotes?id='
+	for(e of emotes) {
+		apiUrl += e + ','
+	}
+	return new Promise((resolve, reject) => {
+		let channels = [];
+		let settings = { method: "Get" };
+		fetch(apiUrl, settings)
+		.then(res => res.json())
+		.then((json) => {
+			for(e of json) {
+				channels.push(e['channel_name']);
+			}
+			return resolve(channels);
+		})
+	});
 }
