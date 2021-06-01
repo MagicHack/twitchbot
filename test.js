@@ -86,6 +86,10 @@ client.on('message', (channel, tags, message, self) => {
 		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
 		sendMessage(channel, `@${tags.username}, lidl code is here https://github.com/MagicHack/twitchbot`);
 	}
+	if(cleanMessage.toLowerCase() === '&tmi') {
+		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
+		sendMessage(channel, `@${tags.username}, tmijs docs : https://github.com/tmijs/docs/tree/gh-pages/_posts/v1.4.2`);
+	}
 	
 	if(tags.username !== client.getUsername()) {
 		let channelsNoPriority = [ '#pepto__bismol'];
@@ -178,8 +182,8 @@ function checkIfRaid(tags, message) {
 	}
 }
 
-let modSpamMessageCounter = 0;
-let modSpamCounterTimeStampMs = 0;
+let messageCounter = 0;
+let messageCounterTimeStampMs = 0;
 
 // Retries to send messages if they fail
 function sendMessageRetry(channel, message) {
@@ -201,12 +205,17 @@ function sendMessage(channel, message) {
 	} else {
 		console.log("Couldn't check role");
 	}
+
 	let modSpam = false;
+
 	let currentRate = rateLimitDelay;
+	let currentLimit = rateLimitMessages;
 
 	if(isMod) {
 		console.log("using mod rate limit");
 		currentRate = rateLimitDelayMod;
+		currentLimit = rateLimitMessagesMod;
+
 		if(modSpamChannels.includes(channel)) {
 			modSpam = true;
 			console.log("Mod spam enabled TriHard");
@@ -214,24 +223,27 @@ function sendMessage(channel, message) {
 	}
 
 	if(!modSpam && Date.now() - lastMessageTimeStampMs < currentRate * 1000) {
-		console.log("Dropped message cause of rate limit Sadge");
+		// We send messages at most every 30s/ratelimit so it's impossible to go over the rate limit.
+		// except in channel where mod spam is enabled.
+		console.log("Dropped message cause we are sending too fast");
 		return false;
 	} else {
-		if(modSpam) {
-			if(Date.now() - modSpamCounterTimeStampMs > 30 * 1000) {
-				modSpamMessageCounter = 0;
-				modSpamCounterTimeStampMs = Date.now();
-			}
-			if(modSpamMessageCounter >= rateLimitMessagesMod - 5) {
-				// We keep a margin of a few messages to try to not get shadowbanned
-				console.log("Dropped cause of mod rate limit Sadeg");
-				return false;
-			} else {
-				modSpamMessageCounter++;
-			}
+		console.log("Current message counter is : " + messageCounter);
+		// Refill rate limit bucket after 30 + 1 second of margin
+		if(Date.now() - messageCounterTimeStampMs > (30 + 1) * 1000) {
+			console.log("Resetting message counter to 0");
+			messageCounter = 0;
+			messageCounterTimeStampMs = Date.now();
 		}
+		if(messageCounter >= currentLimit * 0.8) {
+			// We keep a margin of 20% to try to not get shadowbanned
+			console.log("Dropped message cause we are approching max number of message/30s");
+			return false;
+		}
+		messageCounter++;
 		lastMessageTimeStampMs = Date.now();
-		// Add random char after to not trigger same message protection
+
+		// Add random char after to not trigger same message rejection
 		if(lastSentMessage === message) {
 			message += ' ' + blankchar;
 		}
