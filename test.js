@@ -162,28 +162,27 @@ client.on("join", (channel, username, self) => {
 });
 
 function checkIfRaid(tags, message) {
-	let notifyChannel = '#minusinsanity';
+	let notifyChannels = ['#minusinsanity', '#hackmagic'];
 	let peopleToNotify = [ 'hackmagic' ];
 	if(tags.username === 'huwobot') {
 		if(/A Raid Event at Level \[[0-9]+\] has appeared./.test(message)) {
 			console.log("Raid detected");
 			let notifMessage = '';
-			for(p of peopleToNotify) {
-				if(channelsChatters[notifyChannel].includes(p)) {
-					notifMessage += ' @' + p ;
+			for(notifyChannel of notifyChannels) {
+				for(p of peopleToNotify) {
+					if(channelsChatters[notifyChannel].includes(p)) {
+						notifMessage += ' @' + p ;
+					}
 				}
-			}
-			if(notifMessage.length !== 0) {
-				sendMessageRetry(notifyChannel, 'DinkDonk +join' + notifMessage);
-			} else {
-				console.log("No one to notify Sadge");
+				if(notifMessage.length !== 0) {
+					sendMessageRetry(notifyChannel, 'DinkDonk +join' + notifMessage);
+				} else {
+					console.log("No one to notify Sadge");
+				}
 			}
 		}
 	}
 }
-
-let messageCounter = 0;
-let messageCounterTimeStampMs = 0;
 
 // Retries to send messages if they fail
 function sendMessageRetry(channel, message) {
@@ -193,10 +192,18 @@ function sendMessageRetry(channel, message) {
 	}
 }
 
+// We assume normal bucket is full on start, maybe we it should be mod bucket?
+let sentMessagesTS = new Array(rateLimitMessages).fill(Date.now());
+
 function sendMessage(channel, message) {
 	// TODO implement banphrase api
-	// Currently we treat the rate limit as global...
-	// TODO, implement per channel and mod/vip rate limit
+
+	// We implement rate limit as a sliding window, 
+	// (last refill is now - 30seconds) to never go over the limit
+	// We remove timestamps older then 30 second (+1 for safety margin)
+	sentMessagesTS = sentMessagesTS.filter(ts => Date.now() - ts < (30 + 1) * 1000);
+	let messageCounter = sentMessagesTS.length;
+
 	let modSpamChannels = [ '#pepto__bismol' ]
 
 	let isMod = false;
@@ -223,24 +230,20 @@ function sendMessage(channel, message) {
 	}
 
 	if(!modSpam && Date.now() - lastMessageTimeStampMs < currentRate * 1000) {
-		// We send messages at most every 30s/ratelimit so it's impossible to go over the rate limit.
+		// We send messages at most every 30s/ratelimit, another mesure to not go over the rate limit
 		// except in channel where mod spam is enabled.
 		console.log("Dropped message cause we are sending too fast");
 		return false;
 	} else {
 		console.log("Current message counter is : " + messageCounter);
-		// Refill rate limit bucket after 30 + 1 second of margin
-		if(Date.now() - messageCounterTimeStampMs > (30 + 1) * 1000) {
-			console.log("Resetting message counter to 0");
-			messageCounter = 0;
-			messageCounterTimeStampMs = Date.now();
-		}
+
 		if(messageCounter >= currentLimit * 0.8) {
 			// We keep a margin of 20% to try to not get shadowbanned
-			console.log("Dropped message cause we are approching max number of message/30s");
+			console.log("Dropped message cause we are approching max number of message every 30s");
 			return false;
 		}
-		messageCounter++;
+		// We add the current timestamp to the sliding window
+		sentMessagesTS.push(Date.now());
 		lastMessageTimeStampMs = Date.now();
 
 		// Add random char after to not trigger same message rejection
