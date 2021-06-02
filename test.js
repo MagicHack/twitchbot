@@ -138,8 +138,13 @@ client.on('message', (channel, tags, message, self) => {
 			}
 			if(cleanMessage.startsWith('&eval ')) {
 				console.log("Eval monkaGIGA");
-				let result = String(eval('(' + cleanMessage.substring('&eval '.length) + ')'));
-				sendMessageRetry(channel, result);
+				try {
+					let result = String(eval('(' + cleanMessage.substring('&eval '.length) + ')'));
+					sendMessageRetry(channel, result);
+				  } catch (e) {
+					console.log(e.message);
+					sendMessageRetry(channel, "Eval failed, check console for details.");
+				  }
 			}
 		}
 
