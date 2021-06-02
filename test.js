@@ -167,8 +167,8 @@ function checkIfRaid(tags, message) {
 	if(tags.username === 'huwobot') {
 		if(/A Raid Event at Level \[[0-9]+\] has appeared./.test(message)) {
 			console.log("Raid detected");
-			let notifMessage = '';
 			for(notifyChannel of notifyChannels) {
+				let notifMessage = '';
 				for(p of peopleToNotify) {
 					if(channelsChatters[notifyChannel].includes(p)) {
 						notifMessage += ' @' + p ;
