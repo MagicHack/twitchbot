@@ -136,6 +136,11 @@ client.on('message', (channel, tags, message, self) => {
 			if(cleanMessage.startsWith('&w ')) {
 				// = cleanMessage.substring(3).split(' ');
 			}
+			if(cleanMessage.startsWith('&eval ')) {
+				console.log("Eval monkaGIGA");
+				let result = String(eval('(' + cleanMessage.substring('&eval '.length) + ')'));
+				sendMessageRetry(channel, result);
+			}
 		}
 
 		if(tags.emotes !== null) {
