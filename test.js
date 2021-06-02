@@ -34,7 +34,7 @@ try {
 	return 1;
 }
 
-const donkRepliesPriority = ['ron__bot', 'g0ldfishbot', 'doo_dul']
+const donkRepliesPriority = ['g0ldfishbot', 'doo_dul', 'ron__bot']
 const trusted = [ 'hackmagic' ]
 
 const client = new tmi.Client({
@@ -163,7 +163,7 @@ client.on("join", (channel, username, self) => {
 
 function checkIfRaid(tags, message) {
 	let notifyChannels = ['#minusinsanity', '#hackmagic'];
-	let peopleToNotify = [ 'hackmagic' ];
+	let peopleToNotify = [ 'hackmagic', 'prog0ldfish'];
 	if(tags.username === 'huwobot') {
 		if(/A Raid Event at Level \[[0-9]+\] has appeared./.test(message)) {
 			console.log("Raid detected");
