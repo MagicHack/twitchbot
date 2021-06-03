@@ -23,12 +23,14 @@ const startTimeStamp = Date.now();
 
 let username = '';
 let password = '';
+let weatherApiKey = '';
 
 try {
 	const data = fs.readFileSync(configFilePath, 'utf8')
 	configData = JSON.parse(data);
 	username = configData["username"];
 	password = configData["token"];
+	weatherApiKey = configData["weatherKey"];
 } catch (err) {
 	console.error(typeof err + " " + err.message);
 	console.log("Error, could not read config file. Quitting");

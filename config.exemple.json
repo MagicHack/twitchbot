@@ -1,4 +1,5 @@
 {
     "username" : "username",
-    "token" : "oauth:abcdkdflknasklfnskalfn"
+    "token" : "oauth:abcdkdflknasklfnskalfn",
+    "weatherKey" : "openweathermapkey"
 }
