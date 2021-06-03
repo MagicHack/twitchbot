@@ -57,14 +57,12 @@ let chattersRoles= {};
 let lastMessageTimeStampMs = 0;
 let lastSentMessage = '';
 
-let lastChatterRefreshTimeStampMs = 0;
+// refresh all chatters peridically
+setInterval(getAllChatters, delayChatterRefresh * 1000);
 
 client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {
 	if(self) return;
-	// refresh chatter list if needed
-	getAllChatters();
-
 	// ignore whispers for now
 	if(tags['message-type'] === 'whisper') {
 		console.log("ignored whisper");
@@ -108,6 +106,10 @@ client.on('message', (channel, tags, message, self) => {
 			if(cleanMessage.startsWith('FeelsDonkMan TeaTime')) {
 				sendMessage(channel, `TeaTime FeelsDonkMan`);
 			}
+		}
+		const newCommand = 'I made a new command HeyGuys';
+		if(cleanMessage.startsWith(newCommand)) {
+			sendMessage(channel, newCommand);
 		}
 		let sameRepliesChannel = [ '#hackmagic', '#pepto__bismol' ];
 		let sameReplies = ['DinkDonk', 'YEAHBUTBTTV', 'TrollDespair', 'MODS', 'monkaE', 'POGGERS', 'VeryPog', 
@@ -263,16 +265,17 @@ function sendMessage(channel, message) {
 }
 
 function getAllChatters() {
-	if(Date.now() - lastChatterRefreshTimeStampMs < delayChatterRefresh * 1000) {
-		return;
-	}
-	lastChatterRefreshTimeStampMs = Date.now();
-	console.log("Updating all channel chatters");
+	console.log("Dispatching chatters updates");
 
 	let channels = client.getChannels();
-	console.log(channels);
-	channels.forEach(getChatters);
-
+	// channels.forEach(getChatters);
+	// delay each channel refresh to space them out in the delay
+	let delay = delayChatterRefresh / channels.length;
+	for(i in channels) {
+		cDelay = i * delay;
+		console.log("Updating chatters for " + channels[i] + " in " + cDelay.toFixed(2) + "s");
+		setTimeout(getChatters, cDelay * 1000, channels[i]);
+	}
 }
 
 function getChatters(channelName) {
@@ -322,6 +325,8 @@ function prettySeconds(seconds) {
 
 function channelEmotes(emotes) {
 	// check which channels emotes come from and return them
+
+	// TODO : cache emote results for at least 30 minutes (api refresh rate) to not abuse the api
 	let apiUrl = 'https://api.twitchemotes.com/api/v4/emotes?id='
 	for(e of emotes) {
 		apiUrl += e + ','
@@ -333,7 +338,9 @@ function channelEmotes(emotes) {
 		.then(res => res.json())
 		.then((json) => {
 			for(e of json) {
-				channels.push(e['channel_name']);
+				if(e['channel_name'] !== null) {
+					channels.push(e['channel_name']);
+				}
 			}
 			return resolve(channels);
 		}).catch((error) => {
