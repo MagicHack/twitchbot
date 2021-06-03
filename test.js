@@ -143,6 +143,15 @@ client.on('message', (channel, tags, message, self) => {
 					sendMessageRetry(channel, "Eval failed, check console for details.");
 				  }
 			}
+			if(cleanMessage.startsWith('&quit')) {
+				console.log("Received quit command, bye Sadge");
+				sendMessageRetry(channel, 'Quitting PepeHands');
+				setTimeout(process.exit, 1500);
+			}
+			if(cleanMessage.startsWith('&kill')) {
+				console.log("Received kill command, quitting now.");
+				process.exit();
+			}
 		}
 
 		if(tags.emotes !== null) {
