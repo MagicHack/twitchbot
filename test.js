@@ -29,7 +29,7 @@ try {
 	username = configData["username"];
 	password = configData["token"];
 } catch (err) {
-	console.error(err);
+	console.error(typeof err + " " + err.message);
 	console.log("Error, could not read config file. Quitting");
 	return 1;
 }
@@ -47,7 +47,8 @@ const client = new tmi.Client({
 		username: username,
 		password: password
 	},
-	channels: [ 'swushwoi', 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol', 'huwobot' ]
+	channels: [ 'swushwoi', 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol', 
+	'huwobot', 'dontkermitsueside']
 });
 
 let channelsChatters = {};
@@ -72,22 +73,15 @@ client.on('message', (channel, tags, message, self) => {
 	let cleanMessage = message.replace(blankchar, '').trim();
 
 	checkIfRaid(tags, cleanMessage);
-
-	// console.log(tags);
-	console.log(tags.emotes);
-	
 	
 	if(cleanMessage.toLowerCase() === '&ping') {
 		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
-
 		sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}s`);
 	}
 	if(cleanMessage.toLowerCase() === '&code') {
-		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
 		sendMessage(channel, `@${tags.username}, lidl code is here https://github.com/MagicHack/twitchbot`);
 	}
 	if(cleanMessage.toLowerCase() === '&tmi') {
-		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
 		sendMessage(channel, `@${tags.username}, tmijs docs : https://github.com/tmijs/docs/tree/gh-pages/_posts/v1.4.2`);
 	}
 	
@@ -142,7 +136,7 @@ client.on('message', (channel, tags, message, self) => {
 					let result = String(eval('(' + cleanMessage.substring('&eval '.length) + ')'));
 					sendMessageRetry(channel, result);
 				  } catch (e) {
-					console.log(e.message);
+					console.error(e.message);
 					sendMessageRetry(channel, "Eval failed, check console for details.");
 				  }
 			}
@@ -151,7 +145,9 @@ client.on('message', (channel, tags, message, self) => {
 		if(tags.emotes !== null) {
 			channelEmotes(Object.keys(tags.emotes)).then((res) => {
 				let cemotes = res;
-				console.log(cemotes);
+				if(cemotes.length > 0) {
+					console.log(cemotes);
+				}
 				/*
 				if(channel === '#ron__bot') {
 					sendMessageRetry(channel, String(cemotes));
@@ -313,6 +309,9 @@ function getChatters(channelName) {
 		}
 		channelsChatters[channelName] = chatters;
 		chattersRoles[channelName] = json;
+	}).catch((error) => {
+		console.error("Failed to get chatters list from tmi");
+		console.error(typeof error + " " + error.message);
 	});
 }
 
@@ -337,6 +336,11 @@ function channelEmotes(emotes) {
 				channels.push(e['channel_name']);
 			}
 			return resolve(channels);
-		})
+		}).catch((error) => {
+			console.error("Failed to get emote info from twitchemotes api");
+			console.error(typeof error + " " + error.message);
+			// Idk, maybe we should reject eShrug
+			return resolve(channels);
+		});
 	});
 }
