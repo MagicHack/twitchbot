@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const sfetch = require('sync-fetch');
 const tmi = require('tmi.js');
 const fs = require('fs');
 
@@ -204,6 +205,7 @@ function sendMessageRetry(channel, message) {
 let sentMessagesTS = new Array(rateLimitMessages).fill(Date.now());
 
 function sendMessage(channel, message) {
+	const charLimit = 500;
 	// TODO implement banphrase api
 
 	// We implement rate limit as a sliding window, 
@@ -259,6 +261,11 @@ function sendMessage(channel, message) {
 			message += ' ' + blankchar;
 		}
 		lastSentMessage = message;
+		if(message.length > charLimit) {
+			// TODO : implement sending in multiple messages, maybe with a message queue?
+			console.log("Message too long (" + message.length + " chars), truncating it");
+			message = message.substring(0, charLimit - 5) + ' ...';
+		}
 		client.say(channel, message);
 		return true;
 	}
