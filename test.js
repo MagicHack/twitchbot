@@ -19,8 +19,6 @@ const blankchar = '󠀀';
 
 const configFilePath = 'config.json';
 
-const startTimeStamp = Date.now();
-
 let username = '';
 let password = '';
 let weatherApiKey = '';
@@ -76,7 +74,7 @@ client.on('message', (channel, tags, message, self) => {
 	checkIfRaid(tags, cleanMessage);
 	
 	if(cleanMessage.toLowerCase() === '&ping') {
-		let timeSeconds = (Date.now() - startTimeStamp) / 1000;
+		let timeSeconds = process.uptime();
 		sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}s`);
 	}
 	if(cleanMessage.toLowerCase() === '&code') {
