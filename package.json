@@ -1,0 +1,24 @@
+{
+  "name": "twitchbot",
+  "version": "1.0.0",
+  "description": "lidl twitch bot",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MagicHack/twitchbot.git"
+  },
+  "author": "MagicHack",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MagicHack/twitchbot/issues"
+  },
+  "homepage": "https://github.com/MagicHack/twitchbot#readme",
+  "dependencies": {
+    "node-fetch": "^2.6.1",
+    "sync-fetch": "^0.3.0",
+    "tmi.js": "^1.8.3"
+  }
+}
