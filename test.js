@@ -367,3 +367,68 @@ function channelEmotes(emotes) {
 		});
 	});
 }
+
+function yeahbut7tvGlobal() {
+	let queryStr = `{
+		search_emotes(query: "", globalState: "only", limit: 150, pageSize: 150) {
+			id
+			name
+			provider
+			provider_id
+			visibility
+			mime
+			owner {
+				id
+				display_name
+				login
+				twitch_id
+			}
+		}
+	}`
+	let params = new URLSearchParams();
+	params.append('query', queryStr);
+
+	let apiUrl = 'https://api.7tv.app/v2/gql';
+
+	const data = sfetch(apiUrl, {
+		method : 'POST',
+		body :  params
+	}).text();
+	console.log(data);
+	return data;
+}
+
+function yeahbut7tv(channel) {
+	if(channel[0] == "#") {
+		channel = channel.substring(1);
+	}
+	let queryStr = `{
+		user(id: "${channel}") {
+			emotes {
+				id
+				name
+				provider
+				provider_id
+				visibility
+				mime
+				owner {
+					id
+					display_name
+					login
+					twitch_id
+				}
+			}
+		}
+	}`
+	let params = new URLSearchParams();
+	params.append('query', queryStr);
+
+	let apiUrl = 'https://api.7tv.app/v2/gql';
+
+	const data = sfetch(apiUrl, {
+		method : 'POST',
+		body :  params
+	}).text();
+	console.log(data);
+	return data;
+}
