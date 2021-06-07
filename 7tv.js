@@ -72,13 +72,3 @@ function yeahbut7tvGlobal(page) {
 	// console.log(data);
 	return data;
 }
-
-
-for(i = 1; i < 10; i++) {
-    console.log("page " + i);
-    let res = yeahbut7tvGlobal(i);
-    let data = JSON.parse(res);
-    console.log(JSON.stringify(data, null, 2));
-    console.log(data.data.search_emotes.length)
-}
-

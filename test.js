@@ -378,5 +378,3 @@ function channelEmotes(emotes) {
 		});
 	});
 }
-
-seventv.yeahbut7tvGlobal()
