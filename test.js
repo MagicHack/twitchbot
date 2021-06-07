@@ -129,12 +129,10 @@ client.on('message', (channel, tags, message, self) => {
 			sendMessage(channel, cleanMessage.substring(5));
 		}
 		if(cleanMessage.startsWith('&players ')) {
-			let apiUrl = "https://api.magichack.xyz/steam/players/pajbot/";
+
 			let game = cleanMessage.substring('&players '.length).trim();
 			if(game.length > 0) {
-				let response = sfetch(apiUrl + game, {
-					method : 'GET'
-				}).text();
+				let response = getPlayers(game, trusted.includes(tags.username));
 				sendMessageRetry(channel, response);
 			}
 		}
@@ -183,6 +181,24 @@ client.on('message', (channel, tags, message, self) => {
 		}
 	}
 });
+
+let lastTS = Date.now();
+function getPlayers(game, trusted) {
+	const cooldown = 15;
+	const apiUrl = "https://api.magichack.xyz/steam/players/pajbot/";
+	
+	let elapsedTime = (Date.now() - lastTS) / 1000;
+
+	if(elapsedTime > cooldown || trusted) {
+		let response = sfetch(apiUrl + game, {
+			method : 'GET'
+		}).text();
+		lastTS = Date.now();
+		return response;
+	} else {
+		return "Command on cooldown, wait " + (cooldown - elapsedTime).toFixed(2) + "s"
+	}
+}
 
 client.on("join", (channel, username, self) => {
 	if(typeof channelsChatters[channel] === 'undefined') {
