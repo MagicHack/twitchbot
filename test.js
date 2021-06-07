@@ -3,6 +3,7 @@ const sfetch = require('sync-fetch');
 const tmi = require('tmi.js');
 const fs = require('fs');
 
+const seventv = require('./7tv.js');
 // Number of message that can be sent every 30 seconds
 const rateLimitMessages = 20; 
 const rateLimitMessagesMod = 100;
@@ -126,6 +127,16 @@ client.on('message', (channel, tags, message, self) => {
 		
 		if(trusted.includes(tags.username) && cleanMessage.startsWith('&say ')) {
 			sendMessage(channel, cleanMessage.substring(5));
+		}
+		if(cleanMessage.startsWith('&players ')) {
+			let apiUrl = "https://api.magichack.xyz/steam/players/pajbot/";
+			let game = cleanMessage.substring('&players '.length).trim();
+			if(game.length > 0) {
+				let response = sfetch(apiUrl + game, {
+					method : 'GET'
+				}).text();
+				sendMessageRetry(channel, response);
+			}
 		}
 
 		if(trusted.includes(tags.username)) {
@@ -368,67 +379,4 @@ function channelEmotes(emotes) {
 	});
 }
 
-function yeahbut7tvGlobal() {
-	let queryStr = `{
-		search_emotes(query: "", globalState: "only", limit: 150, pageSize: 150) {
-			id
-			name
-			provider
-			provider_id
-			visibility
-			mime
-			owner {
-				id
-				display_name
-				login
-				twitch_id
-			}
-		}
-	}`
-	let params = new URLSearchParams();
-	params.append('query', queryStr);
-
-	let apiUrl = 'https://api.7tv.app/v2/gql';
-
-	const data = sfetch(apiUrl, {
-		method : 'POST',
-		body :  params
-	}).text();
-	console.log(data);
-	return data;
-}
-
-function yeahbut7tv(channel) {
-	if(channel[0] == "#") {
-		channel = channel.substring(1);
-	}
-	let queryStr = `{
-		user(id: "${channel}") {
-			emotes {
-				id
-				name
-				provider
-				provider_id
-				visibility
-				mime
-				owner {
-					id
-					display_name
-					login
-					twitch_id
-				}
-			}
-		}
-	}`
-	let params = new URLSearchParams();
-	params.append('query', queryStr);
-
-	let apiUrl = 'https://api.7tv.app/v2/gql';
-
-	const data = sfetch(apiUrl, {
-		method : 'POST',
-		body :  params
-	}).text();
-	console.log(data);
-	return data;
-}
+seventv.yeahbut7tvGlobal()
