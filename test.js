@@ -190,10 +190,10 @@ function getPlayers(game, trusted) {
 	let elapsedTime = (Date.now() - lastTS) / 1000;
 
 	if(elapsedTime > cooldown || trusted) {
+		lastTS = Date.now();
 		let response = sfetch(apiUrl + game, {
 			method : 'GET'
 		}).text();
-		lastTS = Date.now();
 		return response;
 	} else {
 		return "Command on cooldown, wait " + (cooldown - elapsedTime).toFixed(2) + "s"
