@@ -132,11 +132,12 @@ client.on('message', (channel, tags, message, self) => {
 
 			let game = cleanMessage.substring('&players '.length).trim();
 			if(game.length > 0) {
-				let response = getPlayers(game, trusted.includes(tags.username));
-				if(channel === "#swushwoi") {
-					response = response.replace(/https:\/\/.*/, '');
-				}
-				sendMessageRetry(channel, response);
+				getPlayers(game, trusted.includes(tags.username)).then((response) => {
+					if(channel === "#swushwoi") {
+						response = response.replace(/https:\/\/.*/, '');
+					}
+					sendMessageRetry(channel, response);
+				})
 			}
 		}
 
@@ -192,15 +193,25 @@ function getPlayers(game, trusted) {
 	
 	let elapsedTime = (Date.now() - lastTS) / 1000;
 
-	if(elapsedTime > cooldown || trusted) {
-		lastTS = Date.now();
-		let response = sfetch(apiUrl + game, {
-			method : 'GET'
-		}).text();
-		return response;
-	} else {
-		return "Command on cooldown, wait " + (cooldown - elapsedTime).toFixed(2) + "s"
-	}
+	return new Promise((resolve, reject) => {
+		let settings = { method: "Get" };
+		if(elapsedTime > cooldown || trusted) {
+			lastTS = Date.now();
+			fetch(apiUrl + game, settings)
+			.then(res => res.text())
+			.then((text) => {
+				return resolve(text);
+			}).catch((error) => {
+				console.error("Failed to get player info from steamapi");
+				console.error(typeof error + " " + error.message);
+				// Idk, maybe we should reject eShrug
+				return resolve("Error fetching steam players info")
+			});
+		}
+		else {
+			return resolve("Command on cooldown, wait " + (cooldown - elapsedTime).toFixed(2) + "s")
+		}
+	});
 }
 
 client.on("join", (channel, username, self) => {
