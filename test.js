@@ -77,7 +77,7 @@ client.on('message', (channel, tags, message, self) => {
 	
 	if(cleanMessage.toLowerCase() === '&ping') {
 		let timeSeconds = process.uptime();
-		sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}s`);
+		sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}`);
 	}
 	if(cleanMessage.toLowerCase() === '&code') {
 		sendMessage(channel, `@${tags.username}, lidl code is here https://github.com/MagicHack/twitchbot`);
