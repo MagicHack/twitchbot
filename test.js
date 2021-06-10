@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 const sfetch = require('sync-fetch');
 const tmi = require('tmi.js');
 const fs = require('fs');
+const humanizeDuration = require('humanize-duration');
 
 const seventv = require('./7tv.js');
 // Number of message that can be sent every 30 seconds
@@ -377,7 +378,7 @@ function getChatters(channelName) {
 
 function prettySeconds(seconds) {
 	// return a formatted string days, hours, minutes, seconds
-	return new Date(1000 * seconds).toISOString().substr(11, 8).replace(/^[0:]+/, "");
+	return humanizeDuration(seconds * 1000);
 }
 
 function channelEmotes(emotes) {

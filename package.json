@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/MagicHack/twitchbot#readme",
   "dependencies": {
+    "humanize-duration": "^3.27.0",
     "node-fetch": "^2.6.1",
     "sync-fetch": "^0.3.0",
     "tmi.js": "^1.8.3"
