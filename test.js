@@ -378,7 +378,7 @@ function getChatters(channelName) {
 
 function prettySeconds(seconds) {
 	// return a formatted string days, hours, minutes, seconds
-	return humanizeDuration(seconds * 1000);
+	return humanizeDuration(Math.round(seconds) * 1000);
 }
 
 function channelEmotes(emotes) {
