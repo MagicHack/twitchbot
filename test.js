@@ -175,10 +175,10 @@ client.on('message', (channel, tags, message, self) => {
 					if(emote.trim() !== '' && size > 1) {
 						let emoteSpace = emote.trim() + " ";
 						for(let i = 1; i < size; i++) {
-							sendMessageRetry(emoteSpace.repeat(i));
+							sendMessageRetry(channel, emoteSpace.repeat(i));
 						}
 						for(let i = size; i > 0; i--) {
-							sendMessageRetry(emoteSpace.repeat(i));
+							sendMessageRetry(channel, emoteSpace.repeat(i));
 						}
 					}
 				} catch(e) {
