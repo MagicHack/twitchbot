@@ -166,6 +166,25 @@ client.on('message', (channel, tags, message, self) => {
 				console.log("Received kill command, quitting now.");
 				process.exit();
 			}
+			if(cleanMessage.startsWith('&supamodpyramid ')) {
+				let args = cleanMessage.substring('&supamodpyramid'.length).split(' ');
+				try {
+					let size = parseInt(args[0]);
+					let emote = args[1];
+					if(message.trim() !== '' && size > 1) {
+						let emoteSpace = emote + " ";
+						for(let i = 1; i < size; i++) {
+							sendMessageRetry(emoteSpace.repeat(i));
+						}
+						for(let i = size; i > 0; i--) {
+							sendMessageRetry(emoteSpace.repeat(i));
+						}
+					}
+				} catch(error) {
+					console.log("Error while parsing supamodpyramid");
+				    console.error(typeof error + " : " + error.message);
+				}
+			}
 		}
 
 		if(tags.emotes !== null) {
