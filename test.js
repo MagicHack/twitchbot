@@ -168,11 +168,12 @@ client.on('message', (channel, tags, message, self) => {
 			}
 			if(cleanMessage.startsWith('&supamodpyramid ')) {
 				let args = cleanMessage.substring('&supamodpyramid '.length).split(' ');
+				console.log('pyramid args : ' + String(args))
 				try {
 					let size = parseInt(args[0]);
 					let emote = args[1];
-					if(message.trim() !== '' && size > 1) {
-						let emoteSpace = emote + " ";
+					if(emote.trim() !== '' && size > 1) {
+						let emoteSpace = emote.trim() + " ";
 						for(let i = 1; i < size; i++) {
 							sendMessageRetry(emoteSpace.repeat(i));
 						}
@@ -180,9 +181,9 @@ client.on('message', (channel, tags, message, self) => {
 							sendMessageRetry(emoteSpace.repeat(i));
 						}
 					}
-				} catch(error) {
+				} catch(e) {
 					console.log("Error while parsing supamodpyramid");
-				    console.error(typeof error + " : " + error.message);
+				    console.error(typeof e + " : " + e.message);
 				}
 			}
 		}
