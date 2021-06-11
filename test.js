@@ -318,8 +318,8 @@ function sendMessage(channel, message) {
 	} else {
 		console.log("Current message counter is : " + messageCounter);
 
-		if(messageCounter >= currentLimit * 0.8) {
-			// We keep a margin of 20% to try to not get shadowbanned
+		if(messageCounter >= currentLimit - 1) {
+			// 1 message buffer monkaGIGA...
 			console.log("Dropped message cause we are approching max number of message every 30s");
 			return false;
 		}
