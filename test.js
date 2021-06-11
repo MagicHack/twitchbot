@@ -167,7 +167,7 @@ client.on('message', (channel, tags, message, self) => {
 				process.exit();
 			}
 			if(cleanMessage.startsWith('&supamodpyramid ')) {
-				let args = cleanMessage.substring('&supamodpyramid'.length).split(' ');
+				let args = cleanMessage.substring('&supamodpyramid '.length).split(' ');
 				try {
 					let size = parseInt(args[0]);
 					let emote = args[1];
