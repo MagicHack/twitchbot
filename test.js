@@ -90,7 +90,7 @@ client.on('message', (channel, tags, message, self) => {
 	}
 	const singleCharReply = ['!', '&'];
 	if(singleCharReply.includes(cleanMessage)) {
-		sendMessage(cleanMessage);
+		sendMessage(channel, cleanMessage);
 	}
 	
 	if(tags.username !== client.getUsername()) {
@@ -280,7 +280,7 @@ function sendMessageRetry(channel, message) {
 }
 
 // We assume normal bucket is full on start, maybe we it should be mod bucket?
-let sentMessagesTS = new Array(rateLimitMessages).fill(Date.now());
+let sentMessagesTS = new Array(Math.round(rateLimitMessages/2)).fill(Date.now());
 
 function sendMessage(channel, message) {
 	const charLimit = 500;
