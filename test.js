@@ -17,7 +17,7 @@ const rateLimitDelayMod = 30 / rateLimitMessagesMod;
 const delayChatterRefresh = 120;
 
 // Prefix for commands, ex: &ping
-const prefix = '&';
+let prefix = '&';
 
 // Weird char in twitch messages
 const blankchar = '󠀀';
@@ -88,7 +88,7 @@ client.on('message', (channel, tags, message, self) => {
 	if(isCommand(cleanMessage.toLowerCase(), 'tmi')) {
 		sendMessage(channel, `@${tags.username}, tmijs docs : https://github.com/tmijs/docs/tree/gh-pages/_posts/v1.4.2`);
 	}
-	const singleCharReply = ['!', '&'];
+	const singleCharReply = ['!', prefix];
 	if(singleCharReply.includes(cleanMessage)) {
 		sendMessage(channel, cleanMessage);
 	}
@@ -150,6 +150,15 @@ client.on('message', (channel, tags, message, self) => {
 		}
 
 		if(trusted.includes(tags.username)) {
+			if(isCommand(cleanMessage, "setprefix")) {
+				const args = cleanMessage.split(' ');
+				if(args[1] !== '') {
+					prefix = args[1];
+					sendMessageRetry(channel, "Changed bot prefix to " + prefix);
+				} else {
+					sendMessageRetry(channel, "Can't set empty prefix FeelsDankMan");
+				}
+			}
 			// whisper, todo
 			if(cleanMessage.startsWith('&w ')) {
 				// = cleanMessage.substring(3).split(' ');
