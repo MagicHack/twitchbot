@@ -16,6 +16,9 @@ const rateLimitDelayMod = 30 / rateLimitMessagesMod;
 // Time between chatter fetch
 const delayChatterRefresh = 120;
 
+// Prefix for commands, ex: &ping
+const prefix = '&';
+
 // Weird char in twitch messages
 const blankchar = '󠀀';
 
@@ -75,15 +78,19 @@ client.on('message', (channel, tags, message, self) => {
 
 	checkIfRaid(tags, cleanMessage);
 	
-	if(cleanMessage.toLowerCase() === '&ping') {
+	if(isCommand(cleanMessage.toLowerCase(), 'ping')) {
 		let timeSeconds = process.uptime();
 		sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}`);
 	}
-	if(cleanMessage.toLowerCase() === '&code') {
+	if(isCommand(cleanMessage.toLowerCase(), 'code')) {
 		sendMessage(channel, `@${tags.username}, lidl code is here https://github.com/MagicHack/twitchbot`);
 	}
-	if(cleanMessage.toLowerCase() === '&tmi') {
+	if(isCommand(cleanMessage.toLowerCase(), 'tmi')) {
 		sendMessage(channel, `@${tags.username}, tmijs docs : https://github.com/tmijs/docs/tree/gh-pages/_posts/v1.4.2`);
+	}
+	const singleCharReply = ['!', '&'];
+	if(singleCharReply.includes(cleanMessage)) {
+		sendMessage(cleanMessage);
 	}
 	
 	if(tags.username !== client.getUsername()) {
@@ -126,10 +133,10 @@ client.on('message', (channel, tags, message, self) => {
 			}
 		}
 		
-		if(trusted.includes(tags.username) && cleanMessage.startsWith('&say ')) {
+		if(trusted.includes(tags.username) && isCommand(cleanMessage.toLowerCase(), 'say ')) {
 			sendMessage(channel, cleanMessage.substring(5));
 		}
-		if(cleanMessage.startsWith('&players ')) {
+		if(isCommand(cleanMessage.toLowerCase(), 'players ')) {
 
 			let game = cleanMessage.substring('&players '.length).trim();
 			if(game.length > 0) {
@@ -147,7 +154,7 @@ client.on('message', (channel, tags, message, self) => {
 			if(cleanMessage.startsWith('&w ')) {
 				// = cleanMessage.substring(3).split(' ');
 			}
-			if(cleanMessage.startsWith('&eval ')) {
+			if(isCommand(cleanMessage.toLowerCase(), 'eval ')) {
 				console.log("Eval monkaGIGA");
 				try {
 					let result = String(eval('(' + cleanMessage.substring('&eval '.length) + ')'));
@@ -157,16 +164,16 @@ client.on('message', (channel, tags, message, self) => {
 					sendMessageRetry(channel, "Eval failed, check console for details.");
 				  }
 			}
-			if(cleanMessage.startsWith('&quit')) {
+			if(isCommand(cleanMessage.toLowerCase(), 'quit')) {
 				console.log("Received quit command, bye Sadge");
 				sendMessageRetry(channel, 'Quitting PepeHands');
 				setTimeout(process.exit, 1500);
 			}
-			if(cleanMessage.startsWith('&kill')) {
+			if(isCommand(cleanMessage.toLowerCase(), 'kill')) {
 				console.log("Received kill command, quitting now.");
 				process.exit();
 			}
-			if(cleanMessage.startsWith('&supamodpyramid ')) {
+			if(isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
 				let args = cleanMessage.substring('&supamodpyramid '.length).split(' ');
 				console.log('pyramid args : ' + String(args))
 				try {
@@ -428,4 +435,8 @@ function channelEmotes(emotes) {
 			return resolve(channels);
 		});
 	});
+}
+
+function isCommand(message, command) {
+	return message.startsWith(prefix + command);
 }
