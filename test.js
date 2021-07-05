@@ -148,6 +148,29 @@ client.on('message', (channel, tags, message, self) => {
 				})
 			}
 		}
+		if(trusted.includes(tags.username) || tags.mod) {
+			if(isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
+				let args = cleanMessage.substring('&supamodpyramid '.length).split(' ');
+				console.log('pyramid args : ' + String(args))
+				try {
+					let size = parseInt(args[0]);
+					let emote = args[1];
+					if(emote.trim() !== '' && size > 1) {
+						let emoteSpace = emote.trim() + " ";
+						for(let i = 1; i < size; i++) {
+							sendMessageRetry(channel, emoteSpace.repeat(i));
+						}
+						for(let i = size; i > 0; i--) {
+							sendMessageRetry(channel, emoteSpace.repeat(i));
+						}
+					}
+				} catch(e) {
+					console.log("Error while parsing supamodpyramid");
+					console.error(typeof e + " : " + e.message);
+				}
+			}
+		}
+		
 
 		if(trusted.includes(tags.username)) {
 			if(isCommand(cleanMessage, "setprefix")) {
@@ -181,26 +204,6 @@ client.on('message', (channel, tags, message, self) => {
 			if(isCommand(cleanMessage.toLowerCase(), 'kill')) {
 				console.log("Received kill command, quitting now.");
 				process.exit();
-			}
-			if(isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
-				let args = cleanMessage.substring('&supamodpyramid '.length).split(' ');
-				console.log('pyramid args : ' + String(args))
-				try {
-					let size = parseInt(args[0]);
-					let emote = args[1];
-					if(emote.trim() !== '' && size > 1) {
-						let emoteSpace = emote.trim() + " ";
-						for(let i = 1; i < size; i++) {
-							sendMessageRetry(channel, emoteSpace.repeat(i));
-						}
-						for(let i = size; i > 0; i--) {
-							sendMessageRetry(channel, emoteSpace.repeat(i));
-						}
-					}
-				} catch(e) {
-					console.log("Error while parsing supamodpyramid");
-				    console.error(typeof e + " : " + e.message);
-				}
 			}
 		}
 
