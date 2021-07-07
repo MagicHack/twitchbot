@@ -262,7 +262,7 @@ client.on("join", (channel, username, self) => {
 
 function checkIfRaid(tags, message) {
 	let notifyChannels = ['#minusinsanity', '#hackmagic'];
-	let peopleToNotify = [ 'hackmagic', 'minusinsanity', 'yung_randd', 'alecbirdman', '2jesusss', 'sunephef'];
+	let peopleToNotify = [ 'hackmagic', 'minusinsanity', 'yung_randd', 'alecbirdman', '2jesusss', 'sunephef', 'rawblv'];
 	if(tags.username === 'huwobot') {
 		if(/A Raid Event at Level \[[0-9]+\] has appeared./.test(message)) {
 			console.log("Raid detected");
