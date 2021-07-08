@@ -1,7 +1,7 @@
 /**
- * Twitch_bot Class
+ * TwitchBot Class
  */
-import {Logger} from "winston";
+import { Logger } from "winston";
 import { ChatClient } from 'dank-twitch-irc';
 
 export { TwitchBot };
