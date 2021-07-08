@@ -2,8 +2,12 @@
   "name": "twitchbot",
   "version": "1.0.0",
   "description": "lidl twitch bot",
-  "main": "test.js",
+  "main": "build/main.js",
   "scripts": {
+    "prebuild": "npx tslint -c tslint.json -p tsconfig.json --fix",
+    "build": "npx tsc",
+    "prestart": "npm run build",
+    "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,9 +21,17 @@
   },
   "homepage": "https://github.com/MagicHack/twitchbot#readme",
   "dependencies": {
+    "dank-twitch-irc": "^4.3.0",
+    "dotenv": "^10.0.0",
     "humanize-duration": "^3.27.0",
     "node-fetch": "^2.6.1",
     "sync-fetch": "^0.3.0",
-    "tmi.js": "^1.8.3"
+    "tmi.js": "^1.8.3",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.1",
+    "tslint": "^6.1.3",
+    "typescript": "^4.3.5"
   }
 }
