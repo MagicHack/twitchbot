@@ -54,7 +54,7 @@ const client = new tmi.Client({
 		password: password
 	},
 	channels: [ 'swushwoi', 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol', 
-	'huwobot', 'dontkermitsueside']
+	'huwobot', 'dontkermitsueside', 'prog0ldfish']
 });
 
 let channelsChatters = {};
