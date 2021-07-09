@@ -1,6 +1,7 @@
 /**
  * Base Command
  */
+
 import {Logger} from "winston";
 
 abstract class Command {
@@ -13,11 +14,10 @@ abstract class Command {
         this.aliases = aliases;
         this.logger = logger;
     }
-    abstract execute(params : string[], user) : string;
+    abstract execute(params : string[], message: Message) : string;
 
     /**
      * Check if the value matches any aliases of the command
-     * @param value
      */
     public check(value : string) : boolean{
         return this.aliases.includes(value);
