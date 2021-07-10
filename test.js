@@ -264,9 +264,13 @@ function checkIfRaid(tags, message) {
 	let notifyChannels = ['#minusinsanity', '#hackmagic'];
 	let peopleToNotify = [ 'hackmagic', 'minusinsanity', 'yung_randd', 'alecbirdman', '2jesusss', 'sunephef', 'rawblv'];
 	if(tags.username === 'huwobot') {
-		let raidRE = /A Raid Event at Level \[([0-9]+)\] has appeared./;
-		let match = raidRE.exec(message);
-		if(match !== null) {
+		let raidBeginRE = /A Raid Event at Level \[([0-9]+)] has appeared./;
+		let raidLostRE = /\d+ users? failed to beat the raid level \[\d+] - No experience rewarded!/;
+		let raidWonRE = /\d+ users beat the raid level \[\d+] - (\d+) experience rewarded!/;
+		let matchBegin = raidBeginRE.exec(message);
+		let matchLost = raidLostRE.exec(message);
+		let matchWon = raidWonRE.exec(message);
+		if(matchBegin !== null) {
 			console.log("Raid detected");
 			for(notifyChannel of notifyChannels) {
 				let notifMessage = '';
@@ -276,10 +280,21 @@ function checkIfRaid(tags, message) {
 					}
 				}
 				if(notifMessage.length !== 0) {
-					sendMessageRetry(notifyChannel, 'DinkDonk +join (raid lvl ' + match[1]  + ') ' + notifMessage);
+					sendMessageRetry(notifyChannel, 'DinkDonk +join (raid lvl ' + matchBegin[1]  + ') '
+						+ notifMessage);
 				} else {
 					console.log("No one to notify Sadge");
 				}
+			}
+		} else if(matchLost !== null) {
+			console.log("Raid lost");
+			for(notifyChannel of notifyChannels) {
+				sendMessageRetry(notifyChannel, "Raid L OMEGALULiguess ST");
+			}
+		} else if(matchWon !== null) {
+			console.log("Raid won");
+			for(notifyChannel of notifyChannels) {
+				sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + matchWon[1] + "xp)");
 			}
 		}
 	}
