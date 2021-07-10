@@ -264,7 +264,9 @@ function checkIfRaid(tags, message) {
 	let notifyChannels = ['#minusinsanity', '#hackmagic'];
 	let peopleToNotify = [ 'hackmagic', 'minusinsanity', 'yung_randd', 'alecbirdman', '2jesusss', 'sunephef', 'rawblv'];
 	if(tags.username === 'huwobot') {
-		if(/A Raid Event at Level \[[0-9]+\] has appeared./.test(message)) {
+		let raidRE = /A Raid Event at Level \[([0-9]+)\] has appeared./;
+		let match = raidRE.exec(message);
+		if(match !== null) {
 			console.log("Raid detected");
 			for(notifyChannel of notifyChannels) {
 				let notifMessage = '';
@@ -274,7 +276,7 @@ function checkIfRaid(tags, message) {
 					}
 				}
 				if(notifMessage.length !== 0) {
-					sendMessageRetry(notifyChannel, 'DinkDonk +join' + notifMessage);
+					sendMessageRetry(notifyChannel, 'DinkDonk +join (raid lvl ' + match[1]  + ') ' + notifMessage);
 				} else {
 					console.log("No one to notify Sadge");
 				}
