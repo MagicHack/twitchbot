@@ -22,7 +22,7 @@ let prefix = '&';
 
 // name of file storing raid users
 const RAID_FILE = 'raid.json';
-let peopleToNotify = ['hackmagic', 'minusinsanity', 'yung_randd', 'alecbirdman', '2jesusss', 'sunephef', 'rawblv'];
+let peopleToNotify = [];
 readRaidPingFile();
 
 // Weird char in twitch messages
