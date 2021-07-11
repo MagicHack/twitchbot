@@ -3,7 +3,6 @@ const sfetch = require('sync-fetch');
 const tmi = require('tmi.js');
 const fs = require('fs');
 const humanizeDuration = require('humanize-duration');
-const readline = require('readline');
 
 const seventv = require('./7tv.js');
 // Number of message that can be sent every 30 seconds
@@ -274,6 +273,8 @@ client.on("join", (channel, username, self) => {
 });
 
 function checkIfRaid(tags, message) {
+    // How many chars to split a message
+    const MAX_CHARS = 400;
     let notifyChannels = ['#minusinsanity', '#hackmagic'];
     if (tags.username === 'huwobot') {
         let raidBeginRE = /A Raid Event at Level \[([0-9]+)] has appeared./;
@@ -284,10 +285,16 @@ function checkIfRaid(tags, message) {
         let matchWon = raidWonRE.exec(message);
         if (matchBegin !== null) {
             console.log("Raid detected");
-            for (notifyChannel of notifyChannels) {
-                let notifMessage = '';
-                for (p of peopleToNotify) {
+            for (let notifyChannel of notifyChannels) {
+                let baseMessage = 'DinkDonk +join (raid lvl ' + matchBegin[1] + ') ';
+                let notifMessage = baseMessage;
+                for (let p of peopleToNotify) {
                     if (channelsChatters[notifyChannel].includes(p)) {
+                        // Send and create a new message when it's too long
+                        if(notifMessage.length + channelsChatters.length >= 400) {
+                            sendMessageRetry(notifMessage, notifMessage);
+                            notifMessage = baseMessage;
+                        }
                         notifMessage += ' @' + p;
                     }
                 }
@@ -452,9 +459,9 @@ function prettySeconds(seconds) {
 function channelEmotes(emotes) {
     // check which channels emotes come from and return them
 
-    // TODO : cache emote results for at least 30 minutes (api refresh rate) to not abuse the api
+    // TODO : scrap this code or replace it since api dead
     let apiUrl = 'https://api.twitchemotes.com/api/v4/emotes?id='
-    for (e of emotes) {
+    for (let e of emotes) {
         apiUrl += e + ','
     }
     return new Promise((resolve, reject) => {
