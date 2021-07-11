@@ -294,7 +294,7 @@ function checkIfRaid(tags, message) {
                 for (let p of peopleToNotify) {
                     if (channelsChatters[notifyChannel].includes(p)) {
                         // Send and create a new message when it's too long
-                        if(notifMessage.length + channelsChatters.length >= 400) {
+                        if(notifMessage.length + p.length >= 400) {
                             sendMessageRetry(notifMessage, notifMessage);
                             notifMessage = baseMessage;
                         }
