@@ -157,9 +157,9 @@ client.on('message', (channel, tags, message, self) => {
             }
         }
         if(isCommand(cleanMessage.toLowerCase(), 'raidping')) {
-        	raidPing();
+        	raidPing(channel, tags.username);
 		} else if(isCommand(cleanMessage.toLowerCase(), 'raidunping')) {
-        	raidUnPing();
+        	raidUnPing(channel, tags.username);
 		}
         if (trusted.includes(tags.username) || tags.mod) {
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
@@ -537,6 +537,7 @@ function readRaidPingFile() {
             const data = fs.readFileSync(configFilePath, 'utf8')
             let userData = JSON.parse(data);
             userData['users'].forEach( user => peopleToNotify.push(user));
+            console.log("Successfully read ping file");
         } catch (err) {
             console.error(typeof err + " " + err.message);
             console.error("Error, could not read raid file.");
