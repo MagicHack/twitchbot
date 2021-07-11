@@ -302,8 +302,7 @@ function checkIfRaid(tags, message) {
                     }
                 }
                 if (notifMessage.length !== 0) {
-                    sendMessageRetry(notifyChannel, 'DinkDonk +join (raid lvl ' + matchBegin[1] + ') '
-                        + notifMessage);
+                    sendMessageRetry(notifyChannel, notifMessage);
                 } else {
                     console.log("No one to notify Sadge");
                 }
