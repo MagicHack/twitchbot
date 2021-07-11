@@ -159,7 +159,10 @@ client.on('message', (channel, tags, message, self) => {
         	raidPing(channel, tags.username);
 		} else if(isCommand(cleanMessage.toLowerCase(), 'raidunping')) {
         	raidUnPing(channel, tags.username);
-		}
+		} else if(isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
+            'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
+            help(channel, tags.username);
+        }
         if (trusted.includes(tags.username) || tags.mod) {
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
                 let args = cleanMessage.substring('&supamodpyramid '.length).split(' ');
@@ -550,4 +553,9 @@ function readRaidPingFile() {
             console.error("Error, could not read raid file.");
         }
     }
+}
+
+function help(channel, user) {
+    const helpText = "&raidping to get notified of raids, &players to check the current online player count of a steam game."
+    sendMessageRetry(channel, `@${user}, ${helpText}`);
 }
