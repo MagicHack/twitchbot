@@ -534,7 +534,7 @@ function createRaidPingFile() {
 function readRaidPingFile() {
     if (fs.existsSync(RAID_FILE)) {
         try {
-            const data = fs.readFileSync(configFilePath, 'utf8')
+            const data = fs.readFileSync(RAID_FILE, 'utf8')
             let userData = JSON.parse(data);
             userData['users'].forEach( user => peopleToNotify.push(user));
             console.log("Successfully read ping file");
