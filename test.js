@@ -313,13 +313,17 @@ function checkIfRaid(tags, message) {
         let matchWon = raidWonRE.exec(message);
         if (matchBegin !== null) {
             console.log("Raid detected");
+            // Notify me of a raid if I have my chat open
+            if(channelsChatters["#hackmagic"].includes('hackmagic')) {
+                sendNotification("Join raid DinkDonk !!");
+            }
             for (let notifyChannel of notifyChannels) {
                 let baseMessage = 'DinkDonk +join (raid lvl ' + matchBegin[1] + ') ';
                 let notifMessage = baseMessage;
                 for (let p of peopleToNotify) {
                     if (channelsChatters[notifyChannel].includes(p)) {
                         // Send and create a new message when it's too long
-                        if(notifMessage.length + p.length >= 400) {
+                        if(notifMessage.length + p.length >= MAX_CHARS) {
                             sendMessageRetry(notifMessage, notifMessage);
                             notifMessage = baseMessage;
                         }
