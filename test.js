@@ -94,7 +94,7 @@ client.on('message', (channel, tags, message, self) => {
     let cleanMessage = message.replace(blankchar, '').trim();
 
     checkIfRaid(tags, cleanMessage);
-    phoneNotifications(channel, cleanMessage, tags.displayName);
+    phoneNotifications(channel, cleanMessage, tags['display-name']);
 
     if (isCommand(cleanMessage.toLowerCase(), 'ping')) {
         let timeSeconds = process.uptime();
