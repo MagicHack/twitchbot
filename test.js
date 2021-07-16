@@ -584,10 +584,18 @@ function help(channel, user) {
     sendMessageRetry(channel, `@${user}, ${helpText}`);
 }
 
-function phoneNotifications(rawChannel, message, user, skipRegex = false) {
+function phoneNotifications(rawChannel, message, user) {
     let channel = rawChannel;
     let username = user.username;
     let displayName = user['display-name'];
+
+    for(let u of ignoreUsersPing) {
+        if(u.toLowerCase() === username.toLowerCase()) {
+            console.log("skipped ping from : " + username);
+            return;
+        }
+    }
+
     if(channel.startsWith('#')) {
         channel = channel.substring(1);
     }
