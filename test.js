@@ -570,7 +570,7 @@ function help(channel, user) {
     sendMessageRetry(channel, `@${user}, ${helpText}`);
 }
 
-function phoneNotifications(rawChannel, message, username) {
+function phoneNotifications(rawChannel, message, username, skipRegex = false) {
     let channel = rawChannel;
     if(channel.startsWith('#')) {
         channel = channel.substring(1);
@@ -581,16 +581,20 @@ function phoneNotifications(rawChannel, message, username) {
     if(pingChannels.includes(channel)) {
         for(let exp of pingRE) {
             if(exp.match(message)) {
-                console.log("Sendind pushover notification");
-                pushover.send({message : `[${rawChannel}] ${username}: ${message}`}, function( err, result ) {
-                    if ( err ) {
-                        console.error(typeof err + ' : ' + err);
-                        console.error("Error sending pushover notification");
-                    }
-                    console.log( result )
-                });
+                sendNotification(`[${rawChannel}] ${username}: ${message}`)
                 break;
             }
         }
     }
+}
+
+function sendNotification(message) {
+    console.log("Sending pushover notification");
+    pushover.send({message : message}, function( err, result ) {
+        if ( err ) {
+            console.error(typeof err + ' : ' + err);
+            console.error("Error sending pushover notification");
+        }
+        console.log( result )
+    });
 }
