@@ -205,12 +205,12 @@ client.on('message', (channel, tags, message, self) => {
             if(isCommand(cleanMessage.toLowerCase(), 'unping')) {
                 let params = cleanMessage.split(' ');
                 if(params.length >= 2 ) {
-                    addUserIgnore(params[1]);
+                    addUserIgnore(channel, params[1]);
                 }
             } else if(isCommand(cleanMessage.toLowerCase(), 'reping')) {
                 let params = cleanMessage.split(' ');
                 if(params.length >= 2 ) {
-                    removeUserIgnore(params[1]);
+                    removeUserIgnore(channel, params[1]);
                 }
             }
             if (isCommand(cleanMessage, "setprefix")) {
