@@ -37,6 +37,9 @@ let weatherApiKey = '';
 
 let pushoverToken = '';
 let pushoverUser = '';
+let ignoreUsersPing = [];
+const IGNORE_PING_FILE = 'ignorePings.json';
+readIgnorePingFile();
 
 
 try {
@@ -94,7 +97,7 @@ client.on('message', (channel, tags, message, self) => {
     let cleanMessage = message.replace(blankchar, '').trim();
 
     checkIfRaid(tags, cleanMessage);
-    phoneNotifications(channel, cleanMessage, tags['display-name']);
+    phoneNotifications(channel, cleanMessage, tags);
 
     if (isCommand(cleanMessage.toLowerCase(), 'ping')) {
         let timeSeconds = process.uptime();
@@ -199,6 +202,17 @@ client.on('message', (channel, tags, message, self) => {
 
 
         if (trusted.includes(tags.username)) {
+            if(isCommand(cleanMessage.toLowerCase(), 'unping')) {
+                let params = cleanMessage.split(' ');
+                if(params.length >= 2 ) {
+                    addUserIgnore(params[1]);
+                }
+            } else if(isCommand(cleanMessage.toLowerCase(), 'reping')) {
+                let params = cleanMessage.split(' ');
+                if(params.length >= 2 ) {
+                    removeUserIgnore(params[1]);
+                }
+            }
             if (isCommand(cleanMessage, "setprefix")) {
                 const args = cleanMessage.split(' ');
                 if (args[1] !== '') {
@@ -570,8 +584,10 @@ function help(channel, user) {
     sendMessageRetry(channel, `@${user}, ${helpText}`);
 }
 
-function phoneNotifications(rawChannel, message, username, skipRegex = false) {
+function phoneNotifications(rawChannel, message, user, skipRegex = false) {
     let channel = rawChannel;
+    let username = user.username;
+    let displayName = user['display-name'];
     if(channel.startsWith('#')) {
         channel = channel.substring(1);
     }
@@ -581,7 +597,7 @@ function phoneNotifications(rawChannel, message, username, skipRegex = false) {
     if(pingChannels.includes(channel)) {
         for(let exp of pingRE) {
             if(exp.test(message)) {
-                sendNotification(`[${rawChannel}] ${username}: ${message}`)
+                sendNotification(`[${rawChannel}] ${displayName}: ${message}`)
                 break;
             }
         }
@@ -596,5 +612,57 @@ function sendNotification(message) {
             console.error("Error sending pushover notification");
         }
         console.log( result )
+    });
+}
+
+function readIgnorePingFile() {
+    if (fs.existsSync(IGNORE_PING_FILE)) {
+        try {
+            const data = fs.readFileSync(IGNORE_PING_FILE, 'utf8');
+            let userData = JSON.parse(data);
+            userData['users'].forEach( user => ignoreUsersPing.push(user));
+            console.log("Successfully read ignore file");
+        } catch (err) {
+            console.error(typeof err + " " + err.message);
+            console.error("Error, could not read ignore file.");
+        }
+    }
+}
+
+function removeUserIgnore(channel, username) {
+    let index = ignoreUsersPing.indexOf(username);
+    if(index === -1) {
+        sendMessageRetry(channel, 'hackmagic, user not in list');
+    } else {
+        ignoreUsersPing.splice(index, 1);
+        sendMessageRetry(channel, `hackmagic, removed user ${username} from ping list`);
+        try {
+            createIgnorePingFile();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+}
+
+function addUserIgnore(channel, username) {
+    if(!ignoreUsersPing.includes(username)) {
+        ignoreUsersPing.push(username);
+        sendMessageRetry(channel, `hackmagic, added user ${username} to ping ignore list`);
+        try {
+            createIgnorePingFile();
+        } catch (e) {
+            console.error(e);
+        }
+
+    } else {
+        sendMessageRetry(channel, 'hackmagic, user already in list');
+    }
+}
+
+function createIgnorePingFile() {
+    let users = {users: ignoreUsersPing};
+    fs.writeFile(IGNORE_PING_FILE, JSON.stringify(users), 'utf8', (err) => {
+        if (err) throw err;
+        console.log('The ignore user ping file has been saved!');
     });
 }
