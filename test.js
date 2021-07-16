@@ -3,6 +3,7 @@ const sfetch = require('sync-fetch');
 const tmi = require('tmi.js');
 const fs = require('fs');
 const humanizeDuration = require('humanize-duration');
+const Push = require('pushover-notifications');
 
 const seventv = require('./7tv.js');
 // Number of message that can be sent every 30 seconds
@@ -33,12 +34,19 @@ let username = '';
 let password = '';
 let weatherApiKey = '';
 
+
+let pushoverToken = '';
+let pushoverUser = '';
+
+
 try {
     const data = fs.readFileSync(configFilePath, 'utf8')
     configData = JSON.parse(data);
     username = configData["username"];
     password = configData["token"];
     weatherApiKey = configData["weatherKey"];
+    pushoverToken = configData["ptoken"];
+    pushoverUser = configData["puser"];
 } catch (err) {
     console.error(typeof err + " " + err.message);
     console.log("Error, could not read config file. Quitting");
@@ -48,6 +56,8 @@ try {
 
 const donkRepliesPriority = ['g0ldfishbot', 'doo_dul', 'ron__bot']
 const trusted = ['hackmagic']
+
+const pushover = new Push({user : pushoverUser, token : pushoverToken});
 
 
 const client = new tmi.Client({
@@ -84,6 +94,7 @@ client.on('message', (channel, tags, message, self) => {
     let cleanMessage = message.replace(blankchar, '').trim();
 
     checkIfRaid(tags, cleanMessage);
+    phoneNotifications(channel, cleanMessage, tags.displayName);
 
     if (isCommand(cleanMessage.toLowerCase(), 'ping')) {
         let timeSeconds = process.uptime();
@@ -543,7 +554,7 @@ function createRaidPingFile() {
 function readRaidPingFile() {
     if (fs.existsSync(RAID_FILE)) {
         try {
-            const data = fs.readFileSync(RAID_FILE, 'utf8')
+            const data = fs.readFileSync(RAID_FILE, 'utf8');
             let userData = JSON.parse(data);
             userData['users'].forEach( user => peopleToNotify.push(user));
             console.log("Successfully read ping file");
@@ -557,4 +568,29 @@ function readRaidPingFile() {
 function help(channel, user) {
     const helpText = "&raidping to get notified of raids, &players to check the current online player count of a steam game."
     sendMessageRetry(channel, `@${user}, ${helpText}`);
+}
+
+function phoneNotifications(rawChannel, message, username) {
+    let channel = rawChannel;
+    if(channel.startsWith('#')) {
+        channel = channel.substring(1);
+    }
+    const pingChannels = ['swushwoi', 'minusinsanity', 'pepto__bismol', 'hackmagic'];
+    const pingRE = [/hackmagic/i, /(?<![a-z])hack(?![a-z])/i, /(?<![a-z])magic(?![a-z])/i]
+
+    if(pingChannels.includes(channel)) {
+        for(let exp of pingRE) {
+            if(exp.match(message)) {
+                console.log("Sendind pushover notification");
+                pushover.send({message : `[${rawChannel}] ${username}: ${message}`}, function( err, result ) {
+                    if ( err ) {
+                        console.error(typeof err + ' : ' + err);
+                        console.error("Error sending pushover notification");
+                    }
+                    console.log( result )
+                });
+                break;
+            }
+        }
+    }
 }
