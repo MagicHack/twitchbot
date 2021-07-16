@@ -643,7 +643,7 @@ function removeUserIgnore(channel, username) {
         sendMessageRetry(channel, 'hackmagic, user not in list');
     } else {
         ignoreUsersPing.splice(index, 1);
-        sendMessageRetry(channel, `hackmagic, removed user ${username} from ping list`);
+        sendMessageRetry(channel, `hackmagic, removed user ${username} from ignore ping list`);
         try {
             createIgnorePingFile();
         } catch (e) {
