@@ -580,7 +580,7 @@ function phoneNotifications(rawChannel, message, username, skipRegex = false) {
 
     if(pingChannels.includes(channel)) {
         for(let exp of pingRE) {
-            if(exp.match(message)) {
+            if(exp.test(message)) {
                 sendNotification(`[${rawChannel}] ${username}: ${message}`)
                 break;
             }
