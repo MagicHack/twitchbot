@@ -590,7 +590,7 @@ function phoneNotifications(rawChannel, message, username, skipRegex = false) {
 
 function sendNotification(message) {
     console.log("Sending pushover notification");
-    pushover.send({message : message}, function( err, result ) {
+    pushover.send({message : message, title : 'Twitch'}, function( err, result ) {
         if ( err ) {
             console.error(typeof err + ' : ' + err);
             console.error("Error sending pushover notification");
