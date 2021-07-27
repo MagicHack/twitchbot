@@ -321,14 +321,12 @@ function checkIfRaid(tags, message) {
                 let baseMessage = 'DinkDonk +join (raid lvl ' + matchBegin[1] + ') ';
                 let notifMessage = baseMessage;
                 for (let p of peopleToNotify) {
-                    if (channelsChatters[notifyChannel].includes(p)) {
-                        // Send and create a new message when it's too long
-                        if(notifMessage.length + p.length >= MAX_CHARS) {
-                            sendMessageRetry(notifMessage, notifMessage);
-                            notifMessage = baseMessage;
-                        }
-                        notifMessage += ' @' + p;
+                    // Send and create a new message when it's too long
+                    if(notifMessage.length + p.length >= MAX_CHARS) {
+                        sendMessageRetry(notifMessage, notifMessage);
+                        notifMessage = baseMessage;
                     }
+                    notifMessage += ' @' + p;
                 }
                 if (notifMessage.length !== 0) {
                     sendMessageRetry(notifyChannel, notifMessage);
