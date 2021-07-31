@@ -278,7 +278,7 @@ function getPlayers(game, trusted) {
         let settings = {method: "Get"};
         if (elapsedTime > cooldown || trusted) {
             lastTS = Date.now();
-            fetch(apiUrl + game, settings)
+            fetch(apiUrl + encodeURIComponent(game), settings)
                 .then(res => res.text())
                 .then((text) => {
                     return resolve(text);
