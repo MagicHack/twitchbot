@@ -275,6 +275,9 @@ function getPlayers(game, trusted) {
     let elapsedTime = (Date.now() - lastTS) / 1000;
 
     return new Promise((resolve, reject) => {
+        if(game === "/") {
+            throw new Error("Invalid game name");
+        }
         let settings = {method: "Get"};
         if (elapsedTime > cooldown || trusted) {
             console.log("Game : " + game);
