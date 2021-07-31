@@ -276,7 +276,7 @@ function getPlayers(game, trusted) {
 
     return new Promise((resolve, reject) => {
         if(game === "/") {
-            throw new Error("Invalid game name");
+            return resolve("Invalid game name");
         }
         let settings = {method: "Get"};
         if (elapsedTime > cooldown || trusted) {
