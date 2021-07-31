@@ -271,14 +271,16 @@ let lastTS = Date.now();
 function getPlayers(game, trusted) {
     const cooldown = 15;
     const apiUrl = "https://api.magichack.xyz/steam/players/pajbot/";
-
+    const url = apiUrl + encodeURIComponent(game);
     let elapsedTime = (Date.now() - lastTS) / 1000;
 
     return new Promise((resolve, reject) => {
         let settings = {method: "Get"};
         if (elapsedTime > cooldown || trusted) {
+            console.log("Game : " + game);
+            console.log("Request : " + url);
             lastTS = Date.now();
-            fetch(apiUrl + encodeURIComponent(game), settings)
+            fetch(url, settings)
                 .then((res) =>
                 {
                     if(!res.ok) {
