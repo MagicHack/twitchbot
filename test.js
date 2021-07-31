@@ -279,7 +279,13 @@ function getPlayers(game, trusted) {
         if (elapsedTime > cooldown || trusted) {
             lastTS = Date.now();
             fetch(apiUrl + encodeURIComponent(game), settings)
-                .then(res => res.text())
+                .then((res) =>
+                {
+                    if(!res.ok) {
+                        throw new Error("Not 2xx response");
+                    }
+                    return res.text();
+                })
                 .then((text) => {
                     return resolve(text);
                 }).catch((error) => {
