@@ -15,9 +15,24 @@ export abstract class ChatClient extends EventEmitter<ChatClientEvent> {
     public abstract sendPrivateMessage(message: string, user: string): Promise<boolean>;
 
     /**
+     * Ban a user in a channel, optional reason for the ban
+     */
+    public abstract banUser(user: User, channel: string, reason?: string): Promise<boolean>;
+
+    /**
+     * Delete a message by it's id in a channel
+     */
+    public abstract deleteMessage(messageId: string, channel: string): Promise<boolean>;
+
+    /**
      * @return platform of the chat client (ex: twitch)
      */
     public abstract getPlatform(): PLATFORM;
+
+    /**
+     * Check if the client is a moderator in a channel
+     */
+    public abstract isMod(channel: string): boolean;
 
     protected emitMessage(message: Message): void {
         this.emit('message', message);
