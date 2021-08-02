@@ -29,10 +29,11 @@ class TwitchClient extends ChatClient {
         });
 
         this.client.on('CLEARCHAT', (msg) => {
-            if(msg.isTimeout()) {
-                // TODO
-            } else if (msg.isPermaban()) {
-                // TODO
+            const message = this.createMessageClearChat(msg);
+            if(message instanceof TimeoutMessage) {
+                this.emitTimeoutMessage(message);
+            } else {
+                this.emitBanMessage(message);
             }
         });
     }
@@ -84,13 +85,30 @@ class TwitchClient extends ChatClient {
         return false;
     }
 
-    // TODO : emit a TwitchClientEvent? or just shove everything in ChatClientEvents eShrug
     private emitTimeoutMessage(message: TimeoutMessage): void {
         this.emit('timeout', message);
     }
 
     private emitBanMessage(message: BanMessage): void {
         this.emit('ban', message);
+    }
+
+    private createUserClearChat(message: ClearchatMessage): User {
+        const isMod = false;
+        if(message.isTimeout() || message.isPermaban()) {
+            return new User(message.targetUsername, "", this.getPlatform(), isMod, message.channelName);
+        }
+        throw new Error("Unexpected ClearchatMessage");
+    }
+
+    private createMessageClearChat(message: ClearchatMessage): TimeoutMessage|BanMessage {
+        if(message.isTimeout()) {
+            return new TimeoutMessage(this.createUserClearChat(message), message.channelName, message.banDuration,
+                this.getPlatform());
+        } else if (message.isPermaban()) {
+            return new BanMessage(this.createUserClearChat(message), message.channelName, this.getPlatform());
+        }
+        throw new Error("Unexpected ClearchatMessage");
     }
 
     private createUser(message: PrivmsgMessage|WhisperMessage): User {
