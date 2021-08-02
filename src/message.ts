@@ -3,11 +3,13 @@ class Message {
     public readonly user: User;
     public readonly platform: PLATFORM;
     public readonly channel: string;
-    constructor(message: string, user: User, channel: string, platform = user.platform) {
+    public readonly id: string;
+    constructor(message: string, user: User, channel: string, id: string, platform : PLATFORM) {
         this.message = message;
         this.user = user;
         this.platform = platform;
         this.channel = channel;
+        this.id = id;
     }
 
     /**
