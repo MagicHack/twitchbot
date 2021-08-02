@@ -1,5 +1,9 @@
 import {ChatClient} from "./chatClient";
-import {ChatClient as DankClient, IRCMessage, me, PrivmsgMessage, WhisperMessage} from "dank-twitch-irc";
+import {
+    ChatClient as DankClient, ClearchatMessage,
+    PrivmsgMessage,
+    WhisperMessage
+} from "dank-twitch-irc";
 
 class TwitchClient extends ChatClient {
     private readonly client: DankClient;
@@ -7,7 +11,6 @@ class TwitchClient extends ChatClient {
 
     constructor(username?: string, token?: string) {
         super();
-        // TODO, login/anon and stuff
         if(!username || !token) {
             this.isAnon = true;
             this.client = new DankClient();
@@ -23,6 +26,14 @@ class TwitchClient extends ChatClient {
 
         this.client.on('WHISPER', (msg) => {
             this.emitPrivateMessage(this.createMessage(msg));
+        });
+
+        this.client.on('CLEARCHAT', (msg) => {
+            if(msg.isTimeout()) {
+                // TODO
+            } else if (msg.isPermaban()) {
+                // TODO
+            }
         });
     }
 
@@ -46,9 +57,45 @@ class TwitchClient extends ChatClient {
         return true;
     }
 
+
+    public async banUser(user: User, channel: string, reason?: string): Promise<boolean> {
+        if(this.isMod(channel)) {
+            await this.client.ban(channel, user.rawName, reason);
+            return true;
+        }
+        return false;
+    }
+
+    public async deleteMessage(messageId:string, channel:string): Promise<boolean> {
+        if(this.isMod(channel)) {
+            await this.client.privmsg(channel,`/delete ${messageId}`);
+            return true;
+        }
+        return false;
+    }
+
+    public isMod(channel: string): boolean {
+        if(!this.isAnon) {
+            const isMod = this.client.userStateTracker?.getChannelState(channel)?.isMod;
+            if (isMod !== undefined) {
+                return isMod;
+            }
+        }
+        return false;
+    }
+
+    // TODO : emit a TwitchClientEvent? or just shove everything in ChatClientEvents eShrug
+    private emitTimeoutMessage(message: TimeoutMessage): void {
+        this.emit('systemMessage', message);
+    }
+
+    private emitBanMessage(message: BanMessage): void {
+        this.emit('systemMessage', message);
+    }
+
     private createUser(message: PrivmsgMessage|WhisperMessage): User {
         let isMod = false;
-        if(TwitchClient.isPrivateMsg(message)) {
+        if(message instanceof PrivmsgMessage) {
             isMod = message.isMod;
         }
         return new User(message.senderUsername, message.senderUserID, this.getPlatform(), isMod,
@@ -57,19 +104,12 @@ class TwitchClient extends ChatClient {
 
     private createMessage(message: PrivmsgMessage|WhisperMessage): Message {
         let channelName: string;
-        if(TwitchClient.isPrivateMsg(message)) {
+        if(message instanceof PrivmsgMessage) {
             channelName = message.channelName;
         } else {
             channelName = message.senderUsername;
         }
-        return new Message(message.messageText, this.createUser(message), channelName, this.getPlatform());
-    }
-
-    private static isPrivateMsg(message: IRCMessage) : message is PrivmsgMessage {
-        return (message as PrivmsgMessage).channelName !== undefined;
-    }
-
-    private static isWhishper(message: IRCMessage) : message is WhisperMessage {
-        return (message as WhisperMessage).recipientUsername !== undefined;
+        return new Message(message.messageText, this.createUser(message), channelName,  message.messageID,
+            this.getPlatform());
     }
 }
