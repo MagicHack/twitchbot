@@ -176,6 +176,15 @@ client.on('message', (channel, tags, message, self) => {
 		} else if(isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
             'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
             help(channel, tags.username);
+        } else if(isCommand(cleanMessage.toLowerCase(), "flashbang")) {
+            let amount = 1;
+            try {
+                amount = parseInt(cleanMessage.split(" ")[1]);
+            } catch (e) {
+                console.log("Error while parsing flashbang");
+                console.log(e);
+            }
+            flashbang(channel, tags, amount);
         }
         if (trusted.includes(tags.username) || tags.mod) {
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
@@ -697,4 +706,16 @@ function createIgnorePingFile() {
         if (err) throw err;
         console.log('The ignore user ping file has been saved!');
     });
+}
+
+function flashbang(channel, user, amount) {
+    if(amount > 50) {
+        amount = 50;
+    }
+    const fb = "FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote";
+    if(channel === "#pepto__bismol" && (trusted.includes(user.username) || user.mod)) {
+        for(let i = 0; i < amount; i++) {
+            sendMessageRetry(channel, fb);
+        }
+    }
 }
