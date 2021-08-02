@@ -611,13 +611,11 @@ function phoneNotifications(rawChannel, message, user) {
         lastMessage = Date.now();
     }
     if(Date.now() - lastMessage < afkTime * 1000) {
-        console.log("skipped ping from : " + username + " , not afk for long enough");
         return;
     }
 
     for(let u of ignoreUsersPing) {
         if(u.toLowerCase() === username.toLowerCase()) {
-            console.log("skipped ping from : " + username);
             return;
         }
     }
