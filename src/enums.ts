@@ -9,7 +9,7 @@ enum PLATFORM {
 /**
  * Events shared between most chat clients
  */
-interface ChatClientEvent {
+interface BaseChatClientEvent {
     message : Message;
     privateMessage : Message;
     systemMessage : Message;
@@ -19,8 +19,10 @@ interface ChatClientEvent {
 /**
  * Events specific to twitch
  */
-interface TwitchClientEvent extends ChatClientEvent {
+interface TwitchClientEvent {
     // TODO add subs/resubs raid etc...
     timeout : TimeoutMessage;
     ban : BanMessage;
 }
+
+type ChatClientEvent = BaseChatClientEvent & TwitchClientEvent;

@@ -86,11 +86,11 @@ class TwitchClient extends ChatClient {
 
     // TODO : emit a TwitchClientEvent? or just shove everything in ChatClientEvents eShrug
     private emitTimeoutMessage(message: TimeoutMessage): void {
-        this.emit('systemMessage', message);
+        this.emit('timeout', message);
     }
 
     private emitBanMessage(message: BanMessage): void {
-        this.emit('systemMessage', message);
+        this.emit('ban', message);
     }
 
     private createUser(message: PrivmsgMessage|WhisperMessage): User {
