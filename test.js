@@ -186,7 +186,7 @@ client.on('message', (channel, tags, message, self) => {
             }
             flashbang(channel, tags, amount);
         }
-        if (trusted.includes(tags.username) || tags.mod) {
+        if (trusted.includes(tags.username) || isMod(tags, channel)) {
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
                 let args = cleanMessage.substring('&supamodpyramid '.length).split(' ');
                 console.log('pyramid args : ' + String(args))
@@ -713,9 +713,17 @@ function flashbang(channel, user, amount) {
         amount = 50;
     }
     const fb = "FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote";
-    if(channel === "#pepto__bismol" && (trusted.includes(user.username) || user.mod)) {
+    if(channel === "#pepto__bismol" && (trusted.includes(user.username) || isMod(user, channel))) {
         for(let i = 0; i < amount; i++) {
             sendMessageRetry(channel, fb);
         }
     }
+}
+
+function isMod(user, channel) {
+    let chan = channel;
+    if(channel.startsWith("#")) {
+        chan = channel.substring(1);
+    }
+    return user.mod || user.username === chan;
 }
