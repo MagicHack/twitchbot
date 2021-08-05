@@ -188,7 +188,7 @@ client.on('message', (channel, tags, message, self) => {
                 console.log(e);
             }
             flashbang(channel, tags, amount);
-        } else if (isCommand(cleanMessage), "CallingTheImpostor") {
+        } else if (isCommand(cleanMessage, "CallingTheImpostor")) {
             callingTheImpostor(channel);
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
