@@ -737,21 +737,17 @@ function callingTheImpostor(channel) {
     let tzNames = momentTZ.tz.names();
     var now = moment();
     let possibleZone = [];
-    let possibleTimes = [];
     // TODO : find a better way then checking all possible time zones WAYTOODANK
     for(let tz of tzNames) {
-        let time = now.tz(tz);
-        let hour = time.format("H");
+        let hour = now.tz(tz).format("H");
         if(hour === "3") {
             possibleZone.push(tz);
-            possibleTimes.push(time);
         }
     }
     if(possibleZone.length > 0) {
         let index = getRandomInt(possibleZone.length);
         let tz = possibleZone[index];
-        let time = possibleTimes[index];
-        sendMessage(channel, "In " + tz + " it is currently " + time.format("HH:mm") + " CallingTheImpostor")
+        sendMessage(channel, "In " + tz + " it is currently " + now.tz(tz).format("HH:mm") + " CallingTheImpostor");
     } else {
         console.log("Didn't find any timezone where it's 3am, weird...");
     }
