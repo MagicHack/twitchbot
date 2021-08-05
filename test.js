@@ -194,13 +194,12 @@ client.on('message', (channel, tags, message, self) => {
             let params = cleanMessage.split(" ");
             if(params.length === 2) {
                 let url = params[1];
-                try {
-                    let delay = pingPajbotApi(url);
-                    sendMessageRetry(channel, String(delay) + "ms to " + url);
-                } catch (e) {
-                    console.log(e);
-                    sendMessageRetry(channel, "error pinging the pajbotapi provided");
-                }
+                 pingPajbotApi(url).then((delay) => {
+                     sendMessageRetry(channel, String(delay) + "ms to " + url);
+                }).catch((e) => {
+                     console.log(e);
+                     sendMessageRetry(channel, "error pinging the pajbotapi provided");
+                });
             }
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
