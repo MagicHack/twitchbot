@@ -4,8 +4,11 @@ const tmi = require('tmi.js');
 const fs = require('fs');
 const humanizeDuration = require('humanize-duration');
 const Push = require('pushover-notifications');
+const momentTZ = require('moment-timezone');
+const moment = require("moment");
 
 const seventv = require('./7tv.js');
+
 // Number of message that can be sent every 30 seconds
 const rateLimitMessages = 20;
 const rateLimitMessagesMod = 100;
@@ -185,6 +188,8 @@ client.on('message', (channel, tags, message, self) => {
                 console.log(e);
             }
             flashbang(channel, tags, amount);
+        } else if (isCommand(cleanMessage), "CallingTheImpostor") {
+            callingTheImpostor(channel);
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
@@ -535,7 +540,7 @@ function channelEmotes(emotes) {
 }
 
 function isCommand(message, command) {
-    return message.startsWith(prefix + command);
+    return message.startsWith(prefix + command) || message.startsWith(prefix + ' ' + command);
 }
 
 
@@ -726,4 +731,45 @@ function isMod(user, channel) {
         chan = channel.substring(1);
     }
     return user.mod || user.username === chan;
+}
+
+function callingTheImpostor(channel) {
+    let tzNames = momentTZ.tz.names();
+    var now = moment();
+    let possibleZone = [];
+    let possibleTimes = [];
+    // TODO : find a better way then checking all possible time zones WAYTOODANK
+    for(let tz of tzNames) {
+        let time = now.tz(tz);
+        let hour = time.format("H");
+        if(hour === "3") {
+            possibleZone.push(tz);
+            possibleTimes.push(time);
+        }
+    }
+    if(possibleZone.length > 0) {
+        let index = getRandomInt(possibleZone.length);
+        let tz = possibleZone[index];
+        let time = possibleTimes[index];
+        sendMessage(channel, "In " + tz + " it is currently " + time.format("HH:mm") + " CallingTheImpostor")
+    } else {
+        console.log("Didn't find any timezone where it's 3am, weird...");
+    }
+}
+
+function getTimeZone(targetHour, currentHour) {
+    let offset = -(currentHour - targetHour);
+    if(Math.abs(offset) > 12) {
+        let shift = 24;
+        if(offset > 0) {
+            offset -= shift;
+        } else {
+            offset += shift;
+        }
+    }
+    return offset;
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
 }

@@ -18,6 +18,8 @@
   "homepage": "https://github.com/MagicHack/twitchbot#readme",
   "dependencies": {
     "humanize-duration": "^3.27.0",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
     "node-fetch": "^2.6.1",
     "pushover-notifications": "^1.2.2",
     "sync-fetch": "^0.3.0",
