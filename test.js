@@ -185,6 +185,18 @@ client.on('message', (channel, tags, message, self) => {
                 console.log(e);
             }
             flashbang(channel, tags, amount);
+        } else if(isCommand(cleanMessage.toLowerCase(), "banphraseping")) {
+            let params = cleanMessage.split(" ");
+            if(params.length === 2) {
+                let url = params[1];
+                try {
+                    let delay = pingPajbotApi(url);
+                    sendMessageRetry(channel, String(delay) + "ms to " + url);
+                } catch (e) {
+                    console.log(e);
+                    sendMessageRetry(channel, "error pinging the pajbotapi provided");
+                }
+            }
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
@@ -726,4 +738,15 @@ function isMod(user, channel) {
         chan = channel.substring(1);
     }
     return user.mod || user.username === chan;
+}
+
+async function pingPajbotApi(url) {
+    let testPhrase = "test";
+    let start = Date.now();
+    let result = await fetch(url + "/api/v1/banphrases/test", {method: 'POST', body:
+            JSON.stringify({message : testPhrase}), headers: {'Content-Type': 'application/json'}});
+
+    let elapsed = Date.now() - start;
+    console.log("pinged " + url + "in " + elapsed + "ms");
+    return elapsed;
 }
