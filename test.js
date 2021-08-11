@@ -30,6 +30,7 @@ readRaidPingFile();
 
 // Weird char in twitch messages
 const blankchar = '󠀀';
+let sunTimeoutChance = 0.7;
 
 const configFilePath = 'config.json';
 
@@ -97,6 +98,18 @@ client.on('message', (channel, tags, message, self) => {
         console.log("ignored whisper");
         return;
     }
+
+    // Anti weeb tech
+    if(channel === "#pepto__bismol") {
+        if(tags.username === "sunephef") {
+            if(Math.random() < sunTimeoutChance) {
+                sendMessageRetry(channel, "/timeout " + tags.username + " 1 NaM silence weeb");
+            }
+        } else if(tags.username === "sunwithnofaceclap") {
+            sendMessageRetry(channel, "/timeout " + tags.username + " 1 NaM silence weeb, alt detected MODS");
+        }
+    }
+
     let cleanMessage = message.replace(blankchar, '').trim();
 
     checkIfRaid(tags, cleanMessage);
