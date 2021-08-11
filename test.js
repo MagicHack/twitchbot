@@ -30,7 +30,7 @@ readRaidPingFile();
 
 // Weird char in twitch messages
 const blankchar = '󠀀';
-let sunTimeoutChance = 0.7;
+let sunTimeoutChance = 0.5;
 
 const configFilePath = 'config.json';
 
