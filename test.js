@@ -814,7 +814,7 @@ async function progress(channel) {
     if(percent > 90) {
         message = "PagMan finishing the game today";
     } else if(percent > 80) {
-
+        message = "Don't doubt the god gamer";
     } else if (percent > 60) {
         message = "Clueless lot of progress today";
     } else if (percent > 50) {
