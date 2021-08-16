@@ -214,7 +214,7 @@ client.on('message', (channel, tags, message, self) => {
                      sendMessageRetry(channel, "error pinging the pajbotapi provided");
                 });
             }
-        } else if(isCommand(cleanMessage.toLowerCase(), "progress") || isCommand(cleanMessage.toLowerCase(), "forsenDespair")) {
+        } else if(isCommand(cleanMessage.toLowerCase(), "progress") || isCommand(cleanMessage.toLowerCase(), "forsendespair")) {
             progress(channel).then();
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
