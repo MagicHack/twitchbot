@@ -815,14 +815,24 @@ async function progress(channel) {
         message = "PagMan finishing the game today";
     } else if(percent > 80) {
         message = "Don't doubt the god gamer";
+    } else if(percent > 70) {
+        message = "HandsUp I believe";
     } else if (percent > 60) {
         message = "Clueless lot of progress today";
     } else if (percent > 50) {
         message = "Clueless must be a max jump";
-    } else if (percent < 5) {
-        message = "TrollDespair can't go any lower right";
-    } else {
+    } else if(percent > 40){
         message = "TrollDespair progress soon";
+    } else if(percent > 30){
+        message = "ZULOL never ending cycle ♻";
+    } else if (percent > 20) {
+        message = "TrollDespair who is forsen";
+    } else if (percent > 10) {
+        message = "TrollDespair just press Q";
+    } else if (percent > 5) {
+        message = "Almost at the bottom Mr. Fors FeelsOkayMan 👍";
+    } else {
+        message = "TrollDespair can't go any lower right";
     }
     message += " " + percent + "%";
     sendMessageRetry(channel, message);
