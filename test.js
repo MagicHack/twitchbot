@@ -214,6 +214,8 @@ client.on('message', (channel, tags, message, self) => {
                      sendMessageRetry(channel, "error pinging the pajbotapi provided");
                 });
             }
+        } else if(isCommand(cleanMessage.toLowerCase(), "progress") || isCommand(cleanMessage.toLowerCase(), "forsenDespair")) {
+            progress(channel).then();
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
@@ -803,4 +805,25 @@ async function pingPajbotApi(url) {
     let elapsed = Date.now() - start;
     console.log("pinged " + url + "in " + elapsed + "ms");
     return elapsed;
+}
+async function progress(channel) {
+    let response = await fetch("https://forsenjk-default-rtdb.firebaseio.com/forsen/last.json", {});
+    let data = await response.json();
+    let percent = data["percent"];
+    let message = "";
+    if(percent > 90) {
+        message = "PagMan finishing the game today";
+    } else if(percent > 80) {
+
+    } else if (percent > 60) {
+        message = "Clueless lot of progress today";
+    } else if (percent > 50) {
+        message = "Clueless must be a max jump";
+    } else if (percent < 5) {
+        message = "TrollDespair can't go any lower right";
+    } else {
+        message = "TrollDespair progress soon";
+    }
+    message += " " + percent + "%";
+    sendMessageRetry(channel, message);
 }
