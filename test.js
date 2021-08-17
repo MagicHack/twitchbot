@@ -742,7 +742,7 @@ function createIgnorePingFile() {
 }
 
 function flashbang(channel, user, amount) {
-    let enabledChannels = ["#pepto__bismol", "ryuuiro"];
+    let enabledChannels = ["#pepto__bismol", "#ryuuiro"];
     if (amount > 50) {
         amount = 50;
     }
