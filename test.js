@@ -742,11 +742,12 @@ function createIgnorePingFile() {
 }
 
 function flashbang(channel, user, amount) {
+    let enabledChannels = ["#pepto__bismol", "ryuuiro"];
     if (amount > 50) {
         amount = 50;
     }
     const fb = "FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote";
-    if (channel === "#pepto__bismol" && (trusted.includes(user.username) || isMod(user, channel))) {
+    if (enabledChannels.includes(channel) && (trusted.includes(user.username) || isMod(user, channel))) {
         for (let i = 0; i < amount; i++) {
             sendMessageRetry(channel, fb);
         }
