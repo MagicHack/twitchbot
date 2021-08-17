@@ -833,11 +833,11 @@ async function progress(channel) {
     } else if (percent > 20) {
         message = "TrollDespair who is forsen";
     } else if (percent > 10) {
-        message = "TrollDespair just press Q";
+        message = "peptobProgress";
     } else if (percent > 5) {
         message = "Almost at the bottom Mr. Fors FeelsOkayMan 👍";
     } else {
-        message = "TrollDespair can't go any lower right";
+        message = "TrollDespair can't go any lower right peptobProgress";
     }
     message += " " + percent + "%";
     sendMessageRetry(channel, message);
