@@ -64,7 +64,7 @@ try {
 const donkRepliesPriority = ['g0ldfishbot', 'doo_dul', 'ron__bot']
 const trusted = ['hackmagic']
 
-const pushover = new Push({user : pushoverUser, token : pushoverToken});
+const pushover = new Push({user: pushoverUser, token: pushoverToken});
 
 
 const client = new tmi.Client({
@@ -100,12 +100,12 @@ client.on('message', (channel, tags, message, self) => {
     }
 
     // Anti weeb tech
-    if(channel === "#pepto__bismol") {
-        if(tags.username === "sunephef") {
-            if(Math.random() < sunTimeoutChance) {
+    if (channel === "#pepto__bismol") {
+        if (tags.username === "sunephef") {
+            if (Math.random() < sunTimeoutChance) {
                 sendMessageRetry(channel, "/timeout " + tags.username + " 1 NaM silence weeb");
             }
-        } else if(tags.username === "sunwithnofaceclap") {
+        } else if (tags.username === "sunwithnofaceclap") {
             sendMessageRetry(channel, "/timeout " + tags.username + " 1 NaM silence weeb, alt detected MODS");
         }
     }
@@ -185,14 +185,14 @@ client.on('message', (channel, tags, message, self) => {
                 })
             }
         }
-        if(isCommand(cleanMessage.toLowerCase(), 'raidping')) {
-        	raidPing(channel, tags.username);
-		} else if(isCommand(cleanMessage.toLowerCase(), 'raidunping')) {
-        	raidUnPing(channel, tags.username);
-		} else if(isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
+        if (isCommand(cleanMessage.toLowerCase(), 'raidping')) {
+            raidPing(channel, tags.username);
+        } else if (isCommand(cleanMessage.toLowerCase(), 'raidunping')) {
+            raidUnPing(channel, tags.username);
+        } else if (isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
             'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
             help(channel, tags.username);
-        } else if(isCommand(cleanMessage.toLowerCase(), "flashbang")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
             let amount = 1;
             try {
                 amount = parseInt(cleanMessage.split(" ")[1]);
@@ -203,18 +203,20 @@ client.on('message', (channel, tags, message, self) => {
             flashbang(channel, tags, amount);
         } else if (isCommand(cleanMessage, "CallingTheImpostor")) {
             callingTheImpostor(channel);
-        } else if(isCommand(cleanMessage.toLowerCase(), "banphraseping")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "banphraseping")) {
             let params = cleanMessage.split(" ");
-            if(params.length === 2) {
+            if (params.length === 2) {
                 let url = params[1];
-                 pingPajbotApi(url).then((delay) => {
-                     sendMessageRetry(channel, String(delay) + "ms to " + url);
+                pingPajbotApi(url).then((delay) => {
+                    sendMessageRetry(channel, String(delay) + "ms to " + url);
                 }).catch((e) => {
-                     console.log(e);
-                     sendMessageRetry(channel, "error pinging the pajbotapi provided");
+                    console.log(e);
+                    sendMessageRetry(channel, "error pinging the pajbotapi provided");
                 });
             }
-        } else if(isCommand(cleanMessage.toLowerCase(), "progress") || isCommand(cleanMessage.toLowerCase(), "forsendespair")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "progress") ||
+            isCommand(cleanMessage.toLowerCase(), "forsendespair") ||
+            isCommand(cleanMessage.toLowerCase(), "peptobprogress")) {
             progress(channel).then();
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
@@ -242,14 +244,14 @@ client.on('message', (channel, tags, message, self) => {
 
 
         if (trusted.includes(tags.username)) {
-            if(isCommand(cleanMessage.toLowerCase(), 'unping')) {
+            if (isCommand(cleanMessage.toLowerCase(), 'unping')) {
                 let params = cleanMessage.split(' ');
-                if(params.length >= 2 ) {
+                if (params.length >= 2) {
                     addUserIgnore(channel, params[1]);
                 }
-            } else if(isCommand(cleanMessage.toLowerCase(), 'reping')) {
+            } else if (isCommand(cleanMessage.toLowerCase(), 'reping')) {
                 let params = cleanMessage.split(' ');
-                if(params.length >= 2 ) {
+                if (params.length >= 2) {
                     removeUserIgnore(channel, params[1]);
                 }
             }
@@ -315,7 +317,7 @@ function getPlayers(game, trusted) {
     let elapsedTime = (Date.now() - lastTS) / 1000;
 
     return new Promise((resolve, reject) => {
-        if(game === "/") {
+        if (game === "/") {
             return resolve("Invalid game name");
         }
         let settings = {method: "Get"};
@@ -324,9 +326,8 @@ function getPlayers(game, trusted) {
             console.log("Request : " + url);
             lastTS = Date.now();
             fetch(url, settings)
-                .then((res) =>
-                {
-                    if(!res.ok) {
+                .then((res) => {
+                    if (!res.ok) {
                         throw new Error("Not 2xx response");
                     }
                     return res.text();
@@ -365,7 +366,7 @@ function checkIfRaid(tags, message) {
         if (matchBegin !== null) {
             console.log("Raid detected");
             // Notify me of a raid if I have my chat open
-            if(channelsChatters["#hackmagic"].includes('hackmagic')) {
+            if (channelsChatters["#hackmagic"].includes('hackmagic')) {
                 sendNotification("Join raid DinkDonk !!");
             }
             for (let notifyChannel of notifyChannels) {
@@ -373,7 +374,7 @@ function checkIfRaid(tags, message) {
                 let notifMessage = baseMessage;
                 for (let p of peopleToNotify) {
                     // Send and create a new message when it's too long
-                    if(notifMessage.length + p.length >= MAX_CHARS) {
+                    if (notifMessage.length + p.length >= MAX_CHARS) {
                         sendMessageRetry(notifMessage, notifMessage);
                         notifMessage = baseMessage;
                     }
@@ -571,22 +572,22 @@ function isCommand(message, command) {
 
 
 function raidPing(channel, user) {
-	const index = peopleToNotify.indexOf(user);
-	if(index === -1) {
-		peopleToNotify.push(user);
-		try {
-			createRaidPingFile();
-		} catch (error) {
-			console.error(typeof error + " " + error.message);
-			console.error("Failed to write the raid users file");
-			sendMessageRetry(channel, `@${user}, an error occurred while saving the ping list monkaS, contact 
+    const index = peopleToNotify.indexOf(user);
+    if (index === -1) {
+        peopleToNotify.push(user);
+        try {
+            createRaidPingFile();
+        } catch (error) {
+            console.error(typeof error + " " + error.message);
+            console.error("Failed to write the raid users file");
+            sendMessageRetry(channel, `@${user}, an error occurred while saving the ping list monkaS, contact 
 			@hackmagic`);
-		}
-		sendMessageRetry(channel, `@${user}, added you to the raid ping list FeelsOkayMan`);
-	} else {
-		sendMessageRetry(channel, `@${user}, you are already in the ping list FeelsDankMan , type 
+        }
+        sendMessageRetry(channel, `@${user}, added you to the raid ping list FeelsOkayMan`);
+    } else {
+        sendMessageRetry(channel, `@${user}, you are already in the ping list FeelsDankMan , type 
 		${prefix}raidunping if you no longer want to be pinged`);
-	}
+    }
 }
 
 function raidUnPing(channel, user) {
@@ -594,14 +595,14 @@ function raidUnPing(channel, user) {
     if (index !== -1) {
         peopleToNotify.splice(index, 1);
         try {
-			createRaidPingFile();
-		} catch (error) {
-			console.error(typeof error + " " + error.message);
-			console.error("Failed to write the raid users file");
-			sendMessageRetry(channel, `@${user}, an error occurred while saving the ping list monkaS, contact 
+            createRaidPingFile();
+        } catch (error) {
+            console.error(typeof error + " " + error.message);
+            console.error("Failed to write the raid users file");
+            sendMessageRetry(channel, `@${user}, an error occurred while saving the ping list monkaS, contact 
 			@hackmagic`);
-			return;
-		}
+            return;
+        }
         sendMessageRetry(channel, `@${user}, removed you from the ping list FeelsOkayMan , type 
 		${prefix}raidping if you want to get pinged again`);
     } else {
@@ -623,7 +624,7 @@ function readRaidPingFile() {
         try {
             const data = fs.readFileSync(RAID_FILE, 'utf8');
             let userData = JSON.parse(data);
-            userData['users'].forEach( user => peopleToNotify.push(user));
+            userData['users'].forEach(user => peopleToNotify.push(user));
             console.log("Successfully read ping file");
         } catch (err) {
             console.error(typeof err + " " + err.message);
@@ -638,6 +639,7 @@ function help(channel, user) {
 }
 
 let lastMessage = Date.now();
+
 function phoneNotifications(rawChannel, message, user) {
     // Time with no message before a it sends a ping
     const afkTime = 15;
@@ -647,28 +649,28 @@ function phoneNotifications(rawChannel, message, user) {
     let displayName = user['display-name'];
 
     // Ignore a possible ping if not afk
-    if(user.username === 'hackmagic') {
+    if (user.username === 'hackmagic') {
         lastMessage = Date.now();
     }
-    if(Date.now() - lastMessage < afkTime * 1000) {
+    if (Date.now() - lastMessage < afkTime * 1000) {
         return;
     }
 
-    for(let u of ignoreUsersPing) {
-        if(u.toLowerCase() === username.toLowerCase()) {
+    for (let u of ignoreUsersPing) {
+        if (u.toLowerCase() === username.toLowerCase()) {
             return;
         }
     }
 
-    if(channel.startsWith('#')) {
+    if (channel.startsWith('#')) {
         channel = channel.substring(1);
     }
     const pingChannels = ['swushwoi', 'minusinsanity', 'pepto__bismol', 'hackmagic'];
     const pingRE = [/hackmagic/i, /(?<![a-z])hack(?![a-z])/i, /(?<![a-z])magic(?![a-z])/i]
 
-    if(pingChannels.includes(channel)) {
-        for(let exp of pingRE) {
-            if(exp.test(message)) {
+    if (pingChannels.includes(channel)) {
+        for (let exp of pingRE) {
+            if (exp.test(message)) {
                 sendNotification(`[${rawChannel}] ${displayName}: ${message}`)
                 break;
             }
@@ -678,12 +680,12 @@ function phoneNotifications(rawChannel, message, user) {
 
 function sendNotification(message) {
     console.log("Sending pushover notification");
-    pushover.send({message : message, title : 'Twitch'}, function( err, result ) {
-        if ( err ) {
+    pushover.send({message: message, title: 'Twitch'}, function (err, result) {
+        if (err) {
             console.error(typeof err + ' : ' + err);
             console.error("Error sending pushover notification");
         }
-        console.log( result )
+        console.log(result)
     });
 }
 
@@ -692,7 +694,7 @@ function readIgnorePingFile() {
         try {
             const data = fs.readFileSync(IGNORE_PING_FILE, 'utf8');
             let userData = JSON.parse(data);
-            userData['users'].forEach( user => ignoreUsersPing.push(user));
+            userData['users'].forEach(user => ignoreUsersPing.push(user));
             console.log("Successfully read ignore file");
         } catch (err) {
             console.error(typeof err + " " + err.message);
@@ -703,7 +705,7 @@ function readIgnorePingFile() {
 
 function removeUserIgnore(channel, username) {
     let index = ignoreUsersPing.indexOf(username);
-    if(index === -1) {
+    if (index === -1) {
         sendMessageRetry(channel, 'hackmagic, user not in list');
     } else {
         ignoreUsersPing.splice(index, 1);
@@ -717,7 +719,7 @@ function removeUserIgnore(channel, username) {
 }
 
 function addUserIgnore(channel, username) {
-    if(!ignoreUsersPing.includes(username)) {
+    if (!ignoreUsersPing.includes(username)) {
         ignoreUsersPing.push(username);
         sendMessageRetry(channel, `hackmagic, added user ${username} to ping ignore list`);
         try {
@@ -740,12 +742,12 @@ function createIgnorePingFile() {
 }
 
 function flashbang(channel, user, amount) {
-    if(amount > 50) {
+    if (amount > 50) {
         amount = 50;
     }
     const fb = "FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote";
-    if(channel === "#pepto__bismol" && (trusted.includes(user.username) || isMod(user, channel))) {
-        for(let i = 0; i < amount; i++) {
+    if (channel === "#pepto__bismol" && (trusted.includes(user.username) || isMod(user, channel))) {
+        for (let i = 0; i < amount; i++) {
             sendMessageRetry(channel, fb);
         }
     }
@@ -753,7 +755,7 @@ function flashbang(channel, user, amount) {
 
 function isMod(user, channel) {
     let chan = channel;
-    if(channel.startsWith("#")) {
+    if (channel.startsWith("#")) {
         chan = channel.substring(1);
     }
     return user.mod || user.username === chan;
@@ -764,13 +766,13 @@ function callingTheImpostor(channel) {
     var now = moment();
     let possibleZone = [];
     // TODO : find a better way then checking all possible time zones WAYTOODANK
-    for(let tz of tzNames) {
+    for (let tz of tzNames) {
         let hour = now.tz(tz).format("H");
-        if(hour === "3") {
+        if (hour === "3") {
             possibleZone.push(tz);
         }
     }
-    if(possibleZone.length > 0) {
+    if (possibleZone.length > 0) {
         let index = getRandomInt(possibleZone.length);
         let tz = possibleZone[index];
         sendMessage(channel, "In " + tz + " it is currently " + now.tz(tz).format("HH:mm") + " CallingTheImpostor");
@@ -781,9 +783,9 @@ function callingTheImpostor(channel) {
 
 function getTimeZone(targetHour, currentHour) {
     let offset = -(currentHour - targetHour);
-    if(Math.abs(offset) > 12) {
+    if (Math.abs(offset) > 12) {
         let shift = 24;
-        if(offset > 0) {
+        if (offset > 0) {
             offset -= shift;
         } else {
             offset += shift;
@@ -799,31 +801,34 @@ function getRandomInt(max) {
 async function pingPajbotApi(url) {
     let testPhrase = "test";
     let start = Date.now();
-    let result = await fetch(url + "/api/v1/banphrases/test", {method: 'POST', body:
-            JSON.stringify({message : testPhrase}), headers: {'Content-Type': 'application/json'}});
+    let result = await fetch(url + "/api/v1/banphrases/test", {
+        method: 'POST', body:
+            JSON.stringify({message: testPhrase}), headers: {'Content-Type': 'application/json'}
+    });
 
     let elapsed = Date.now() - start;
     console.log("pinged " + url + "in " + elapsed + "ms");
     return elapsed;
 }
+
 async function progress(channel) {
     let response = await fetch("https://forsenjk-default-rtdb.firebaseio.com/forsen/last.json", {});
     let data = await response.json();
     let percent = data["percent"];
     let message = "";
-    if(percent > 90) {
+    if (percent > 90) {
         message = "PagMan finishing the game today";
-    } else if(percent > 80) {
+    } else if (percent > 80) {
         message = "Don't doubt the god gamer";
-    } else if(percent > 70) {
+    } else if (percent > 70) {
         message = "HandsUp I believe";
     } else if (percent > 60) {
         message = "Clueless lot of progress today";
     } else if (percent > 50) {
         message = "Clueless must be a max jump";
-    } else if(percent > 40){
+    } else if (percent > 40) {
         message = "TrollDespair progress soon";
-    } else if(percent > 30){
+    } else if (percent > 30) {
         message = "ZULOL never ending cycle ♻";
     } else if (percent > 20) {
         message = "TrollDespair who is forsen";
