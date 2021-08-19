@@ -31,7 +31,7 @@ readRaidPingFile();
 // Weird char in twitch messages
 const blankchar = '󠀀';
 let sunTimeoutChance = 0.5;
-let sunTimeoutChance = 0.5;
+let fishTimeoutChance = 0.5;
 
 const configFilePath = 'config.json';
 
@@ -109,7 +109,9 @@ client.on('message', (channel, tags, message, self) => {
         } else if (tags.username === "sunwithnofaceclap") {
             sendMessageRetry(channel, "/timeout " + tags.username + " 1 NaM silence weeb, alt detected MODS");
         } else if(tags.username === "prog0ldfish") {
-            sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence pinger WeirdChamp");
+            if(Math.random() < fishTimeoutChance) {
+                sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence pinger WeirdChamp");
+            }
         } else if(tags.username === "prog0idfish") {
             sendMessageRetry(channel, "/timeout " + tags.username + " 1 MODS alt detected");
         }
