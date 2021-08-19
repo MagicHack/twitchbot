@@ -192,15 +192,6 @@ client.on('message', (channel, tags, message, self) => {
         } else if (isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
             'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
             help(channel, tags.username);
-        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
-            let amount = 1;
-            try {
-                amount = parseInt(cleanMessage.split(" ")[1]);
-            } catch (e) {
-                console.log("Error while parsing flashbang");
-                console.log(e);
-            }
-            flashbang(channel, tags, amount, "FreePoggersEmote");
         } else if (isCommand(cleanMessage.toLowerCase(), "flashbang2")) {
             let amount = 1;
             try {
@@ -210,6 +201,15 @@ client.on('message', (channel, tags, message, self) => {
                 console.log(e);
             }
             flashbang(channel, tags, amount, "bruhFAINT");
+        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
+            let amount = 1;
+            try {
+                amount = parseInt(cleanMessage.split(" ")[1]);
+            } catch (e) {
+                console.log("Error while parsing flashbang");
+                console.log(e);
+            }
+            flashbang(channel, tags, amount, "FreePoggersEmote");
         } else if (isCommand(cleanMessage, "CallingTheImpostor")) {
             callingTheImpostor(channel);
         } else if (isCommand(cleanMessage.toLowerCase(), "banphraseping")) {
@@ -758,7 +758,7 @@ function flashbang(channel, user, amount, text) {
     const emoteAndSpace = text + " ";
     const number = Math.floor(500 / emoteAndSpace.length);
 
-    const fb = emoteAndSpace.repeat(50).slice(0, -1);
+    const fb = emoteAndSpace.repeat(number).slice(0, -1);
     if (enabledChannels.includes(channel) && (trusted.includes(user.username) || isMod(user, channel))) {
         for (let i = 0; i < amount; i++) {
             sendMessageRetry(channel, fb);
