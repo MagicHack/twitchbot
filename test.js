@@ -472,8 +472,8 @@ function sendMessage(channel, message) {
         sentMessagesTS.push(Date.now());
         lastMessageTimeStampMs = Date.now();
 
-        // Add random char after to not trigger same message rejection
-        if (lastSentMessage === message) {
+        // Add random char after to not trigger same message rejection, mods do not have this restriction
+        if (!isMod && lastSentMessage === message) {
             message += ' ' + blankchar;
         }
         lastSentMessage = message;
