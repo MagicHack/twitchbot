@@ -192,6 +192,24 @@ client.on('message', (channel, tags, message, self) => {
         } else if (isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
             'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
             help(channel, tags.username);
+        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang3")) {
+            let amount = 1;
+            try {
+                amount = parseInt(cleanMessage.split(" ")[1]);
+            } catch (e) {
+                console.log("Error while parsing flashbang");
+                console.log(e);
+            }
+            flashbang(channel, tags, amount, "GotCaughtTrolling");
+        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang2")) {
+            let amount = 1;
+            try {
+                amount = parseInt(cleanMessage.split(" ")[1]);
+            } catch (e) {
+                console.log("Error while parsing flashbang");
+                console.log(e);
+            }
+            flashbang(channel, tags, amount, "bruhFAINT");
         } else if (isCommand(cleanMessage.toLowerCase(), "supaflashbang")) {
             let amount = 1;
             try {
