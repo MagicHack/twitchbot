@@ -200,7 +200,16 @@ client.on('message', (channel, tags, message, self) => {
                 console.log("Error while parsing flashbang");
                 console.log(e);
             }
-            flashbang(channel, tags, amount);
+            flashbang(channel, tags, amount, "FreePoggersEmote");
+        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang2")) {
+            let amount = 1;
+            try {
+                amount = parseInt(cleanMessage.split(" ")[1]);
+            } catch (e) {
+                console.log("Error while parsing flashbang");
+                console.log(e);
+            }
+            flashbang(channel, tags, amount, "bruhFAINT");
         } else if (isCommand(cleanMessage, "CallingTheImpostor")) {
             callingTheImpostor(channel);
         } else if (isCommand(cleanMessage.toLowerCase(), "banphraseping")) {
@@ -741,12 +750,15 @@ function createIgnorePingFile() {
     });
 }
 
-function flashbang(channel, user, amount) {
+function flashbang(channel, user, amount, text) {
     let enabledChannels = ["#pepto__bismol", "#ryuuiro"];
     if (amount > 50) {
         amount = 50;
     }
-    const fb = "FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote FreePoggersEmote";
+    const emoteAndSpace = text + " ";
+    const number = Math.floor(500 / emoteAndSpace.length);
+
+    const fb = emoteAndSpace.repeat(50).slice(0, -1);
     if (enabledChannels.includes(channel) && (trusted.includes(user.username) || isMod(user, channel))) {
         for (let i = 0; i < amount; i++) {
             sendMessageRetry(channel, fb);
