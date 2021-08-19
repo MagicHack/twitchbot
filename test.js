@@ -435,8 +435,8 @@ function sendMessageRetry(channel, message) {
     }
 }
 
-// We assume normal bucket is full on start, maybe we it should be mod bucket?
-let sentMessagesTS = new Array(Math.round(rateLimitMessages / 2)).fill(Date.now());
+// We assume normal bucket is full on start, 30 seconds before being able to send messages on startup
+let sentMessagesTS = new Array(Math.round(rateLimitMessagesMod)).fill(Date.now());
 
 function sendMessage(channel, message) {
     const charLimit = 500;
