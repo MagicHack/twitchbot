@@ -839,11 +839,17 @@ function getRandomInt(max) {
 async function pingPajbotApi(url) {
     let testPhrase = "test";
     let start = Date.now();
+    const https = "https://";
+    if(!url.startsWith(https)) {
+        url = https + url.trim();
+    }
     let result = await fetch(url + "/api/v1/banphrases/test", {
         method: 'POST', body:
             JSON.stringify({message: testPhrase}), headers: {'Content-Type': 'application/json'}
     });
-
+    if(!result.ok) {
+        throw new Error("Response code not 2xx api");
+    }
     let elapsed = Date.now() - start;
     console.log("pinged " + url + "in " + elapsed + "ms");
     return elapsed;
