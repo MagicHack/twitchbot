@@ -104,10 +104,10 @@ client.on('message', (channel, tags, message, self) => {
     if (channel === "#pepto__bismol") {
         if (tags.username === "sunephef") {
             if (Math.random() < sunTimeoutChance) {
-                sendMessageRetry(channel, "/timeout " + tags.username + " 1 NaM silence weeb");
+                sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence weeb simp furry NaM");
             }
         } else if (tags.username === "sunwithnofaceclap") {
-            sendMessageRetry(channel, "/timeout " + tags.username + " 1 NaM silence weeb, alt detected MODS");
+            sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence weeb simp furry NaM , alt detected MODS");
         } else if(tags.username === "prog0ldfish") {
             if(Math.random() < fishTimeoutChance) {
                 sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence pinger WeirdChamp");
