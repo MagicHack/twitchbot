@@ -410,7 +410,7 @@ function checkIfRaid(tags, message) {
                 for (let p of peopleToNotify) {
                     // Send and create a new message when it's too long
                     if (notifMessage.length + p.length >= MAX_CHARS) {
-                        sendMessageRetry(notifMessage, notifMessage);
+                        sendMessageRetry(notifyChannel, notifMessage);
                         notifMessage = baseMessage;
                     }
                     notifMessage += ' @' + p;
