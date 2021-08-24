@@ -250,7 +250,8 @@ client.on('message', (channel, tags, message, self) => {
             }
         } else if (isCommand(cleanMessage.toLowerCase(), "progress") ||
             isCommand(cleanMessage.toLowerCase(), "forsendespair") ||
-            isCommand(cleanMessage.toLowerCase(), "peptobprogress")) {
+            isCommand(cleanMessage.toLowerCase(), "peptobprogress") ||
+            isCommand(cleanMessage.toLowerCase(), "fallking")) {
             progress(channel).then();
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
