@@ -404,7 +404,7 @@ function checkIfRaid(tags, message) {
                 sendNotification("Join raid DinkDonk !!");
             }
             for (let notifyChannel of notifyChannels) {
-                let baseMessage = 'DinkDonk +join (raid lvl ' + matchBegin[1] + ') ';
+                let baseMessage = '+join DinkDonk (raid lvl ' + matchBegin[1] + ') ';
                 let notifMessage = baseMessage;
                 for (let p of peopleToNotify) {
                     // Send and create a new message when it's too long
