@@ -208,6 +208,15 @@ client.on('message', (channel, tags, message, self) => {
                 console.log(e);
             }
             flashbang(channel, tags, amount, "GotCaughtTrolling");
+        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang4")) {
+            let amount = 1;
+            try {
+                amount = parseInt(cleanMessage.split(" ")[1]);
+            } catch (e) {
+                console.log("Error while parsing flashbang");
+                console.log(e);
+            }
+            flashbang(channel, tags, amount, "NothingHere");
         } else if (isCommand(cleanMessage.toLowerCase(), "flashbang2")) {
             let amount = 1;
             try {
