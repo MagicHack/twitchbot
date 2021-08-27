@@ -524,7 +524,7 @@ function sendMessage(channel, message) {
         lastMessageTimeStampMs = Date.now();
 
         // Add random char after to not trigger same message rejection, mods do not have this restriction
-        if (!isMod && lastSentMessage === message) {
+        if (!isMod && !isVip && lastSentMessage === message) {
             message += ' ' + blankchar;
         }
         lastSentMessage = message;
