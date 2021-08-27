@@ -474,11 +474,18 @@ function sendMessage(channel, message) {
     sentMessagesTS = sentMessagesTS.filter(ts => Date.now() - ts < (30 + 1) * 1000);
     let messageCounter = sentMessagesTS.length;
 
-    let modSpamChannels = ['#pepto__bismol']
+    let modSpamChannels = ['#pepto__bismol', "#sunephef"];
 
     let isMod = false;
+    let isVip = false;
     if (typeof chattersRoles[channel].chatters.moderators !== 'undefined') {
         isMod = chattersRoles[channel].chatters.moderators.includes(client.getUsername());
+    } else {
+        console.log("Couldn't check role");
+    }
+
+    if (typeof chattersRoles[channel].chatters.vips !== 'undefined') {
+        isVip = chattersRoles[channel].chatters.vips.includes(client.getUsername());
     } else {
         console.log("Couldn't check role");
     }
@@ -488,8 +495,8 @@ function sendMessage(channel, message) {
     let currentRate = rateLimitDelay;
     let currentLimit = rateLimitMessages;
 
-    if (isMod) {
-        console.log("using mod rate limit");
+    if (isMod || isVip) {
+        console.log("using mod/vip rate limit");
         currentRate = rateLimitDelayMod;
         currentLimit = rateLimitMessagesMod;
 
