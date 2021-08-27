@@ -78,7 +78,7 @@ const client = new tmi.Client({
         username: username,
         password: password
     },
-    channels: ['swushwoi', 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol',
+    channels: ['ron__bot', 'pepto__bismol', 'hackmagic', 'swushwoi', 'minusinsanity', 'ron__johnson_', 'katelynerika',
         'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro', 'yung_randd', 'sunephef']
 });
 
@@ -108,11 +108,11 @@ client.on('message', (channel, tags, message, self) => {
             }
         } else if (tags.username === "sunwithnofaceclap") {
             sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence weeb simp furry NaM , alt detected MODS");
-        } else if(tags.username === "prog0ldfish") {
-            if(Math.random() < fishTimeoutChance) {
+        } else if (tags.username === "prog0ldfish") {
+            if (Math.random() < fishTimeoutChance) {
                 sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence pinger WeirdChamp");
             }
-        } else if(tags.username === "prog0idfish") {
+        } else if (tags.username === "prog0idfish") {
             sendMessageRetry(channel, "/timeout " + tags.username + " 1 MODS alt detected");
         }
     }
@@ -199,7 +199,7 @@ client.on('message', (channel, tags, message, self) => {
         } else if (isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
             'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
             help(channel, tags.username);
-        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang3")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang5")) {
             let amount = 1;
             try {
                 amount = parseInt(cleanMessage.split(" ")[1]);
@@ -207,7 +207,7 @@ client.on('message', (channel, tags, message, self) => {
                 console.log("Error while parsing flashbang");
                 console.log(e);
             }
-            flashbang(channel, tags, amount, "GotCaughtTrolling");
+            flashbang(channel, tags, amount, "KartComback");
         } else if (isCommand(cleanMessage.toLowerCase(), "flashbang4")) {
             let amount = 1;
             try {
@@ -217,6 +217,15 @@ client.on('message', (channel, tags, message, self) => {
                 console.log(e);
             }
             flashbang(channel, tags, amount, "NothingHere");
+        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang3")) {
+            let amount = 1;
+            try {
+                amount = parseInt(cleanMessage.split(" ")[1]);
+            } catch (e) {
+                console.log("Error while parsing flashbang");
+                console.log(e);
+            }
+            flashbang(channel, tags, amount, "GotCaughtTrolling");
         } else if (isCommand(cleanMessage.toLowerCase(), "flashbang2")) {
             let amount = 1;
             try {
@@ -226,15 +235,6 @@ client.on('message', (channel, tags, message, self) => {
                 console.log(e);
             }
             flashbang(channel, tags, amount, "bruhFAINT");
-        } else if (isCommand(cleanMessage.toLowerCase(), "supaflashbang")) {
-            let amount = 1;
-            try {
-                amount = parseInt(cleanMessage.split(" ")[1]);
-            } catch (e) {
-                console.log("Error while parsing flashbang");
-                console.log(e);
-            }
-            flashbang(channel, tags, amount, "GotCaughtTrolling FreePoggersEmote bruhFAINT");
         } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
             let amount = 1;
             try {
@@ -244,6 +244,15 @@ client.on('message', (channel, tags, message, self) => {
                 console.log(e);
             }
             flashbang(channel, tags, amount, "FreePoggersEmote");
+        } else if (isCommand(cleanMessage.toLowerCase(), "supaflashbang")) {
+            let amount = 1;
+            try {
+                amount = parseInt(cleanMessage.split(" ")[1]);
+            } catch (e) {
+                console.log("Error while parsing flashbang");
+                console.log(e);
+            }
+            flashbang(channel, tags, amount, "GotCaughtTrolling FreePoggersEmote bruhFAINT");
         } else if (isCommand(cleanMessage, "CallingTheImpostor")) {
             callingTheImpostor(channel);
         } else if (isCommand(cleanMessage.toLowerCase(), "banphraseping")) {
@@ -850,14 +859,14 @@ async function pingPajbotApi(url) {
     let testPhrase = "test";
     let start = Date.now();
     const https = "https://";
-    if(!url.startsWith(https)) {
+    if (!url.startsWith(https)) {
         url = https + url.trim();
     }
     let result = await fetch(url + "/api/v1/banphrases/test", {
         method: 'POST', body:
             JSON.stringify({message: testPhrase}), headers: {'Content-Type': 'application/json'}
     });
-    if(!result.ok) {
+    if (!result.ok) {
         throw new Error("Response code not 2xx api");
     }
     let elapsed = Date.now() - start;
