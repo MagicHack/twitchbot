@@ -79,7 +79,7 @@ const client = new tmi.Client({
         password: password
     },
     channels: ['swushwoi', 'ron__bot', 'ron__johnson_', 'hackmagic', 'minusinsanity', 'katelynerika', 'pepto__bismol',
-        'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro']
+        'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro', 'yung_randd', 'sunephef']
 });
 
 let channelsChatters = {};
@@ -709,10 +709,10 @@ function phoneNotifications(rawChannel, message, user) {
     if (channel.startsWith('#')) {
         channel = channel.substring(1);
     }
-    const pingChannels = ['swushwoi', 'minusinsanity', 'pepto__bismol', 'hackmagic'];
+    const noPingChannels = ['forsen'];
     const pingRE = [/hackmagic/i, /(?<![a-z])hack(?![a-z])/i, /(?<![a-z])magic(?![a-z])/i]
 
-    if (pingChannels.includes(channel)) {
+    if (!noPingChannels.includes(channel)) {
         for (let exp of pingRE) {
             if (exp.test(message)) {
                 sendNotification(`[${rawChannel}] ${displayName}: ${message}`)
