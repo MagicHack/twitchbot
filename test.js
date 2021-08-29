@@ -407,7 +407,7 @@ client.on("join", (channel, username, self) => {
 
 function checkIfRaid(tags, message) {
     // How many chars to split a message
-    const MAX_CHARS = 400;
+    const MAX_CHARS = 500;
     let notifyChannels = ['#minusinsanity', '#hackmagic'];
     if (tags.username === 'huwobot') {
         let raidBeginRE = /A Raid Event at Level \[([0-9]+)] has appeared./;
@@ -725,7 +725,7 @@ function phoneNotifications(rawChannel, message, user) {
     if (channel.startsWith('#')) {
         channel = channel.substring(1);
     }
-    const noPingChannels = ['forsen'];
+    const noPingChannels = ['forsen', 'huwobot'];
     const pingRE = [/hackmagic/i, /(?<![a-z])hack(?![a-z])/i, /(?<![a-z])magic(?![a-z])/i]
 
     if (!noPingChannels.includes(channel)) {
