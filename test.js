@@ -918,7 +918,7 @@ function moderation(channel, tags, message) {
     }
     // hoss bots follows annouced by streamelements
     if(tags.username === "streamelements") {
-        const hossRe = /\s?@?([h]+[0o]+[s]+[o0-9]+)\s?/gi;
+        const hossRe = /\s?@?([h]+[0o]+[s]+[o0-9]+_*)\s?/gi;
         let match = hossRe.exec(message);
         if(match !== null) {
             let user = match[1];
