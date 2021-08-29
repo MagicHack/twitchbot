@@ -185,9 +185,6 @@ client.on('message', (channel, tags, message, self) => {
             let game = cleanMessage.substring('&players '.length).trim();
             if (game.length > 0) {
                 getPlayers(game, trusted.includes(tags.username)).then((response) => {
-                    if (channel === "#swushwoi") {
-                        response = response.replace(/https:\/\/.*/, '');
-                    }
                     sendMessageRetry(channel, response);
                 })
             }
