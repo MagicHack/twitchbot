@@ -121,6 +121,7 @@ client.on('message', (channel, tags, message, self) => {
 
     checkIfRaid(tags, cleanMessage);
     phoneNotifications(channel, cleanMessage, tags);
+    moderation(channel, tags, cleanMessage);
 
     if (isCommand(cleanMessage.toLowerCase(), 'ping')) {
         let timeSeconds = process.uptime();
@@ -909,3 +910,20 @@ async function progress(channel) {
     message += " " + percent + "%";
     sendMessageRetry(channel, message);
 }
+
+function moderation(channel, tags, message) {
+    let enableChannels = ['#hackmagic'];
+    if(!enableChannels.includes(channel)) {
+        return;
+    }
+    // hoss bots follows annouced by streamelements
+    if(tags.username === "streamelements") {
+        const hossRe = /\s?@?([h]+[0o]+[s]+[o0-9]+)\s?/gi;
+        let match = hossRe.exec(message);
+        if(match !== null) {
+            let user = match[1];
+            sendMessageRetry(channel, "/ban " + user + " automated bot ban");
+        }
+    }
+}
+
