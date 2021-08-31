@@ -30,8 +30,9 @@ readRaidPingFile();
 
 // Weird char in twitch messages
 const blankchar = '󠀀';
-let sunTimeoutChance = 0.5;
-let fishTimeoutChance = 0.5;
+let sunTimeoutChance = 1;
+let fishTimeoutChance = 0.01;
+let motaTimeoutChance = 1;
 
 const configFilePath = 'config.json';
 
@@ -79,7 +80,7 @@ const client = new tmi.Client({
         password: password
     },
     channels: ['ron__bot', 'pepto__bismol', 'hackmagic', 'swushwoi', 'minusinsanity', 'ron__johnson_', 'katelynerika',
-        'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro', 'yung_randd', 'sunephef']
+        'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro', 'yung_randd', 'sunephef', 'schooleo']
 });
 
 let channelsChatters = {};
@@ -103,17 +104,21 @@ client.on('message', (channel, tags, message, self) => {
     // Anti weeb tech
     if (channel === "#pepto__bismol") {
         if (tags.username === "sunephef") {
-            if (Math.random() < sunTimeoutChance) {
+            if (Math.random() <= sunTimeoutChance) {
                 sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence weeb simp furry NaM");
             }
         } else if (tags.username === "sunwithnofaceclap") {
             sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence weeb simp furry NaM , alt detected MODS");
         } else if (tags.username === "prog0ldfish") {
-            if (Math.random() < fishTimeoutChance) {
+            if (Math.random() <= fishTimeoutChance) {
                 sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence pinger WeirdChamp");
             }
         } else if (tags.username === "prog0idfish") {
             sendMessageRetry(channel, "/timeout " + tags.username + " 1 MODS alt detected");
+        } else if (tags.username === "motakam") {
+            if (Math.random() <= motaTimeoutChance) {
+                sendMessageRetry(channel, "/timeout " + tags.username + " 1 it didn't have to come to this you know forsenDespair");
+            }
         }
     }
 
