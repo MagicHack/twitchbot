@@ -300,6 +300,9 @@ client.on('message', (channel, tags, message, self) => {
 
 
         if (trusted.includes(tags.username)) {
+            if(isCommand(cleanMessage, "runlist")) {
+                runList(channel, tags, cleanMessage);
+            }
             if (isCommand(cleanMessage.toLowerCase(), 'unping')) {
                 let params = cleanMessage.split(' ');
                 if (params.length >= 2) {
@@ -932,3 +935,23 @@ function moderation(channel, tags, message) {
     }
 }
 
+function runList(channel, tags, message) {
+    if(!trusted.includes(tags.username)) {
+        console.log("ERROR untrusted user tried to run a list " + tags.username);
+        return;
+    }
+    let params = message.split(" ");
+    if(params.length >= 2 && params[1].length !== 0) {
+        let path = params[1];
+        try {
+            let data = fs.readFileSync(path, 'utf8');
+            let lines = data.split('\n');
+            lines.forEach(l => sendMessageRetry(channel, l));
+        } catch (e) {
+            console.log(e);
+            sendMessageRetry(channel, String(e));
+        }
+    } else {
+        sendMessageRetry(channel, "put a file name to run");
+    }
+}
