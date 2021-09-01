@@ -940,13 +940,14 @@ function runList(channel, tags, message) {
         console.log("ERROR untrusted user tried to run a list " + tags.username);
         return;
     }
+    console.log("Start of runlist, invocation : " + message + " by " + tags.username);
     let params = message.split(" ");
     if(params.length >= 2 && params[1].length !== 0) {
         let path = params[1];
         let lines = [];
         try {
             let data = fs.readFileSync(path, 'utf8');
-            data.split('\n');
+            lines = data.split('\n');
         } catch (e) {
             console.log(e);
             sendMessageRetry(channel, String(e));
@@ -962,7 +963,9 @@ function runList(channel, tags, message) {
             }
             lines = lines.map(l => command + l + reason);
         }
+        console.log("Running " + lines.length + " lines in the list");
         lines.forEach(l => sendMessageRetry(channel, l));
+        sendMessageRetry(channel, "Ran the list of " + lines.length + " lines");
     } else {
         sendMessageRetry(channel, "put a file name to run");
     }
