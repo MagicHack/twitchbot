@@ -485,7 +485,7 @@ function sendMessageRetry(channel, message) {
     }
     if(messageQueue.length > 0) {
         let messageToSend = messageQueue[0];
-        if(timerHandle !== null) {
+        if(timerHandle === null) {
             console.log("Starting interval for sending messages");
             timerHandle = setInterval(sendMessageRetry, 300, channel, '');
         }
