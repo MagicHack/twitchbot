@@ -476,7 +476,7 @@ function checkIfRaid(tags, message) {
     }
 }
 
-let timeoutHandle = null;
+let timerHandle = null;
 // Retries to send messages if they fail
 function sendMessageRetry(channel, message) {
     if(message !== '') {
@@ -487,14 +487,14 @@ function sendMessageRetry(channel, message) {
         let messageToSend = messageQueue[0];
         if (!sendMessage(messageToSend.channel, messageToSend.message)) {
             // retry after 300ms
-            if(timeoutHandle !== null) {
-                timeoutHandle = setTimeout(sendMessageRetry, 300, channel, '');
+            if(timerHandle !== null) {
+                timerHandle = setInterval(sendMessageRetry, 300, channel, '');
             }
         } else {
             messageQueue.shift();
         }
     } else {
-        timeoutHandle = null;
+        timerHandle = null;
     }
 }
 
