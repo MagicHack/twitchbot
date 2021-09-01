@@ -481,19 +481,19 @@ let timerHandle = null;
 function sendMessageRetry(channel, message) {
     if(message !== '') {
         messageQueue.push({channel : channel, message : message});
-        console.log("Queue length : " + message.length);
+        console.log("Queue length : " + messageQueue.length);
     }
     if(messageQueue.length > 0) {
         let messageToSend = messageQueue[0];
-        if (!sendMessage(messageToSend.channel, messageToSend.message)) {
-            // retry after 300ms
-            if(timerHandle !== null) {
-                timerHandle = setInterval(sendMessageRetry, 300, channel, '');
-            }
-        } else {
+        if(timerHandle !== null) {
+            console.log("Starting interval for sending messages");
+            timerHandle = setInterval(sendMessageRetry, 300, channel, '');
+        }
+        if (sendMessage(messageToSend.channel, messageToSend.message)) {
             messageQueue.shift();
         }
     } else {
+        console.log("Stopping retry message timer, no messages in queue");
         timerHandle = null;
     }
 }
