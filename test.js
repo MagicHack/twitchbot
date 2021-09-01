@@ -314,7 +314,7 @@ client.on('message', (channel, tags, message, self) => {
                 console.log(message);
                 message = tags.username + " " + message;
                 if(numberOfMessages > 0) {
-                    messageQueue.unshift({channel, message});
+                    messageQueue.unshift({channel : channel, message : message});
                     sendMessageRetry(channel, '');
                 } else {
                     sendMessageRetry(channel, message);
@@ -480,7 +480,8 @@ let timeoutHandle = null;
 // Retries to send messages if they fail
 function sendMessageRetry(channel, message) {
     if(message !== '') {
-        messageQueue.push({channel, message});
+        messageQueue.push({channel : channel, message : message});
+        console.log("Queue length : " + message.length);
     }
     if(messageQueue.length > 0) {
         let messageToSend = messageQueue[0];
