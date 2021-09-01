@@ -47,7 +47,6 @@ let ignoreUsersPing = [];
 const IGNORE_PING_FILE = 'ignorePings.json';
 readIgnorePingFile();
 
-
 try {
     const data = fs.readFileSync(configFilePath, 'utf8')
     configData = JSON.parse(data);
@@ -68,7 +67,6 @@ const trusted = ['hackmagic']
 
 const pushover = new Push({user: pushoverUser, token: pushoverToken});
 
-
 const client = new tmi.Client({
     options: {debug: true, messagesLogLevel: "info"},
     connection: {
@@ -88,6 +86,7 @@ let chattersRoles = {};
 
 let lastMessageTimeStampMs = 0;
 let lastSentMessage = '';
+let messageQueue = [];
 
 // refresh all chatters peridically
 setInterval(getAllChatters, delayChatterRefresh * 1000);
@@ -452,7 +451,7 @@ function checkIfRaid(tags, message) {
             }
         } else if (matchWon !== null) {
             console.log("Raid won");
-            for (notifyChannel of notifyChannels) {
+            for (let notifyChannel of notifyChannels) {
                 sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + matchWon[1] + "xp)");
             }
         }
@@ -461,9 +460,18 @@ function checkIfRaid(tags, message) {
 
 // Retries to send messages if they fail
 function sendMessageRetry(channel, message) {
-    if (!sendMessage(channel, message)) {
+    if(message !== '') {
+        messageQueue.push(message);
+    }
+    let messageToSend = '';
+    if(messageQueue.length > 0) {
+        messageToSend = messageQueue[0];
+    }
+    if (!sendMessage(channel, messageToSend)) {
         // retry after 300ms
-        setTimeout(sendMessageRetry, 300, channel, message);
+        setTimeout(sendMessageRetry, 300, channel, messageToSend);
+    } else {
+        messageQueue.shift();
     }
 }
 
