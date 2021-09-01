@@ -956,14 +956,17 @@ function runList(channel, tags, message) {
             let command = "";
             let reason = " : automated ban";
             if(params[2] === 'name' || params[2] === 'names') {
-                let command = "/ban ";
-            }
-            if(params >= 4 && params[3].length !== 0) {
-                reason = " " + params[3];
+                command = "/ban ";
+                if(params >= 4 && params[3].length !== 0) {
+                    reason = " " + params[3];
+                }
             }
             lines = lines.map(l => command + l + reason);
         }
         console.log("Running " + lines.length + " lines in the list");
+        if(lines.length > 0) {
+            console.log("first line : " + lines[0]);
+        }
         lines.forEach(l => sendMessageRetry(channel, l));
         sendMessageRetry(channel, "Ran the list of " + lines.length + " lines");
     } else {
