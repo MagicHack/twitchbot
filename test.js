@@ -943,14 +943,26 @@ function runList(channel, tags, message) {
     let params = message.split(" ");
     if(params.length >= 2 && params[1].length !== 0) {
         let path = params[1];
+        let lines = [];
         try {
             let data = fs.readFileSync(path, 'utf8');
-            let lines = data.split('\n');
-            lines.forEach(l => sendMessageRetry(channel, l));
+            data.split('\n');
         } catch (e) {
             console.log(e);
             sendMessageRetry(channel, String(e));
         }
+        if(params.length >= 3 && params[2].length !== 0) {
+            let command = "";
+            let reason = " : automated ban";
+            if(params[2] === 'name' || params[2] === 'names') {
+                let command = "/ban ";
+            }
+            if(params >= 4 && params[3].length !== 0) {
+                reason = " " + params[3];
+            }
+            lines = lines.map(l => command + l + reason);
+        }
+        lines.forEach(l => sendMessageRetry(channel, l));
     } else {
         sendMessageRetry(channel, "put a file name to run");
     }
