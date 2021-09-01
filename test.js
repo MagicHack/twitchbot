@@ -481,7 +481,7 @@ let timerHandle = null;
 function sendMessageRetry(channel, message) {
     if(message !== '') {
         messageQueue.push({channel : channel, message : message});
-        console.log("Queue length : " + messageQueue.length);
+        // console.log("Queue length : " + messageQueue.length);
     }
     if(messageQueue.length > 0) {
         let messageToSend = messageQueue[0];
@@ -506,7 +506,7 @@ function sendMessageRetry(channel, message) {
 
 // We assume normal bucket is full on start, 30 seconds before being able to send messages on startup
 let sentMessagesTS = new Array(Math.round(rateLimitMessagesMod)).fill(Date.now());
-
+let logSendMessages = false;
 function sendMessage(channel, message) {
     const charLimit = 500;
     // TODO implement banphrase api
@@ -539,27 +539,37 @@ function sendMessage(channel, message) {
     let currentLimit = rateLimitMessages;
 
     if (isMod || isVip) {
-        console.log("using mod/vip rate limit");
+        if(logSendMessages) {
+            console.log("using mod/vip rate limit");
+        }
         currentRate = rateLimitDelayMod;
         currentLimit = rateLimitMessagesMod;
 
         if (modSpamChannels.includes(channel)) {
             modSpam = true;
-            console.log("Mod spam enabled TriHard");
+            if(logSendMessages) {
+                console.log("Mod spam enabled TriHard");
+            }
         }
     }
 
     if (!modSpam && Date.now() - lastMessageTimeStampMs < currentRate * 1000) {
         // We send messages at most every 30s/ratelimit, another mesure to not go over the rate limit
         // except in channel where mod spam is enabled.
-        console.log("Dropped message cause we are sending too fast");
+        if(logSendMessages) {
+            console.log("Dropped message cause we are sending too fast");
+        }
         return false;
     } else {
-        console.log("Current message counter is : " + messageCounter);
+        if(logSendMessages) {
+            console.log("Current message counter is : " + messageCounter);
+        }
 
         if (messageCounter >= currentLimit - 1) {
             // 1 message buffer monkaGIGA...
-            console.log("Dropped message cause we are approching max number of message every 30s");
+            if(logSendMessages) {
+                console.log("Dropped message cause we are approching max number of message every 30s");
+            }
             return false;
         }
         // We add the current timestamp to the sliding window
@@ -572,7 +582,6 @@ function sendMessage(channel, message) {
         }
         lastSentMessage = message;
         if (message.length > charLimit) {
-            // TODO : implement sending in multiple messages, maybe with a message queue?
             console.log("Message too long (" + message.length + " chars), truncating it");
             message = message.substring(0, charLimit - 5) + ' ...';
         }
