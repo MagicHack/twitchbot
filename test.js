@@ -489,11 +489,17 @@ function sendMessageRetry(channel, message) {
             console.log("Starting interval for sending messages");
             timerHandle = setInterval(sendMessageRetry, 300, channel, '');
         }
-        if (sendMessage(messageToSend.channel, messageToSend.message)) {
+        while(sendMessage(messageToSend.channel, messageToSend.message)) {
             messageQueue.shift();
+            if(messageQueue.length > 0) {
+                messageToSend = messageQueue[0];
+            } else {
+                break;
+            }
         }
     } else {
         console.log("Stopping retry message timer, no messages in queue");
+        clearInterval(timerHandle);
         timerHandle = null;
     }
 }
