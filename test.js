@@ -302,6 +302,24 @@ client.on('message', (channel, tags, message, self) => {
             if(isCommand(cleanMessage, "runlist")) {
                 runList(channel, tags, cleanMessage);
             }
+            if(isCommand(cleanMessage, "clear")) {
+                const numberOfMessages = messageQueue.length;
+                messageQueue = [];
+                console.log("Cleared message queue : " + numberOfMessages + " messages");
+                sendMessageRetry(channel, "@" + tags.username + " cleared queue of " + numberOfMessages + " messages");
+            }
+            if(isCommand(cleanMessage, 'queue')) {
+                const numberOfMessages = messageQueue.length;
+                let message = "Number of messages in queue : " + numberOfMessages;
+                console.log(message);
+                message = tags.username + " " + message;
+                if(numberOfMessages > 0) {
+                    messageQueue.unshift({channel, message});
+                    sendMessageRetry(channel, '');
+                } else {
+                    sendMessageRetry(channel, message);
+                }
+            }
             if (isCommand(cleanMessage.toLowerCase(), 'unping')) {
                 let params = cleanMessage.split(' ');
                 if (params.length >= 2) {
@@ -458,20 +476,24 @@ function checkIfRaid(tags, message) {
     }
 }
 
+let timeoutHandle = null;
 // Retries to send messages if they fail
 function sendMessageRetry(channel, message) {
     if(message !== '') {
-        messageQueue.push(message);
+        messageQueue.push({channel, message});
     }
-    let messageToSend = '';
     if(messageQueue.length > 0) {
-        messageToSend = messageQueue[0];
-    }
-    if (!sendMessage(channel, messageToSend)) {
-        // retry after 300ms
-        setTimeout(sendMessageRetry, 300, channel, messageToSend);
+        let messageToSend = messageQueue[0];
+        if (!sendMessage(messageToSend.channel, messageToSend.message)) {
+            // retry after 300ms
+            if(timeoutHandle !== null) {
+                timeoutHandle = setTimeout(sendMessageRetry, 300, channel, '');
+            }
+        } else {
+            messageQueue.shift();
+        }
     } else {
-        messageQueue.shift();
+        timeoutHandle = null;
     }
 }
 
