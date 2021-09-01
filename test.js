@@ -28,6 +28,9 @@ const RAID_FILE = 'raid.json';
 let peopleToNotify = [];
 readRaidPingFile();
 
+// channel where we can mod/vip spam
+let modSpamChannels = ['#pepto__bismol', "#sunephef", "#hackmagic"];
+
 // Weird char in twitch messages
 const blankchar = '󠀀';
 let sunTimeoutChance = 1;
@@ -516,8 +519,6 @@ function sendMessage(channel, message) {
     // We remove timestamps older then 30 second (+1 for safety margin)
     sentMessagesTS = sentMessagesTS.filter(ts => Date.now() - ts < (30 + 1) * 1000);
     let messageCounter = sentMessagesTS.length;
-
-    let modSpamChannels = ['#pepto__bismol', "#sunephef"];
 
     let isMod = false;
     let isVip = false;
