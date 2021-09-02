@@ -8,6 +8,7 @@ const momentTZ = require('moment-timezone');
 const moment = require("moment");
 
 const seventv = require('./7tv.js');
+const {channel} = require("tmi.js/lib/utils");
 
 // Number of message that can be sent every 30 seconds
 const rateLimitMessages = 20;
@@ -90,6 +91,7 @@ let chattersRoles = {};
 let lastMessageTimeStampMs = 0;
 let lastSentMessage = '';
 let messageQueue = [];
+let messagePriorityQueue = [];
 
 // refresh all chatters peridically
 setInterval(getAllChatters, delayChatterRefresh * 1000);
@@ -316,12 +318,7 @@ client.on('message', (channel, tags, message, self) => {
                 let message = "Number of messages in queue : " + numberOfMessages;
                 console.log(message);
                 message = tags.username + " " + message;
-                if(numberOfMessages > 0) {
-                    messageQueue.unshift({channel : channel, message : message});
-                    sendMessageRetry(channel, '');
-                } else {
-                    sendMessageRetry(channel, message);
-                }
+                sendMessageRetryPriority(channel, message);
             }
             if (isCommand(cleanMessage.toLowerCase(), 'unping')) {
                 let params = cleanMessage.split(' ');
@@ -432,6 +429,7 @@ client.on("join", (channel, username, self) => {
 });
 
 function checkIfRaid(tags, message) {
+
     // How many chars to split a message
     const MAX_CHARS = 500;
     let notifyChannels = ['#minusinsanity', '#hackmagic'];
@@ -443,6 +441,7 @@ function checkIfRaid(tags, message) {
         let matchLost = raidLostRE.exec(message);
         let matchWon = raidWonRE.exec(message);
         if (matchBegin !== null) {
+            let messagesToSend = [];
             console.log("Raid detected");
             // Notify me of a raid if I have my chat open
             if (channelsChatters["#hackmagic"].includes('hackmagic')) {
@@ -454,20 +453,20 @@ function checkIfRaid(tags, message) {
                 for (let p of peopleToNotify) {
                     // Send and create a new message when it's too long
                     if (notifMessage.length + p.length >= MAX_CHARS) {
-                        sendMessageRetry(notifyChannel, notifMessage);
+                        sendMessageRetryPriority(notifyChannel, notifMessage);
                         notifMessage = baseMessage;
                     }
                     notifMessage += ' @' + p;
                 }
                 if (notifMessage.length !== 0) {
-                    sendMessageRetry(notifyChannel, notifMessage);
+                    sendMessageRetryPriority(notifyChannel, notifMessage);
                 } else {
                     console.log("No one to notify Sadge");
                 }
             }
         } else if (matchLost !== null) {
             console.log("Raid lost");
-            for (notifyChannel of notifyChannels) {
+            for (let notifyChannel of notifyChannels) {
                 sendMessageRetry(notifyChannel, "Raid L OMEGALULiguess ST");
             }
         } else if (matchWon !== null) {
@@ -479,23 +478,33 @@ function checkIfRaid(tags, message) {
     }
 }
 
+// Puts messages at the start of the queue
+function sendMessageRetryPriority(channel, message) {
+    messagePriorityQueue.push({channel : channel, message : message});
+    sendMessageRetry(channel, '');
+}
+
 let timerHandle = null;
 // Retries to send messages if they fail
 function sendMessageRetry(channel, message) {
+    let currentQueue = messageQueue;
     if(message !== '') {
-        messageQueue.push({channel : channel, message : message});
+        currentQueue.push({channel : channel, message : message});
         // console.log("Queue length : " + messageQueue.length);
     }
-    if(messageQueue.length > 0) {
-        let messageToSend = messageQueue[0];
+    if(messagePriorityQueue.length > 0) {
+        currentQueue = messagePriorityQueue;
+    }
+    if(currentQueue.length > 0) {
+        let messageToSend = currentQueue[0];
         if(timerHandle === null) {
             console.log("Starting interval for sending messages");
             timerHandle = setInterval(sendMessageRetry, 300, channel, '');
         }
         while(sendMessage(messageToSend.channel, messageToSend.message)) {
-            messageQueue.shift();
-            if(messageQueue.length > 0) {
-                messageToSend = messageQueue[0];
+            currentQueue.shift();
+            if(currentQueue.length > 0) {
+                messageToSend = currentQueue[0];
             } else {
                 break;
             }
