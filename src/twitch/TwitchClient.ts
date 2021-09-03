@@ -85,6 +85,10 @@ class TwitchClient extends ChatClient {
         return false;
     }
 
+    public isBroadcaster(channel: string) {
+        // TODO
+    }
+
     private emitTimeoutMessage(message: TimeoutMessage): void {
         this.emit('timeout', message);
     }
@@ -111,13 +115,16 @@ class TwitchClient extends ChatClient {
         throw new Error("Unexpected ClearchatMessage");
     }
 
-    private createUser(message: PrivmsgMessage|WhisperMessage): User {
+    private createUser(message: PrivmsgMessage|WhisperMessage): TwitchUser {
         let isMod = false;
+        let isBroadcaster = false;
         if(message instanceof PrivmsgMessage) {
-            isMod = message.isMod;
+            isBroadcaster = message.badges.hasBroadcaster;
+            isMod = message.isMod || isBroadcaster;
         }
-        return new User(message.senderUsername, message.senderUserID, this.getPlatform(), isMod,
-            message.displayName);
+
+        return new TwitchUser(message.senderUsername, message.senderUserID, this.getPlatform(), isMod,
+            message.displayName, isBroadcaster);
     }
 
     private createMessage(message: PrivmsgMessage|WhisperMessage): Message {

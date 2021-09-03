@@ -19,9 +19,6 @@ logger.info("MagicBot started");
 const TWITCH_USERNAME = getEnvValue('TWITCH_USERNAME');
 const TWITCH_TOKEN = getEnvValue('TWITCH_TOKEN');
 
-
-
-
 function getEnvValue(key :string) :string {
     const result = process.env[key];
     if(result === undefined) {
@@ -29,5 +26,5 @@ function getEnvValue(key :string) :string {
         logger.error(message);
         throw message;
     }
-    return result!;
+    return result;
 }

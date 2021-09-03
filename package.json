@@ -9,6 +9,7 @@
     "prestart": "npm run build",
     "start": "node .",
     "lint": "npx eslint . --ext .ts",
+    "fix" : "npx eslint . --ext .ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
