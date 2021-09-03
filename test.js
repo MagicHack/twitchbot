@@ -49,7 +49,12 @@ let pushoverToken = '';
 let pushoverUser = '';
 let ignoreUsersPing = [];
 const IGNORE_PING_FILE = 'ignorePings.json';
+
 readIgnorePingFile();
+
+const PROGRESS_FILE = 'progress.txt';
+let maxProgress = 0;
+readProgress();
 
 try {
     const data = fs.readFileSync(configFilePath, 'utf8')
@@ -95,6 +100,9 @@ let messagePriorityQueue = [];
 
 // refresh all chatters peridically
 setInterval(getAllChatters, delayChatterRefresh * 1000);
+
+// get progress every 10 seconds
+setInterval(checkProgress, 10000);
 
 client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {
@@ -280,6 +288,8 @@ client.on('message', (channel, tags, message, self) => {
             isCommand(cleanMessage.toLowerCase(), "peptobprogress") ||
             isCommand(cleanMessage.toLowerCase(), "fallking")) {
             progress(channel).then();
+        } else if(isCommand(cleanMessage.toLowerCase(), "maxprogress")) {
+            sendMessage(channel, String(maxProgress));
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
@@ -891,7 +901,7 @@ function isMod(user, channel) {
 
 function callingTheImpostor(channel) {
     let tzNames = momentTZ.tz.names();
-    var now = moment();
+    let now = moment();
     let possibleZone = [];
     // TODO : find a better way then checking all possible time zones WAYTOODANK
     for (let tz of tzNames) {
@@ -1029,5 +1039,32 @@ function runList(channel, tags, message) {
         sendMessageRetry(channel, "Ran the list of " + lines.length + " lines");
     } else {
         sendMessageRetry(channel, "put a file name to run");
+    }
+}
+
+async function checkProgress() {
+    let response = await fetch("https://forsenjk-default-rtdb.firebaseio.com/forsen/last.json", {});
+    let data = await response.json();
+    let percent = data["percent"];
+    if(percent > maxProgress) {
+        maxProgress = percent;
+        writeProgress();
+    }
+}
+
+function readProgress() {
+    try {
+        let data = fs.readFileSync(PROGRESS_FILE, 'utf8');
+        maxProgress = parseFloat(data);
+    } catch (e) {
+        console.log("Could not read progress file " + e);
+    }
+}
+
+function writeProgress() {
+    try {
+        fs.writeFileSync(PROGRESS_FILE, String(maxProgress));
+    } catch (e) {
+        console.log("error writing progress file" + e);
     }
 }
