@@ -1047,6 +1047,8 @@ async function checkProgress() {
     let data = await response.json();
     let percent = data["percent"];
     if(percent > maxProgress) {
+        const message = "New progress : " + percent + " > " + maxProgress;
+        sendNotification(message);
         console.log("New progress : " + percent + " > " + maxProgress);
         maxProgress = percent;
         writeProgress();
