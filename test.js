@@ -97,9 +97,6 @@ let messagePriorityQueue = [];
 // refresh all chatters peridically
 setInterval(getAllChatters, delayChatterRefresh * 1000);
 
-// get progress every few seconds
-setInterval(checkProgress, 5000);
-
 client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {
     if (self) return;
