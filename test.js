@@ -112,17 +112,19 @@ client.on('message', (channel, tags, message, self) => {
                 sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence weeb simp furry NaM");
             }
         } else if (tags.username === "sunwithnofaceclap") {
-            sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence weeb simp furry NaM , alt detected MODS");
+            sendMessageRetry(channel, "/timeout " + tags.username + " 30 silence weeb simp furry NaM , alt detected MODS");
         } else if (tags.username === "prog0ldfish") {
             if (Math.random() <= fishTimeoutChance) {
                 sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence pinger WeirdChamp");
             }
         } else if (tags.username === "prog0idfish") {
-            sendMessageRetry(channel, "/timeout " + tags.username + " 1 MODS alt detected");
+            sendMessageRetry(channel, "/timeout " + tags.username + " 30 MODS alt detected");
         } else if (tags.username === "motakam") {
             if (Math.random() <= motaTimeoutChance) {
                 sendMessageRetry(channel, "/timeout " + tags.username + " 1 it didn't have to come to this you know forsenDespair");
             }
+        }else if (tags.username === "motacam") {
+            sendMessageRetry(channel, "/timeout " + tags.username + " 30 it didn't have to come to this you know forsenDespair , alt detected MODS")
         }
     }
 
