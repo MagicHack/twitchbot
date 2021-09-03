@@ -101,8 +101,8 @@ let messagePriorityQueue = [];
 // refresh all chatters peridically
 setInterval(getAllChatters, delayChatterRefresh * 1000);
 
-// get progress every 10 seconds
-setInterval(checkProgress, 10000);
+// get progress every few seconds
+setInterval(checkProgress, 5000);
 
 client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {
@@ -289,7 +289,7 @@ client.on('message', (channel, tags, message, self) => {
             isCommand(cleanMessage.toLowerCase(), "fallking")) {
             progress(channel).then();
         } else if(isCommand(cleanMessage.toLowerCase(), "maxprogress")) {
-            sendMessage(channel, String(maxProgress));
+            sendMessage(channel, String(maxProgress) + "%");
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
@@ -1022,7 +1022,7 @@ function runList(channel, tags, message) {
         }
         if(params.length >= 3 && params[2].length !== 0) {
             let command = "";
-            let reason = " : automated ban";
+            let reason = " automated ban";
             if(params[2] === 'name' || params[2] === 'names') {
                 command = "/ban ";
                 if(params >= 4 && params[3].length !== 0) {
@@ -1047,6 +1047,7 @@ async function checkProgress() {
     let data = await response.json();
     let percent = data["percent"];
     if(percent > maxProgress) {
+        console.log("New progress : " + percent + " > " + maxProgress);
         maxProgress = percent;
         writeProgress();
     }
@@ -1056,6 +1057,7 @@ function readProgress() {
     try {
         let data = fs.readFileSync(PROGRESS_FILE, 'utf8');
         maxProgress = parseFloat(data);
+        console.log("Read progress file");
     } catch (e) {
         console.log("Could not read progress file " + e);
     }
@@ -1064,6 +1066,7 @@ function readProgress() {
 function writeProgress() {
     try {
         fs.writeFileSync(PROGRESS_FILE, String(maxProgress));
+        console.log("Wrote progress file");
     } catch (e) {
         console.log("error writing progress file" + e);
     }
