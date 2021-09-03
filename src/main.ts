@@ -1,8 +1,6 @@
 import 'dotenv/config';
 import winston from "winston";
 
-import {TwitchBot} from "./twitch_bot";
-
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.combine(

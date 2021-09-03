@@ -1,4 +1,4 @@
-import {ChatClient} from "./chatClient";
+import {ChatClient} from "../ChatClient";
 import {
     ChatClient as DankClient, ClearchatMessage,
     PrivmsgMessage,
