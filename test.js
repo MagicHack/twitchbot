@@ -951,17 +951,25 @@ async function progress(channel) {
 }
 
 function moderation(channel, tags, message) {
-    let enableChannels = ['#hackmagic'];
+    const hossRe = /\b@?([h]+[0o]+[s]+[o0-9]+\S*)\b/gi;
+    let enableChannels = ['#hackmagic', '#pepto__bismol'];
     if(!enableChannels.includes(channel)) {
         return;
     }
     // hoss bots follows annouced by streamelements
     if(tags.username === "streamelements") {
-        const hossRe = /\s?@?([h]+[0o]+[s]+[o0-9]+_*)\s?/gi;
         let match = hossRe.exec(message);
         if(match !== null) {
             let user = match[1];
             sendMessageRetry(channel, "/ban " + user + " automated bot ban");
+        }
+    } else if (tags.username === "doo_dul") {
+        if(/has followed/gi.test(message)) {
+            let match = hossRe.exec(message);
+            if(match !== null) {
+                let user = match[1];
+                sendMessageRetry(channel, "/ban " + user + " automated bot ban");
+            }
         }
     }
 }
