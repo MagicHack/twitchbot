@@ -5,7 +5,8 @@ import {
     WhisperMessage
 } from "dank-twitch-irc";
 
-class TwitchClient extends ChatClient {
+export class TwitchClient extends ChatClient {
+    private readonly username: string;
     private readonly client: DankClient;
     private readonly isAnon: boolean;
 
@@ -14,9 +15,11 @@ class TwitchClient extends ChatClient {
         if(!username || !token) {
             this.isAnon = true;
             this.client = new DankClient();
+            this.username = "";
         } else {
             this.isAnon = false;
             this.client = new DankClient({username, password : token});
+            this.username = username;
         }
 
         // Register events we want to pass trough
@@ -79,14 +82,20 @@ class TwitchClient extends ChatClient {
         if(!this.isAnon) {
             const isMod = this.client.userStateTracker?.getChannelState(channel)?.isMod;
             if (isMod !== undefined) {
-                return isMod;
+                return isMod || this.isBroadcaster(channel);
+            }
+        }
+        return this.isBroadcaster(channel);
+    }
+
+    public isBroadcaster(channel: string): boolean {
+        if(!this.isAnon) {
+            const isBroadcaster = this.client.userStateTracker?.getChannelState(channel)?.badgeInfo.hasBroadcaster;
+            if(isBroadcaster !== undefined) {
+                return isBroadcaster;
             }
         }
         return false;
-    }
-
-    public isBroadcaster(channel: string) {
-        // TODO
     }
 
     private emitTimeoutMessage(message: TimeoutMessage): void {

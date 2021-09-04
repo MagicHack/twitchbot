@@ -1,5 +1,10 @@
+/**
+ * Main file, gets credentials from config and starts the bot
+ */
 import 'dotenv/config';
 import winston from "winston";
+import {TwitchClient} from "./twitch/TwitchClient";
+import {Bot} from "./Bot"
 
 const logger = winston.createLogger({
     level: 'info',
@@ -18,6 +23,12 @@ logger.info("MagicBot started");
 
 const TWITCH_USERNAME = getEnvValue('TWITCH_USERNAME');
 const TWITCH_TOKEN = getEnvValue('TWITCH_TOKEN');
+
+const twitchClient = new TwitchClient(TWITCH_USERNAME, TWITCH_TOKEN);
+const anonTwitchClient = new TwitchClient();
+
+const bot = new Bot(twitchClient, anonTwitchClient);
+bot.run();
 
 function getEnvValue(key :string) :string {
     const result = process.env[key];
