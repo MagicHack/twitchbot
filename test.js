@@ -900,7 +900,7 @@ async function progress(channel) {
 }
 
 function moderation(channel, tags, message) {
-    const hossRe = /\b@?([h]+[0o]+[s]+[o0-9]+\S*)\b/gi;
+    const hossRe = /\b@?([h]+[0o]+[s]+[t]*[o0-9]+\S*)\b/gi;
     let enableChannels = ['#hackmagic', '#pepto__bismol'];
     if(!enableChannels.includes(channel)) {
         return;
