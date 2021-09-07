@@ -36,6 +36,16 @@ let modSpamChannels = ['#pepto__bismol', "#sunephef", "#hackmagic"];
 
 // Weird char in twitch messages
 const blankchar = '󠀀';
+
+// Auto random timeouts TrollDespair
+const TIMEOUTS_FILE = "timeouts.json";
+let timeoutList = [];
+try {
+    timeoutList = readDataJson(TIMEOUTS_FILE);
+    console.log("read timeout file");
+} catch (e) {
+    console.log(e);
+}
 let sunTimeoutChance = 1;
 let fishTimeoutChance = 0.01;
 let motaTimeoutChance = 1;
@@ -114,25 +124,7 @@ client.on('message', (channel, tags, message, self) => {
 
     // Anti weeb tech
     if (channel === "#pepto__bismol") {
-        if (tags.username === "sunephef") {
-            if (Math.random() <= sunTimeoutChance) {
-                sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence weeb simp furry NaM");
-            }
-        } else if (tags.username === "sunwithnofaceclap") {
-            sendMessageRetry(channel, "/timeout " + tags.username + " 30 silence weeb simp furry NaM , alt detected MODS");
-        } else if (tags.username === "prog0ldfish") {
-            if (Math.random() <= fishTimeoutChance) {
-                sendMessageRetry(channel, "/timeout " + tags.username + " 1 silence pinger WeirdChamp");
-            }
-        } else if (tags.username === "prog0idfish") {
-            sendMessageRetry(channel, "/timeout " + tags.username + " 30 MODS alt detected");
-        } else if (tags.username === "motakam") {
-            if (Math.random() <= motaTimeoutChance) {
-                sendMessageRetry(channel, "/timeout " + tags.username + " 1 it didn't have to come to this you know forsenDespair");
-            }
-        }else if (tags.username === "motacam") {
-            sendMessageRetry(channel, "/timeout " + tags.username + " 30 it didn't have to come to this you know forsenDespair , alt detected MODS")
-        }
+        timeouts(channel, tags.username);
     }
 
     let cleanMessage = message.replace(blankchar, '').trim();
@@ -969,4 +961,17 @@ function saveDataJson(data, filePath) {
 function readDataJson(filePath) {
     let data = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(data);
+}
+
+function timeouts(channel, username) {
+    try {
+        let timeout = timeoutList.find(user => user.username === username);
+        if(timeout !== undefined) {
+            if(Math.random() <= timeout.probability) {
+                sendMessageRetryPriority(channel, `/timeout ${timeout.username} ${timeout.duration} ${timeout.reason}`);
+            }
+        }
+    } catch (e) {
+        console.log(e);
+    }
 }
