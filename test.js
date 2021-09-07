@@ -7,9 +7,6 @@ const Push = require('pushover-notifications');
 const momentTZ = require('moment-timezone');
 const moment = require("moment");
 
-const seventv = require('./7tv.js');
-const {channel} = require("tmi.js/lib/utils");
-
 // Number of message that can be sent every 30 seconds
 const rateLimitMessages = 20;
 const rateLimitMessagesMod = 100;
@@ -27,7 +24,12 @@ let prefix = '&';
 // name of file storing raid users
 const RAID_FILE = 'raid.json';
 let peopleToNotify = [];
-readRaidPingFile();
+try {
+    peopleToNotify = readDataJson(RAID_FILE);
+    console.log("Successfully read ping file");
+} catch (e) {
+    console.log(e);
+}
 
 // channel where we can mod/vip spam
 let modSpamChannels = ['#pepto__bismol', "#sunephef", "#hackmagic"];
@@ -50,11 +52,15 @@ let pushoverUser = '';
 let ignoreUsersPing = [];
 const IGNORE_PING_FILE = 'ignorePings.json';
 
-readIgnorePingFile();
+try {
+    ignoreUsersPing = readDataJson(IGNORE_PING_FILE);
+    console.log("Raid ingore pings file");
+} catch (e) {
+    console.log(e);
+}
 
 try {
-    const data = fs.readFileSync(configFilePath, 'utf8')
-    configData = JSON.parse(data);
+    let configData = readDataJson(configFilePath);
     username = configData["username"];
     password = configData["token"];
     weatherApiKey = configData["weatherKey"];
@@ -444,7 +450,6 @@ function checkIfRaid(tags, message) {
         let matchLost = raidLostRE.exec(message);
         let matchWon = raidWonRE.exec(message);
         if (matchBegin !== null) {
-            let messagesToSend = [];
             console.log("Raid detected");
             // Notify me of a raid if I have my chat open
             if (channelsChatters["#hackmagic"].includes('hackmagic')) {
@@ -695,13 +700,12 @@ function isCommand(message, command) {
     return message.startsWith(prefix + command) || message.startsWith(prefix + ' ' + command);
 }
 
-
 function raidPing(channel, user) {
     const index = peopleToNotify.indexOf(user);
     if (index === -1) {
         peopleToNotify.push(user);
         try {
-            createRaidPingFile();
+            saveDataJson(peopleToNotify, RAID_FILE);
         } catch (error) {
             console.error(typeof error + " " + error.message);
             console.error("Failed to write the raid users file");
@@ -720,7 +724,7 @@ function raidUnPing(channel, user) {
     if (index !== -1) {
         peopleToNotify.splice(index, 1);
         try {
-            createRaidPingFile();
+            saveDataJson(peopleToNotify, RAID_FILE);
         } catch (error) {
             console.error(typeof error + " " + error.message);
             console.error("Failed to write the raid users file");
@@ -733,28 +737,6 @@ function raidUnPing(channel, user) {
     } else {
         sendMessageRetry(channel, `@${user}, you are not currently in the list of people to ping FeelsDankMan 
 		type ${prefix}raidping if you want to get pinged`);
-    }
-}
-
-function createRaidPingFile() {
-    let users = {users: peopleToNotify};
-    fs.writeFile(RAID_FILE, JSON.stringify(users), 'utf8', (err) => {
-        if (err) throw err;
-        console.log('The raid ping file has been saved!');
-    });
-}
-
-function readRaidPingFile() {
-    if (fs.existsSync(RAID_FILE)) {
-        try {
-            const data = fs.readFileSync(RAID_FILE, 'utf8');
-            let userData = JSON.parse(data);
-            userData['users'].forEach(user => peopleToNotify.push(user));
-            console.log("Successfully read ping file");
-        } catch (err) {
-            console.error(typeof err + " " + err.message);
-            console.error("Error, could not read raid file.");
-        }
     }
 }
 
@@ -814,20 +796,6 @@ function sendNotification(message) {
     });
 }
 
-function readIgnorePingFile() {
-    if (fs.existsSync(IGNORE_PING_FILE)) {
-        try {
-            const data = fs.readFileSync(IGNORE_PING_FILE, 'utf8');
-            let userData = JSON.parse(data);
-            userData['users'].forEach(user => ignoreUsersPing.push(user));
-            console.log("Successfully read ignore file");
-        } catch (err) {
-            console.error(typeof err + " " + err.message);
-            console.error("Error, could not read ignore file.");
-        }
-    }
-}
-
 function removeUserIgnore(channel, username) {
     let index = ignoreUsersPing.indexOf(username);
     if (index === -1) {
@@ -836,7 +804,8 @@ function removeUserIgnore(channel, username) {
         ignoreUsersPing.splice(index, 1);
         sendMessageRetry(channel, `hackmagic, removed user ${username} from ignore ping list`);
         try {
-            createIgnorePingFile();
+            saveDataJson(ignoreUsersPing, IGNORE_PING_FILE);
+            console.log('The ignore user ping file has been saved!');
         } catch (e) {
             console.error(e);
         }
@@ -848,22 +817,15 @@ function addUserIgnore(channel, username) {
         ignoreUsersPing.push(username);
         sendMessageRetry(channel, `hackmagic, added user ${username} to ping ignore list`);
         try {
-            createIgnorePingFile();
+            saveDataJson(ignoreUsersPing, IGNORE_PING_FILE);
         } catch (e) {
             console.error(e);
+            console.log('The ignore user ping file has been saved!');
         }
 
     } else {
         sendMessageRetry(channel, 'hackmagic, user already in list');
     }
-}
-
-function createIgnorePingFile() {
-    let users = {users: ignoreUsersPing};
-    fs.writeFile(IGNORE_PING_FILE, JSON.stringify(users), 'utf8', (err) => {
-        if (err) throw err;
-        console.log('The ignore user ping file has been saved!');
-    });
 }
 
 function flashbang(channel, user, amount, text) {
@@ -908,19 +870,6 @@ function callingTheImpostor(channel) {
     } else {
         console.log("Didn't find any timezone where it's 3am, weird...");
     }
-}
-
-function getTimeZone(targetHour, currentHour) {
-    let offset = -(currentHour - targetHour);
-    if (Math.abs(offset) > 12) {
-        let shift = 24;
-        if (offset > 0) {
-            offset -= shift;
-        } else {
-            offset += shift;
-        }
-    }
-    return offset;
 }
 
 function getRandomInt(max) {
@@ -1013,3 +962,11 @@ function runList(channel, tags, message) {
     }
 }
 
+function saveDataJson(data, filePath) {
+    fs.writeFileSync(filePath, JSON.stringify(data), 'utf8');
+}
+
+function readDataJson(filePath) {
+    let data = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(data);
+}
