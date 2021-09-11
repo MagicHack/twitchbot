@@ -114,6 +114,33 @@ let messagePriorityQueue = [];
 setInterval(getAllChatters, delayChatterRefresh * 1000);
 
 client.connect().catch(console.error);
+
+let bans = [];
+try {
+    bans = readDataJson("bans.txt");
+} catch (e) {
+    console.log(e);
+}
+setInterval(saveBans, 10000);
+
+let lastBanCount = bans.length;
+let lastBanSaveTs = Date.now();
+function saveBans() {
+    if(bans.length > lastBanCount) {
+        if(Date.now() - lastBanSaveTs > 30 * 1000) {
+            lastBanCount = bans.length;
+            lastBanSaveTs = Date.now();
+            saveDataJson(bans, "bans.json");
+        }
+    }
+}
+
+client.on("ban", (channel, username, reason, userstate) => {
+    // Log all bans
+    let user = {channel : channel, username : username, ts : Date.now()};
+    bans.push(user);
+});
+
 client.on('message', (channel, tags, message, self) => {
     if (self) return;
     // ignore whispers for now
