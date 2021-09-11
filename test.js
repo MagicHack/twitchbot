@@ -46,9 +46,6 @@ try {
 } catch (e) {
     console.log(e);
 }
-let sunTimeoutChance = 1;
-let fishTimeoutChance = 0.01;
-let motaTimeoutChance = 1;
 
 const configFilePath = 'config.json';
 
@@ -919,7 +916,7 @@ async function progress(channel) {
 }
 
 function moderation(channel, tags, message) {
-    const hossRe = /\b@?([h]+[0o]+[s]+[t]*[o0-9]+\S*)\b/gi;
+    const hossRe = /\b@?([h]+[0o]+[s]+[t_]*[o0-9]+\S*)\b/gi;
     let enableChannels = ['#hackmagic', '#pepto__bismol'];
     if(!enableChannels.includes(channel)) {
         return;
