@@ -114,7 +114,7 @@ client.connect().catch(console.error);
 
 let bans = [];
 try {
-    bans = readDataJson("bans.txt");
+    bans = readDataJson("bans.json");
 } catch (e) {
     console.log(e);
 }
