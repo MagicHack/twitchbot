@@ -2,7 +2,6 @@
  * Main class of the bot
  */
 import {TwitchClient} from "./twitch/TwitchClient";
-import {me} from "dank-twitch-irc";
 
 export class Bot {
     private client: TwitchClient;
@@ -13,8 +12,8 @@ export class Bot {
         this.anonClient = anonClient;
     }
     public run(): void {
-        this.client.on("message", this.handleMessage);
-        this.anonClient.on("message", this.handleAnonMessage);
+        this.client.on("message", (message) => {this.handleMessage(message)});
+        this.anonClient.on("message", (message) => {this.handleMessage(message)});
     }
 
     private handleAnonMessage(message : Message) {
