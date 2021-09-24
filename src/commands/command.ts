@@ -2,18 +2,20 @@
  * Base Command
  */
 
-import {Logger} from "winston";
-
-abstract class Command {
+export abstract class Command {
     /**
      * The first alias in the array is the main name of the command
      */
     private readonly aliases : string[];
-    private readonly logger : Logger;
-    protected constructor(aliases : string[], logger : Logger) {
+    protected constructor(aliases : string[]) {
         this.aliases = aliases;
-        this.logger = logger;
     }
+
+    /**
+     * Runs the command and sends back the result
+     * @param params paramters to run the command
+     * @param message original message that called the command
+     */
     abstract execute(params : string[], message: Message) : string;
 
     /**
@@ -21,5 +23,12 @@ abstract class Command {
      */
     public check(value : string) : boolean{
         return this.aliases.includes(value);
+    }
+
+    /**
+     * Return all aliases of the command
+     */
+    public getAliases() : string[] {
+        return this.aliases;
     }
 }
