@@ -38,7 +38,7 @@ class Config {
         return this.isDevEnv;
     }
 
-    public getPrefixChannel() {
+    public getPrefixChannel(channel: string) {
         // TODO, fetch in file channel
         // Double the prefix in dev mode
         return this.getPrefixGlobal();

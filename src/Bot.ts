@@ -2,6 +2,9 @@
  * Main class of the bot
  */
 import {TwitchClient} from "./twitch/TwitchClient";
+import Utils from "./Utils";
+import {me} from "dank-twitch-irc";
+import {config} from "./Config";
 
 export class Bot {
     private client: TwitchClient;
@@ -22,10 +25,15 @@ export class Bot {
 
     private handleMessage(message : Message) {
         this.logger.info("#" + message.channel + " :" + message.user.rawName + " " + message.message );
+        let params = this.splitMessage(message);
     }
 
     private splitMessage(message : Message): string[] {
         // Split on spaces and remove empty params
-        return message.getCleanMessage().split(' ').filter(val => val.length !== 0);
+        return Utils.splitNoEmpty(message.getCleanMessage(), ' ');
+    }
+
+    private startWithPrefix(message: Message): boolean {
+        return message.getCleanMessage().startsWith(config.getPrefixChannel(message.channel));
     }
 }
