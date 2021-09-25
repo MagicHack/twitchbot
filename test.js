@@ -97,7 +97,7 @@ const client = new tmi.Client({
     },
     channels: ['ron__bot', 'pepto__bismol', 'hackmagic', 'swushwoi', 'minusinsanity', 'ron__johnson_', 'katelynerika',
         'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro', 'yung_randd', 'sunephef', 'schooleo', 'illyaow',
-        'qu0te_if_forsen_threw']
+        'qu0te_if_forsen_threw', 'benjxxm']
 });
 
 let channelsChatters = {};
