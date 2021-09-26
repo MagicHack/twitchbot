@@ -31,6 +31,17 @@ try {
     console.log(e);
 }
 
+const IGNORE_FILE = 'ignore.json';
+let peopleToIgnore = [];
+try {
+    peopleToIgnore = readDataJson(IGNORE_FILE);
+    console.log("Successfully read ignore file");
+} catch (e) {
+    console.log(e);
+}
+
+
+
 // channel where we can mod/vip spam
 let modSpamChannels = ['#pepto__bismol', "#sunephef", "#hackmagic"];
 
@@ -144,6 +155,10 @@ client.on('message', (channel, tags, message, self) => {
     // ignore whispers for now
     if (tags['message-type'] === 'whisper') {
         console.log("ignored whisper");
+        return;
+    }
+
+    if(peopleToIgnore.includes(tags.username.toLowerCase())) {
         return;
     }
 
