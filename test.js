@@ -373,7 +373,7 @@ client.on('message', (channel, tags, message, self) => {
             if (isCommand(cleanMessage.toLowerCase(), 'eval ')) {
                 console.log("Eval monkaGIGA");
                 try {
-                    let result = JSON.stringify(eval('(' + cleanMessage.substring('&eval '.length) + ')'));
+                    let result = String(eval('(' + cleanMessage.substring('&eval '.length) + ')'));
                     sendMessageRetry(channel, result);
                 } catch (e) {
                     console.error(e.message);
