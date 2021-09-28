@@ -491,7 +491,13 @@ function checkIfRaid(tags, message) {
                 sendNotification("Join raid DinkDonk !!");
             }
             for (let notifyChannel of notifyChannels) {
-                let baseMessage = 'DinkDonk +join (raid lvl ' + matchBegin[1] + ') ';
+                let pingEmote = 'DinkDonk';
+                if(notifyChannel === '#benjxxm') {
+                    pingEmote = 'PINGED';
+                } else if(notifyChannel === '#hackmagic') {
+                    pingEmote = 'DINKDONK';
+                }
+                let baseMessage = pingEmote + ' +join (raid lvl ' + matchBegin[1] + ') ';
                 let notifMessage = baseMessage;
                 for (let p of peopleToNotify) {
                     // Send and create a new message when it's too long
