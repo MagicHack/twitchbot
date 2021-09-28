@@ -321,12 +321,16 @@ client.on('message', (channel, tags, message, self) => {
             progress(channel).then();
         }
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
+            const maxSize = 50;
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
                 let args = cleanMessage.substring('&supamodpyramid '.length).split(' ');
                 console.log('pyramid args : ' + String(args))
                 try {
                     let size = parseInt(args[0]);
                     let emote = args[1];
+                    if(size > maxSize) {
+                        size = maxSize;
+                    }
                     if (emote.trim() !== '' && size > 1) {
                         let emoteSpace = emote.trim() + " ";
                         for (let i = 1; i < size; i++) {
