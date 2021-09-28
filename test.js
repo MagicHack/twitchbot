@@ -329,9 +329,8 @@ client.on('message', (channel, tags, message, self) => {
                     let size = parseInt(args[0]);
                     let emote = args[1];
                     if(size > maxSize) {
-                        size = maxSize;
-                    }
-                    if (emote.trim() !== '' && size > 1) {
+                        sendMessage(channel, "The maximum pyramid width is " + maxSize);
+                    } else if (emote.trim() !== '' && size > 1) {
                         let emoteSpace = emote.trim() + " ";
                         for (let i = 1; i < size; i++) {
                             sendMessageRetry(channel, emoteSpace.repeat(i));
