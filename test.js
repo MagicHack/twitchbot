@@ -499,13 +499,14 @@ function checkIfRaid(tags, message) {
                 }
                 let baseMessage = pingEmote + ' +join (raid lvl ' + matchBegin[1] + ') ';
                 let notifMessage = baseMessage;
+                const separator = ' @';
                 for (let p of peopleToNotify) {
                     // Send and create a new message when it's too long
-                    if (notifMessage.length + p.length >= MAX_CHARS) {
+                    if (notifMessage.length + p.length + separator.length >= MAX_CHARS) {
                         sendMessageRetryPriority(notifyChannel, notifMessage);
                         notifMessage = baseMessage;
                     }
-                    notifMessage += ' @' + p;
+                    notifMessage += separator + p;
                 }
                 if (notifMessage.length !== 0) {
                     sendMessageRetryPriority(notifyChannel, notifMessage);
