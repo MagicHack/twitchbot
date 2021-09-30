@@ -106,7 +106,7 @@ const client = new tmi.Client({
         username: username,
         password: password
     },
-    channels: ['ron__bot', 'pepto__bismol', 'hackmagic', 'swushwoi', 'minusinsanity', 'ron__johnson_', 'katelynerika',
+    channels: ['magichackbot', 'ron__bot', 'pepto__bismol', 'hackmagic', 'swushwoi', 'minusinsanity', 'ron__johnson_', 'katelynerika',
         'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro', 'yung_randd', 'sunephef', 'schooleo', 'illyaow',
         'qu0te_if_forsen_threw', 'benjxxm']
 });
@@ -148,6 +148,11 @@ client.on("ban", (channel, username, reason, userstate) => {
     // Log all bans
     let user = {channel : channel, username : username, ts : Date.now()};
     bans.push(user);
+});
+
+client.on("connected", (address, port) => {
+    client.say("#" + username, "connected + " + (new Date()).toISOString());
+    sentMessagesTS.push(Date.now());
 });
 
 client.on('message', (channel, tags, message, self) => {
