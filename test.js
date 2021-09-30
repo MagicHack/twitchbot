@@ -818,17 +818,19 @@ function phoneNotifications(rawChannel, message, user) {
         channel = channel.substring(1);
     }
     const noPingChannels = ['forsen', 'huwobot'];
-    const pingRE = [/hackmagic/i, /(?<![a-z])hack(?![a-z])/i, /(?<![a-z])magic(?![a-z])/i]
+    const pingRE = [/hackmagic/i, /(?<![a-z])hack(?![a-z])/i, /(?<![a-z])magic(?![a-z])/i];
 
     if (!noPingChannels.includes(channel)) {
         for (let exp of pingRE) {
             if (exp.test(message)) {
+                console.log("Message matched ping regex");
                 notifMessages.push(`[${rawChannel}] ${displayName}: ${message}`);
                 // remove old timeout and start a new one
                 if(notifTimer !== null) {
-                    console.log("Clear old timer, started a fresh one");
+                    console.log("Clear old timer");
                     clearTimeout(notifTimer);
                 }
+                console.log("Set new notification timeout");
                 notifTimer = setTimeout(sendQueueNotification, notificationDelay * 1000);
                 break;
             }
@@ -839,6 +841,8 @@ function phoneNotifications(rawChannel, message, user) {
 function sendQueueNotification() {
     const MAX_LENGTH = 1024;
     notifTimer = null;
+
+    console.log("Sending queued " + notifMessages.length + " notifications...");
 
     if(notifMessages.length === 1) {
         sendNotification(notifMessages[0]);
