@@ -788,10 +788,13 @@ function help(channel, user) {
 }
 
 let lastMessage = Date.now();
-
+let notifMessages = [];
+let notifTimer = null;
 function phoneNotifications(rawChannel, message, user) {
     // Time with no message before a it sends a ping
     const afkTime = 15;
+    // Time we wait before sending a notification
+    const notificationDelay = 15;
 
     let channel = rawChannel;
     let username = user.username;
@@ -820,10 +823,42 @@ function phoneNotifications(rawChannel, message, user) {
     if (!noPingChannels.includes(channel)) {
         for (let exp of pingRE) {
             if (exp.test(message)) {
-                sendNotification(`[${rawChannel}] ${displayName}: ${message}`)
+                notifMessages.push(`[${rawChannel}] ${displayName}: ${message}`);
+                // remove old timeout and start a new one
+                if(notifTimer !== null) {
+                    console.log("Clear old timer, started a fresh one");
+                    clearTimeout(notifTimer);
+                }
+                notifTimer = setTimeout(sendQueueNotification, notificationDelay * 1000);
                 break;
             }
         }
+    }
+}
+
+function sendQueueNotification() {
+    const MAX_LENGTH = 1024;
+    notifTimer = null;
+
+    if(notifMessages.length === 1) {
+        sendNotification(notifMessages[0]);
+    } else {
+        let notifMessage = `${notifMessages.length} notifications : `;
+        const sepStr = ' / ';
+        for (let m of notifMessages) {
+            notifMessage += m + sepStr;
+        }
+        // remove last separator
+        notifMessage = notifMessage.substring(0, notifMessage.length - sepStr.length);
+        // remove excess chars
+        if(notifMessage.length > MAX_LENGTH) {
+            const endStr = ' ...';
+            console.log("Full notification : " + notifMessage);
+            notifMessage = notifMessage.substring(0, MAX_LENGTH - endStr.length) + endStr;
+        }
+        // clear notification queue
+        notifMessages = [];
+        sendNotification(notifMessage);
     }
 }
 
