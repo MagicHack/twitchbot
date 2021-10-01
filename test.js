@@ -210,11 +210,19 @@ client.on('message', (channel, tags, message, self) => {
         }
 
         if (donkUsername === '' || tags.username === donkUsername) {
+            // TODO make list of emote combos
             if (cleanMessage.startsWith('TeaTime FeelsDonkMan')) {
                 sendMessage(channel, `FeelsDonkMan TeaTime`);
-            }
-            if (cleanMessage.startsWith('FeelsDonkMan TeaTime')) {
+            } else if (cleanMessage.startsWith('FeelsDonkMan TeaTime')) {
                 sendMessage(channel, `TeaTime FeelsDonkMan`);
+            } else if (cleanMessage.startsWith('WIDEGIGADONK TeaTime')) {
+                sendMessage(channel, `TeaTime WIDEGIGADONK`);
+            } else if (cleanMessage.startsWith('TeaTime WIDEGIGADONK')) {
+                sendMessage(channel, `WIDEGIGADONK TeaTime`);
+            } else if (cleanMessage.startsWith('MiniTeaTime FeelsDonkMan')) {
+                sendMessage(channel, `FeelsDonkMan MiniTeaTime`);
+            } else if (cleanMessage.startsWith('FeelsDonkMan MiniTeaTime')) {
+                sendMessage(channel, `MiniTeaTime FeelsDonkMan`);
             }
         }
         const newCommand = 'I made a new command HeyGuys';
