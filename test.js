@@ -215,6 +215,10 @@ client.on('message', (channel, tags, message, self) => {
                 sendMessage(channel, `FeelsDonkMan TeaTime`);
             } else if (cleanMessage.startsWith('FeelsDonkMan TeaTime')) {
                 sendMessage(channel, `TeaTime FeelsDonkMan`);
+            } else if (cleanMessage.startsWith('bigTeaTime FeelsDonkMan')) {
+                sendMessage(channel, `FeelsDonkMan bigTeaTime`);
+            } else if (cleanMessage.startsWith('FeelsDonkMan bigTeaTime')) {
+                sendMessage(channel, `bigTeaTime FeelsDonkMan`);
             } else if (cleanMessage.startsWith('WIDEGIGADONK TeaTime')) {
                 sendMessage(channel, `TeaTime WIDEGIGADONK`);
             } else if (cleanMessage.startsWith('TeaTime WIDEGIGADONK')) {
