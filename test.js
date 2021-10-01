@@ -151,7 +151,7 @@ client.on("ban", (channel, username, reason, userstate) => {
 });
 
 client.on("connected", (address, port) => {
-    client.say("#" + username, "connected + " + (new Date()).toISOString());
+    client.say("#" + username, "connected " + (new Date()).toISOString());
     sentMessagesTS.push(Date.now());
 });
 
@@ -986,7 +986,7 @@ async function progress(channel) {
 }
 
 function moderation(channel, tags, message) {
-    const hossRe = /\b@?([h]+[0o]+[s]+[t_]*[o0-9]+\S*)\b/gi;
+    const hossRe = /\b@?(\S*[h]+[0o]+[s]+[t_]*[o0-9]+\S*)\b/gi;
     let enableChannels = ['#hackmagic', '#pepto__bismol'];
     if(!enableChannels.includes(channel)) {
         return;
