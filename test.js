@@ -870,10 +870,11 @@ function sendQueueNotification() {
             console.log("Full notification : " + notifMessage);
             notifMessage = notifMessage.substring(0, MAX_LENGTH - endStr.length) + endStr;
         }
-        // clear notification queue
-        notifMessages = [];
         sendNotification(notifMessage);
     }
+
+    // clear notification queue
+    notifMessages = [];
 }
 
 function sendNotification(message) {
