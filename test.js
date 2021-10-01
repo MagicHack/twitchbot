@@ -808,6 +808,11 @@ function phoneNotifications(rawChannel, message, user) {
     // Ignore a possible ping if not afk
     if (user.username === 'hackmagic') {
         lastMessage = Date.now();
+        notifMessages = [];
+        if(notifTimer !== null) {
+            clearTimeout(notifTimer);
+            notifTimer = null;
+        }
     }
     if (Date.now() - lastMessage < afkTime * 1000) {
         return;
