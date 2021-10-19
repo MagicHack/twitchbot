@@ -282,7 +282,9 @@ client.on('message', (channel, tags, message, self) => {
                 try {
                     let text = flashbangselector(params[0]);
                     flashbang(channel, tags, amount, text);
-                } catch (e) {}
+                } catch (e) {
+                    sendMessage(channel, e);
+                }
 
             } else {
                 sendMessage(channel, "usage : " + prefix + "flashbang# amount");
@@ -921,11 +923,10 @@ function flashbangselector(command) {
         console.log("error parsing number in flashbang");
     }
     if(num < 0 || num > flashbangs.length) {
-        sendMessage(channel, "Valid flashbangs are from 1 to " + flashbangs.length);
+        throw new Error("Valid flashbangs are from 1 to " + flashbangs.length);
     } else {
         return flashbangs[num - 1];
     }
-    throw new Error("Invalid flashbang number");
 }
 
 function flashbang(channel, user, amount, text) {
