@@ -6,6 +6,7 @@ const humanizeDuration = require('humanize-duration');
 const Push = require('pushover-notifications');
 const momentTZ = require('moment-timezone');
 const moment = require("moment");
+const {channel} = require("tmi.js/lib/utils");
 
 // Number of message that can be sent every 30 seconds
 const rateLimitMessages = 20;
@@ -268,51 +269,24 @@ client.on('message', (channel, tags, message, self) => {
         } else if (isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
             'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
             help(channel, tags.username);
-        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang5")) {
-            let amount = 1;
-            try {
-                amount = parseInt(cleanMessage.split(" ")[1]);
-            } catch (e) {
-                console.log("Error while parsing flashbang");
-                console.log(e);
-            }
-            flashbang(channel, tags, amount, "KartComback");
-        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang4")) {
-            let amount = 1;
-            try {
-                amount = parseInt(cleanMessage.split(" ")[1]);
-            } catch (e) {
-                console.log("Error while parsing flashbang");
-                console.log(e);
-            }
-            flashbang(channel, tags, amount, "NothingHere");
-        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang3")) {
-            let amount = 1;
-            try {
-                amount = parseInt(cleanMessage.split(" ")[1]);
-            } catch (e) {
-                console.log("Error while parsing flashbang");
-                console.log(e);
-            }
-            flashbang(channel, tags, amount, "GotCaughtTrolling");
-        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang2")) {
-            let amount = 1;
-            try {
-                amount = parseInt(cleanMessage.split(" ")[1]);
-            } catch (e) {
-                console.log("Error while parsing flashbang");
-                console.log(e);
-            }
-            flashbang(channel, tags, amount, "bruhFAINT");
         } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
             let amount = 1;
-            try {
-                amount = parseInt(cleanMessage.split(" ")[1]);
-            } catch (e) {
-                console.log("Error while parsing flashbang");
-                console.log(e);
+            let params = cleanMessage.split(" ").filter(x => x.length !== 0);
+            if(params.length >= 2) {
+                try {
+                    amount = parseInt(params[1]);
+                } catch (e) {
+                    console.log("Error while parsing flashbang");
+                    console.log(e);
+                }
+                try {
+                    let text = flashbangselector(params[0]);
+                    flashbang(channel, tags, amount, text);
+                } catch (e) {}
+
+            } else {
+                sendMessage(channel, "usage : " + prefix + "flashbang# amount");
             }
-            flashbang(channel, tags, amount, "FreePoggersEmote");
         } else if (isCommand(cleanMessage.toLowerCase(), "supaflashbang")) {
             let amount = 1;
             try {
@@ -934,6 +908,24 @@ function addUserIgnore(channel, username) {
     } else {
         sendMessageRetry(channel, 'hackmagic, user already in list');
     }
+}
+
+
+function flashbangselector(command) {
+    // TODO: load from json
+    const flashbangs = ["FreePoggersEmote", "bruhFAINT", "GotCaughtTrolling", "NothingHere", "KartComback", "TriFall"];
+    let num = 1;
+    try {
+        num = parseInt(command.match(/\d+/)[0]);
+    } catch (e) {
+        console.log("error parsing number in flashbang");
+    }
+    if(num < 0 || num > flashbangs.length) {
+        sendMessage(channel, "Valid flashbangs are from 1 to " + flashbangs.length);
+    } else {
+        return flashbangs[num - 1];
+    }
+    throw new Error("Invalid flashbang number");
 }
 
 function flashbang(channel, user, amount, text) {
