@@ -1094,9 +1094,8 @@ function timeouts(channel, username) {
 }
 
 async function update(channel) {
-    console.log("channel : " + channel);
     // pull repo
-    sendMessageRetry("Pulling repo...");
+    sendMessageRetry(channel, "Pulling repo...");
     let {stdout : gitOut} = await childProcess.exec('git pull');
     console.log(gitOut);
     if(gitOut === "Already up to date.") {
