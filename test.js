@@ -284,7 +284,7 @@ client.on('message', (channel, tags, message, self) => {
                     let text = flashbangselector(params[0]);
                     flashbang(channel, tags, amount, text);
                 } catch (e) {
-                    sendMessage(channel, e);
+                    sendMessage(channel, String(e));
                 }
 
             } else {
