@@ -1099,7 +1099,7 @@ async function update(channel) {
     sendMessageRetry(channel, "Pulling repo...");
     let {stdout : gitOut} = await exec('git pull', {encoding: 'utf8'});
     console.log(gitOut);
-    if(gitOut === "Already up to date.") {
+    if(gitOut.includes("Already up to date.")) {
         sendMessageRetry(channel, "No new commits to pull FeelsDankMan");
     } else {
         if(gitOut.includes("package-lock.json") || gitOut.includes("package.json")) {
