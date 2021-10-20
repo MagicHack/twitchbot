@@ -251,13 +251,14 @@ client.on('message', (channel, tags, message, self) => {
             }
         }
 
-        if (trusted.includes(tags.username) && isCommand(cleanMessage.toLowerCase(), 'say ')) {
+        if (trusted.includes(tags.username) && isCommand(cleanMessage.toLowerCase(), 'say')) {
             sendMessage(channel, cleanMessage.substring(5));
         }
         if (isCommand(cleanMessage.toLowerCase(), 'players')) {
             let params = cleanMessage.split(' ').filter(x => x.length !== 0);
             let game = "";
             if(params[0] === prefix) {
+                console.log("splice");
                 params.splice(0, 2);
             } else {
                 params.shift();
@@ -707,7 +708,9 @@ function prettySeconds(seconds) {
 function isCommand(message, command) {
     let params = message.split(" ").filter(x => x.length !== 0);
     if(params.length >= 2) {
-        return params[0] === prefix && params[1] === command;
+        if(params[0] === prefix && params[1] === command) {
+            return true;
+        }
     }
     return message.startsWith(prefix + command);
 }
