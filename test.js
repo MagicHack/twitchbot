@@ -407,23 +407,6 @@ client.on('message', (channel, tags, message, self) => {
                 update(channel).then();
             }
         }
-
-        if (tags.emotes !== null) {
-            channelEmotes(Object.keys(tags.emotes)).then((res) => {
-                let cemotes = res;
-                if (cemotes.length > 0) {
-                    console.log(cemotes);
-                }
-                /*
-                if(channel === '#ron__bot') {
-                    sendMessageRetry(channel, String(cemotes));
-                }
-                if(channel === '#swushwoi' && cemotes.includes('xqcow')) {
-                    sendMessageRetry(channel, "MODS xqc emote detected MrDestructoid");
-                }
-                */
-            })
-        }
     }
 });
 
@@ -713,35 +696,6 @@ function getChatters(channelName) {
 function prettySeconds(seconds) {
     // return a formatted string days, hours, minutes, seconds
     return humanizeDuration(Math.round(seconds) * 1000);
-}
-
-function channelEmotes(emotes) {
-    // check which channels emotes come from and return them
-
-    // TODO : scrap this code or replace it since api dead
-    let apiUrl = 'https://api.twitchemotes.com/api/v4/emotes?id='
-    for (let e of emotes) {
-        apiUrl += e + ','
-    }
-    return new Promise((resolve, reject) => {
-        let channels = [];
-        let settings = {method: "Get"};
-        fetch(apiUrl, settings)
-            .then(res => res.json())
-            .then((json) => {
-                for (e of json) {
-                    if (e['channel_name'] !== null) {
-                        channels.push(e['channel_name']);
-                    }
-                }
-                return resolve(channels);
-            }).catch((error) => {
-            console.error("Failed to get emote info from twitchemotes api");
-            console.error(typeof error + " " + error.message);
-            // Idk, maybe we should reject eShrug
-            return resolve(channels);
-        });
-    });
 }
 
 function isCommand(message, command) {
