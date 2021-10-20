@@ -1097,7 +1097,7 @@ function timeouts(channel, username) {
 async function update(channel) {
     // pull repo
     sendMessageRetry(channel, "Pulling repo...");
-    let {stdout : gitOut} = await exec('git pull');
+    let {stdout : gitOut} = await exec('git pull', {encoding: 'utf8'});
     console.log(gitOut);
     if(gitOut === "Already up to date.") {
         sendMessageRetry(channel, "No new commits to pull FeelsDankMan");
@@ -1105,7 +1105,7 @@ async function update(channel) {
         if(gitOut.includes("package-lock.json") || gitOut.includes("package.json")) {
             sendMessageRetry(channel, "Updating npm packages...");
             // update npm packages
-            let {stdout : npmOut} = await exec("npm i");
+            let {stdout : npmOut} = await exec("npm i", {encoding: 'utf8'});
             console.log(npmOut);
         }
         sendMessageRetry(channel, "restarting...");
