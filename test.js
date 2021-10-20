@@ -593,7 +593,6 @@ function sendMessage(channel, message) {
             console.log("Couldn't check role");
         }
     } catch (e) {
-        sendMessage(username, "Failed to check chatter list for " + String(channel));
         console.error("Failed to check chatter list");
         console.error(e);
     }
