@@ -6,7 +6,8 @@ const humanizeDuration = require('humanize-duration');
 const Push = require('pushover-notifications');
 const momentTZ = require('moment-timezone');
 const moment = require("moment");
-const childProcess = require('child_process');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 
 // Number of message that can be sent every 30 seconds
 const rateLimitMessages = 20;
@@ -1096,7 +1097,7 @@ function timeouts(channel, username) {
 async function update(channel) {
     // pull repo
     sendMessageRetry(channel, "Pulling repo...");
-    let {stdout : gitOut} = await childProcess.exec('git pull');
+    let {stdout : gitOut} = await exec('git pull');
     console.log(gitOut);
     if(gitOut === "Already up to date.") {
         sendMessageRetry(channel, "No new commits to pull FeelsDankMan");
@@ -1104,7 +1105,7 @@ async function update(channel) {
         if(gitOut.includes("package-lock.json") || gitOut.includes("package.json")) {
             sendMessageRetry(channel, "Updating npm packages...");
             // update npm packages
-            let {stdout : npmOut} = await childProcess.exec("npm i");
+            let {stdout : npmOut} = await exec("npm i");
             console.log(npmOut);
         }
         sendMessageRetry(channel, "restarting...");
