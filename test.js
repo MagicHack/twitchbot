@@ -403,7 +403,7 @@ client.on('message', (channel, tags, message, self) => {
                 console.log("Received kill command, quitting now.");
                 process.exit();
             } else if (isCommand(cleanMessage.toLowerCase(), "update")) {
-                update().then();
+                update(channel).then();
             }
         }
 
@@ -579,17 +579,25 @@ function sendMessage(channel, message) {
 
     let isMod = false;
     let isVip = false;
-    if (typeof chattersRoles[channel].chatters.moderators !== 'undefined') {
-        isMod = chattersRoles[channel].chatters.moderators.includes(client.getUsername());
-    } else {
-        console.log("Couldn't check role");
+
+    try {
+        if (typeof chattersRoles[channel].chatters.moderators !== 'undefined') {
+            isMod = chattersRoles[channel].chatters.moderators.includes(client.getUsername());
+        } else {
+            console.log("Couldn't check role");
+        }
+
+        if (typeof chattersRoles[channel].chatters.vips !== 'undefined') {
+            isVip = chattersRoles[channel].chatters.vips.includes(client.getUsername());
+        } else {
+            console.log("Couldn't check role");
+        }
+    } catch (e) {
+        sendMessage(username, "Failed to check chatter list for " + String(channel));
+        console.error("Failed to check chatter list");
+        console.error(e);
     }
 
-    if (typeof chattersRoles[channel].chatters.vips !== 'undefined') {
-        isVip = chattersRoles[channel].chatters.vips.includes(client.getUsername());
-    } else {
-        console.log("Couldn't check role");
-    }
 
     let modSpam = false;
 
