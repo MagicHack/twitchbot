@@ -699,7 +699,11 @@ function prettySeconds(seconds) {
 }
 
 function isCommand(message, command) {
-    return message.startsWith(prefix + command) || message.startsWith(prefix + ' ' + command);
+    let params = message.split(" ").filter(x => x.length !== 0);
+    if(params.length >= 2) {
+        return params[0] === prefix && params[1] === command;
+    }
+    return message.startsWith(prefix + command);
 }
 
 function raidPing(channel, user) {
