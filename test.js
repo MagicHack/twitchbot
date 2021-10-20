@@ -6,7 +6,7 @@ const humanizeDuration = require('humanize-duration');
 const Push = require('pushover-notifications');
 const momentTZ = require('moment-timezone');
 const moment = require("moment");
-const {channel} = require("tmi.js/lib/utils");
+const childProcess = require('child_process');
 
 // Number of message that can be sent every 30 seconds
 const rateLimitMessages = 20;
@@ -399,10 +399,11 @@ client.on('message', (channel, tags, message, self) => {
                 console.log("Received quit command, bye Sadge");
                 sendMessageRetry(channel, 'Quitting PepeHands');
                 setTimeout(process.exit, 1500);
-            }
-            if (isCommand(cleanMessage.toLowerCase(), 'kill')) {
+            } else if (isCommand(cleanMessage.toLowerCase(), 'kill')) {
                 console.log("Received kill command, quitting now.");
                 process.exit();
+            } else if (isCommand(cleanMessage.toLowerCase(), "update")) {
+                update().then();
             }
         }
 
@@ -1082,5 +1083,24 @@ function timeouts(channel, username) {
         }
     } catch (e) {
         console.log(e);
+    }
+}
+
+async function update(channel) {
+    // pull repo
+    sendMessageRetry("Pulling repo...");
+    let {stdout : gitOut} = await childProcess.exec('git pull');
+    console.log(gitOut);
+    if(gitOut === "Already up to date.") {
+        sendMessageRetry(channel, "No new commits to pull FeelsDankMan");
+    } else {
+        if(gitOut.includes("package-lock.json") || gitOut.includes("package.json")) {
+            sendMessageRetry(channel, "Updating npm packages...");
+            // update npm packages
+            let {stdout : npmOut} = await childProcess.exec("npm i");
+            console.log(npmOut);
+        }
+        sendMessageRetry(channel, "restarting...");
+        setTimeout(process.exit(), 3000);
     }
 }
