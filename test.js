@@ -254,9 +254,15 @@ client.on('message', (channel, tags, message, self) => {
         if (trusted.includes(tags.username) && isCommand(cleanMessage.toLowerCase(), 'say ')) {
             sendMessage(channel, cleanMessage.substring(5));
         }
-        if (isCommand(cleanMessage.toLowerCase(), 'players ')) {
-
-            let game = cleanMessage.substring('&players '.length).trim();
+        if (isCommand(cleanMessage.toLowerCase(), 'players')) {
+            let params = cleanMessage.split(' ').filter(x => x.length !== 0);
+            let game = "";
+            if(params[0] === prefix) {
+                params.splice(0, 2);
+            } else {
+                params.shift();
+            }
+            game = params.join(" ");
             if (game.length > 0) {
                 getPlayers(game, trusted.includes(tags.username)).then((response) => {
                     sendMessageRetry(channel, response);
