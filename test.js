@@ -1,13 +1,14 @@
-const fetch = require('node-fetch');
-const sfetch = require('sync-fetch');
-const tmi = require('tmi.js');
-const fs = require('fs');
-const humanizeDuration = require('humanize-duration');
-const Push = require('pushover-notifications');
-const momentTZ = require('moment-timezone');
-const moment = require("moment");
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+import fetch from 'node-fetch';
+import sfetch from 'sync-fetch';
+import tmi from 'tmi.js';
+import fs from 'fs';
+import humanizeDuration from 'humanize-duration';
+import Push from 'pushover-notifications';
+import momentTZ from 'moment-timezone';
+import moment from 'moment';
+import util from 'util';
+import childProcess from 'child_process';
+const exec = util.promisify(childProcess.exec);
 
 // Number of message that can be sent every 30 seconds
 const rateLimitMessages = 20;
@@ -89,7 +90,7 @@ try {
 } catch (err) {
     console.error(typeof err + " " + err.message);
     console.log("Error, could not read config file. Quitting");
-    return 1;
+    process.exit(1);
 }
 
 
@@ -197,7 +198,7 @@ client.on('message', (channel, tags, message, self) => {
 
     if (tags.username !== client.getUsername()) {
         let channelsNoPriority = ['#pepto__bismol'];
-        donkUsername = '';
+        let donkUsername = '';
         if (!channelsNoPriority.includes(channel)) {
             for (donk of donkRepliesPriority) {
                 if (typeof channelsChatters[channel] !== 'undefined') {
@@ -653,8 +654,8 @@ function getAllChatters() {
     // channels.forEach(getChatters);
     // delay each channel refresh to space them out in the delay
     let delay = delayChatterRefresh / channels.length;
-    for (i in channels) {
-        cDelay = i * delay;
+    for (let i in channels) {
+        let cDelay = i * delay;
         console.log("Updating chatters for " + channels[i] + " in " + cDelay.toFixed(2) + "s");
         setTimeout(getChatters, cDelay * 1000, channels[i]);
     }
