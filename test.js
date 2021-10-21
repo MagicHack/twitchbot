@@ -200,7 +200,7 @@ client.on('message', (channel, tags, message, self) => {
         let channelsNoPriority = ['#pepto__bismol'];
         let donkUsername = '';
         if (!channelsNoPriority.includes(channel)) {
-            for (donk of donkRepliesPriority) {
+            for (let donk of donkRepliesPriority) {
                 if (typeof channelsChatters[channel] !== 'undefined') {
                     if (channelsChatters[channel].includes(donk)) {
                         donkUsername = donk;
@@ -244,7 +244,7 @@ client.on('message', (channel, tags, message, self) => {
         let sameReplies = ['DinkDonk', 'YEAHBUTBTTV', 'TrollDespair', 'MODS', 'monkaE', 'POGGERS', 'VeryPog',
             'MegaLUL FBBlock', 'hackerCD', ':)'];
         if (sameRepliesChannel.includes(channel)) {
-            for (reply of sameReplies) {
+            for (let reply of sameReplies) {
                 if (cleanMessage.startsWith(reply)) {
                     sendMessage(channel, reply);
                     break;
@@ -672,25 +672,25 @@ function getChatters(channelName) {
         .then((json) => {
             // console.log(json);
             // do something with JSON
-            for (c of json.chatters.broadcaster) {
+            for (let c of json.chatters.broadcaster) {
                 chatters.push(c);
             }
-            for (c of json.chatters.vips) {
+            for (let c of json.chatters.vips) {
                 chatters.push(c);
             }
-            for (c of json.chatters.moderators) {
+            for (let c of json.chatters.moderators) {
                 chatters.push(c);
             }
-            for (c of json.chatters.staff) {
+            for (let c of json.chatters.staff) {
                 chatters.push(c);
             }
-            for (c of json.chatters.global_mods) {
+            for (let c of json.chatters.global_mods) {
                 chatters.push(c);
             }
-            for (c of json.chatters.admins) {
+            for (let c of json.chatters.admins) {
                 chatters.push(c);
             }
-            for (c of json.chatters.viewers) {
+            for (let c of json.chatters.viewers) {
                 chatters.push(c);
             }
             channelsChatters[channelName] = chatters;
