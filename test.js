@@ -404,7 +404,7 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessageRetry(channel, "Eval failed, check console for details.");
                 }
             } else if (isCommand(cleanMessage.toLowerCase(), "fetch")) {
-                let params = cleanMessage.split(" ").filter(x => x !== prefix || x.length !== 0);
+                let params = cleanMessage.split(" ").filter(x => (x !== prefix && x.length !== 0));
                 if(params.length>= 2) {
                     let url = params[1].startsWith("http") ? params[1] : "https://" + params[1];
                     sendMessageRetry(channel, getUrl(url));
@@ -1090,5 +1090,10 @@ async function update(channel) {
 }
 
 function getUrl(url) {
-    return sfetch(url, {}).text();
+    try {
+        return sfetch(url, {}).text();
+    } catch (e) {
+        console.log(e);
+        return "Error fetching url : " + url;
+    }
 }
