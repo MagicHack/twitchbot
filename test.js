@@ -147,13 +147,13 @@ function saveBans() {
     }
 }
 
-client.on("ban", (channel, username, reason, userstate) => {
+client.on("ban", (channel, username) => {
     // Log all bans
     let user = {channel : channel, username : username, ts : Date.now()};
     bans.push(user);
 });
 
-client.on("connected", (address, port) => {
+client.on("connected", () => {
     client.say("#" + username, "connected " + (new Date()).toISOString());
     sentMessagesTS.push(Date.now());
 });
@@ -257,7 +257,7 @@ client.on('message', (channel, tags, message, self) => {
         }
         if (isCommand(cleanMessage.toLowerCase(), 'players')) {
             let params = cleanMessage.split(' ').filter(x => x.length !== 0);
-            let game = "";
+            let game;
             if(params[0] === prefix) {
                 console.log("splice");
                 params.splice(0, 2);
@@ -403,6 +403,14 @@ client.on('message', (channel, tags, message, self) => {
                     console.error(e.message);
                     sendMessageRetry(channel, "Eval failed, check console for details.");
                 }
+            } else if (isCommand(cleanMessage.toLowerCase(), "fetch")) {
+                let params = cleanMessage.split(" ").filter(x => x !== prefix || x.length !== 0);
+                if(params.length>= 2) {
+                    let url = params[1].startsWith("http") ? params[1] : "https://" + params[1];
+                    sendMessageRetry(channel, getUrl(url));
+                } else {
+                    sendMessage(channel, "No url provided FeelsDankMan");
+                }
             }
             if (isCommand(cleanMessage.toLowerCase(), 'quit')) {
                 console.log("Received quit command, bye Sadge");
@@ -426,7 +434,7 @@ function getPlayers(game, trusted) {
     const url = apiUrl + encodeURIComponent(game);
     let elapsedTime = (Date.now() - lastTS) / 1000;
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         if (game === "/") {
             return resolve("Invalid game name");
         }
@@ -456,7 +464,7 @@ function getPlayers(game, trusted) {
     });
 }
 
-client.on("join", (channel, username, self) => {
+client.on("join", (channel) => {
     if (typeof channelsChatters[channel] === 'undefined') {
         getChatters(channel);
     }
@@ -573,14 +581,14 @@ function sendMessage(channel, message) {
     let isVip = false;
 
     try {
-        if (typeof chattersRoles[channel].chatters.moderators !== 'undefined') {
-            isMod = chattersRoles[channel].chatters.moderators.includes(client.getUsername());
+        if (typeof chattersRoles[channel]["chatters"]["moderators"] !== 'undefined') {
+            isMod = chattersRoles[channel]["chatters"]["moderators"].includes(client.getUsername());
         } else {
             console.log("Couldn't check role");
         }
 
-        if (typeof chattersRoles[channel].chatters.vips !== 'undefined') {
-            isVip = chattersRoles[channel].chatters.vips.includes(client.getUsername());
+        if (typeof chattersRoles[channel]["chatters"]["vips"] !== 'undefined') {
+            isVip = chattersRoles[channel]["chatters"]["vips"].includes(client.getUsername());
         } else {
             console.log("Couldn't check role");
         }
@@ -672,25 +680,25 @@ function getChatters(channelName) {
         .then((json) => {
             // console.log(json);
             // do something with JSON
-            for (let c of json.chatters.broadcaster) {
+            for (let c of json["chatters"]["broadcaster"]) {
                 chatters.push(c);
             }
-            for (let c of json.chatters.vips) {
+            for (let c of json["chatters"]["vips"]) {
                 chatters.push(c);
             }
-            for (let c of json.chatters.moderators) {
+            for (let c of json["chatters"]["moderators"]) {
                 chatters.push(c);
             }
-            for (let c of json.chatters.staff) {
+            for (let c of json["chatters"]["staff"]) {
                 chatters.push(c);
             }
-            for (let c of json.chatters.global_mods) {
+            for (let c of json["chatters"]["global_mods"]) {
                 chatters.push(c);
             }
-            for (let c of json.chatters.admins) {
+            for (let c of json["chatters"]["admins"]) {
                 chatters.push(c);
             }
-            for (let c of json.chatters.viewers) {
+            for (let c of json["chatters"]["viewers"]) {
                 chatters.push(c);
             }
             channelsChatters[channelName] = chatters;
@@ -1053,7 +1061,7 @@ function timeouts(channel, username) {
     try {
         let timeout = timeoutList.find(user => user.username === username);
         if(timeout !== undefined) {
-            if(Math.random() <= timeout.probability) {
+            if(Math.random() <= timeout["probability"]) {
                 sendMessageRetryPriority(channel, `/timeout ${timeout.username} ${timeout.duration} ${timeout.reason}`);
             }
         }
@@ -1079,4 +1087,8 @@ async function update(channel) {
         sendMessageRetry(channel, "restarting...");
         setTimeout(process.exit(), 3000);
     }
+}
+
+function getUrl(url) {
+    return sfetch(url, {}).text();
 }
