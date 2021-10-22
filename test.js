@@ -100,7 +100,7 @@ const trusted = ['hackmagic']
 const pushover = new Push({user: pushoverUser, token: pushoverToken});
 
 const client = new tmi.Client({
-    options: {debug: true, messagesLogLevel: "info"},
+    options: {debug: false, messagesLogLevel: "info"},
     connection: {
         reconnect: true,
         secure: true
@@ -656,15 +656,12 @@ function sendMessage(channel, message) {
 }
 
 function getAllChatters() {
-    console.log("Dispatching chatters updates");
-
     let channels = client.getChannels();
-    // channels.forEach(getChatters);
     // delay each channel refresh to space them out in the delay
     let delay = delayChatterRefresh / channels.length;
     for (let i in channels) {
         let cDelay = i * delay;
-        console.log("Updating chatters for " + channels[i] + " in " + cDelay.toFixed(2) + "s");
+        // console.log("Updating chatters for " + channels[i] + " in " + cDelay.toFixed(2) + "s");
         setTimeout(getChatters, cDelay * 1000, channels[i]);
     }
 }
@@ -678,8 +675,6 @@ function getChatters(channelName) {
     fetch(url, settings)
         .then(res => res.json())
         .then((json) => {
-            // console.log(json);
-            // do something with JSON
             for (let c of json["chatters"]["broadcaster"]) {
                 chatters.push(c);
             }
