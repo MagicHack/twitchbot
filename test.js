@@ -667,7 +667,7 @@ function getAllChatters() {
 }
 
 function getChatters(channelName) {
-    console.log("Updating chatter list for " + channelName);
+    // console.log("Updating chatter list for " + channelName);
     let url = `https://tmi.twitch.tv/group/user/${channelName.substring(1)}/chatters`
 
     let settings = {method: "Get"};
