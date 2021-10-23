@@ -214,7 +214,11 @@ client.on('message', (channel, tags, message, self) => {
 
         if (donkUsername === '' || tags.username === donkUsername) {
             // TODO make list of emote combos
-            if (cleanMessage.startsWith('TeaTime FeelsDonkMan')) {
+            if (cleanMessage.startsWith('TeaTimeU FeelsDonkMan')) {
+                sendMessage(channel, `FeelsDonkMan TeaTimeU`);
+            } else if (cleanMessage.startsWith('FeelsDonkMan TeaTimeU')) {
+                sendMessage(channel, `TeaTimeU FeelsDonkMan`);
+            } if (cleanMessage.startsWith('TeaTime FeelsDonkMan')) {
                 sendMessage(channel, `FeelsDonkMan TeaTime`);
             } else if (cleanMessage.startsWith('FeelsDonkMan TeaTime')) {
                 sendMessage(channel, `TeaTime FeelsDonkMan`);
