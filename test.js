@@ -476,9 +476,11 @@ client.on("join", (channel) => {
 
 function checkIfRaid(tags, message) {
 
+    //TODO : Make raid ping for each channel
+
     // How many chars to split a message
     const MAX_CHARS = 500;
-    let notifyChannels = ['#minusinsanity', '#hackmagic', '#benjxxm'];
+    let notifyChannels = ['#minusinsanity', '#benjxxm'];
     if (tags.username === 'huwobot') {
         let raidBeginRE = /A Raid Event at Level \[([0-9]+)] has appeared./;
         let raidLostRE = /\d+ users? failed to beat the raid level \[\d+] - No experience rewarded!/;
