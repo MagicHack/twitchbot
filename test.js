@@ -26,9 +26,9 @@ let prefix = '&';
 
 // name of file storing raid users
 const RAID_FILE = 'raid.json';
-let peopleToNotify = [];
+let raidData = [];
 try {
-    peopleToNotify = readDataJson(RAID_FILE);
+    raidData = readDataJson(RAID_FILE);
     console.log("Successfully read ping file");
 } catch (e) {
     console.log(e);
@@ -43,7 +43,14 @@ try {
     console.log(e);
 }
 
-
+const PING_CHANNELS_FILE = 'pingChannels.json';
+let raidPingChannels = [];
+try {
+    peopleToIgnore = readDataJson(PING_CHANNELS_FILE);
+    console.log("Successfully read ping channels file");
+} catch (e) {
+    console.log(e);
+}
 
 // channel where we can mod/vip spam
 let modSpamChannels = ['#pepto__bismol', "#sunephef", "#hackmagic"];
@@ -408,13 +415,22 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessageRetry(channel, "Eval failed, check console for details.");
                 }
             } else if (isCommand(cleanMessage.toLowerCase(), "fetch")) {
-                let params = cleanMessage.split(" ").filter(x => (x !== prefix && x.length !== 0));
+                let params = splitNoEmptyNoPrefix(cleanMessage);
                 if(params.length>= 2) {
                     let url = params[1].startsWith("http") ? params[1] : "https://" + params[1];
                     sendMessageRetry(channel, getUrl(url));
                 } else {
                     sendMessage(channel, "No url provided FeelsDankMan");
                 }
+            } else if(isCommand(cleanMessage.toLowerCase(), "enableraid")) {
+                let params = splitNoEmptyNoPrefix(cleanMessage);
+                if(params.length >= 2) {
+                    addChannelRaidPing(channel, params[1]);
+                } else {
+                    addChannelRaidPing(channel);
+                }
+            } else if(isCommand(cleanMessage.toLowerCase(), "disableraid")) {
+                removeChannelRaidPing(channel);
             }
             if (isCommand(cleanMessage.toLowerCase(), 'quit')) {
                 console.log("Received quit command, bye Sadge");
@@ -480,7 +496,6 @@ function checkIfRaid(tags, message) {
 
     // How many chars to split a message
     const MAX_CHARS = 500;
-    let notifyChannels = ['#minusinsanity', '#benjxxm'];
     if (tags.username === 'huwobot') {
         let raidBeginRE = /A Raid Event at Level \[([0-9]+)] has appeared./;
         let raidLostRE = /\d+ users? failed to beat the raid level \[\d+] - No experience rewarded!/;
@@ -494,16 +509,19 @@ function checkIfRaid(tags, message) {
             if (channelsChatters["#hackmagic"].includes('hackmagic')) {
                 sendNotification("Join raid DinkDonk !!");
             }
-            for (let notifyChannel of notifyChannels) {
-                let pingEmote = 'DinkDonk';
-                if(notifyChannel === '#benjxxm') {
-                    pingEmote = 'PINGED';
-                } else if(notifyChannel === '#hackmagic') {
-                    pingEmote = 'DINKDONK';
+            for (let notifyChannel of raidPingChannels) {
+                if(raidData[notifyChannel] === undefined) {
+                    console.error("Raid channel has no data in json file");
+                    continue;
                 }
+                let pingEmote = raidData[notifyChannel]["emote"];
+
                 let baseMessage = pingEmote + ' +join (raid lvl ' + matchBegin[1] + ') ';
                 let notifMessage = baseMessage;
                 const separator = ' @';
+
+                let peopleToNotify = raidData[notifyChannel]["users"];
+
                 for (let p of peopleToNotify) {
                     // Send and create a new message when it's too long
                     if (notifMessage.length + p.length + separator.length >= MAX_CHARS) {
@@ -520,12 +538,12 @@ function checkIfRaid(tags, message) {
             }
         } else if (matchLost !== null) {
             console.log("Raid lost");
-            for (let notifyChannel of notifyChannels) {
+            for (let notifyChannel of raidPingChannels) {
                 sendMessageRetry(notifyChannel, "Raid L OMEGALULiguess ST");
             }
         } else if (matchWon !== null) {
             console.log("Raid won");
-            for (let notifyChannel of notifyChannels) {
+            for (let notifyChannel of raidPingChannels) {
                 sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + matchWon[1] + "xp)");
             }
         }
@@ -725,12 +743,42 @@ function isCommand(message, command) {
     return message.startsWith(prefix + command);
 }
 
+function addChannelRaidPing(channel, emote) {
+    if(raidPingChannels.includes(channel)) {
+        sendMessageRetry(channel, "This channel already has raid pings enabled...");
+        return;
+    }
+    raidPingChannels.push(channel);
+    saveDataJson(raidPingChannels, PING_CHANNELS_FILE);
+    if(raidData[channel] === undefined) {
+        emote = emote === undefined ? "DinkDonk" : emote;
+        raidData[channel] = {emote : emote, users : []};
+    }
+    sendMessageRetry(channel, "Raid pings enabled FeelsGoodMan , do " + prefix + "raidping to get pinged");
+}
+
+function removeChannelRaidPing(channel) {
+    let index = raidPingChannels.find(channel);
+    if(index !== -1) {
+        raidPingChannels.splice(index, 1);
+        sendMessageRetry(channel, "Raid pings disabled FeelsOkayMan");
+        saveDataJson(raidPingChannels, PING_CHANNELS_FILE);
+    } else {
+        sendMessageRetry(channel, "This channel already has raid pings disabled...");
+    }
+}
+
 function raidPing(channel, user) {
-    const index = peopleToNotify.indexOf(user);
+    if(!raidPingChannels.includes(channel)) {
+        sendMessage(channel, "raid pings aren't enabled in this channel :(");
+        return;
+    }
+
+    const index = raidData[channel]["users"].indexOf(user);
     if (index === -1) {
-        peopleToNotify.push(user);
+        raidData[channel]["users"].push(user);
         try {
-            saveDataJson(peopleToNotify, RAID_FILE);
+            saveDataJson(raidData, RAID_FILE);
         } catch (error) {
             console.error(typeof error + " " + error.message);
             console.error("Failed to write the raid users file");
@@ -745,11 +793,15 @@ function raidPing(channel, user) {
 }
 
 function raidUnPing(channel, user) {
-    const index = peopleToNotify.indexOf(user);
+    if(raidData[channel] === undefined) {
+        sendMessage(channel, "You aren't in the ping list for this channel");
+        return;
+    }
+    const index = raidData[channel]["users"].indexOf(user);
     if (index !== -1) {
-        peopleToNotify.splice(index, 1);
+        raidData[channel]["users"].splice(index, 1);
         try {
-            saveDataJson(peopleToNotify, RAID_FILE);
+            saveDataJson(raidData, RAID_FILE);
         } catch (error) {
             console.error(typeof error + " " + error.message);
             console.error("Failed to write the raid users file");
@@ -1097,4 +1149,8 @@ function getUrl(url) {
         console.log(e);
         return "Error fetching url : " + url;
     }
+}
+
+function splitNoEmptyNoPrefix(message) {
+    return message.split(" ").filter(x => (x !== prefix && x.length !== 0));
 }
