@@ -46,7 +46,7 @@ try {
 const PING_CHANNELS_FILE = 'pingChannels.json';
 let raidPingChannels = [];
 try {
-    peopleToIgnore = readDataJson(PING_CHANNELS_FILE);
+    raidPingChannels = readDataJson(PING_CHANNELS_FILE);
     console.log("Successfully read ping channels file");
 } catch (e) {
     console.log(e);
