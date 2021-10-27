@@ -644,9 +644,9 @@ function raidStats() {
         if(numWins > 0) {
             averageXp = sumXp / numWins;
         }
-        return `Recorded ${numRaids} raids, Winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, 
-        Max lvl: ${maxLevel}, Average lvl : ${averageLevel.toFixed(2)}. Wins ${numWins}, Losses ${numLoss}. 
-        Min xp : ${minXp}, Max xp : ${maxXp}, Average xp : ${averageXp.toFixed(2)}`;
+        return `Recorded ${numRaids} raids, Winrate: ${(winRate*100).toFixed(2)}%. Min lvl: ${minLevel}, 
+        Max lvl: ${maxLevel}, Average lvl: ${averageLevel.toFixed(2)}. Wins: ${numWins}, Losses: ${numLoss}. 
+        Min xp: ${minXp}, Max xp: ${maxXp}, Average xp: ${averageXp.toFixed(2)}`;
     }
     return "No raids recorded yet";
 }
@@ -920,7 +920,8 @@ function raidUnPing(channel, user) {
 }
 
 function help(channel, user) {
-    const helpText = "&raidping to get notified of raids, &players to check the current online player count of a steam game."
+    const helpText = "&raidping to get notified of raids, &players to check the current online player count of a steam game," +
+        "&raidstats, &lastraid and &enable/disableraid (mod only)";
     sendMessageRetry(channel, `@${user}, ${helpText}`);
 }
 
