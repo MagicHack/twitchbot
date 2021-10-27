@@ -570,6 +570,7 @@ function checkIfRaid(tags, message) {
             console.log("Raid lost");
             if(lastRaid["won"] === undefined) {
                 lastRaid["won"] = false;
+                lastRaid["xp"] = 0;
                 raidHistory.push(lastRaid);
                 saveDataJson(raidHistory, RAID_HISTORY_FILE);
             } else {
@@ -580,37 +581,48 @@ function checkIfRaid(tags, message) {
             }
         } else if (matchWon !== null) {
             console.log("Raid won");
+            let xp = matchWon[1];
+            try {
+                xp = parseInt(xp);
+            } catch (e) {
+                console.error("Failed to convert xp to int");
+            }
             if(lastRaid["won"] === undefined) {
                 lastRaid["won"] = true;
+                lastRaid["xp"] = xp;
                 raidHistory.push(lastRaid);
             } else {
                 console.log("Did not save raid result. Missed raid start");
             }
             saveDataJson(raidHistory, RAID_HISTORY_FILE);
             for (let notifyChannel of raidPingChannels) {
-                sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + matchWon[1] + "xp)");
+                sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + xp + "xp)");
             }
         }
     }
 }
 
 function raidStats() {
-    let minLevel = 0;
-    let maxLevel = 0;
+    let minLevel = Infinity;
+    let maxLevel = -Infinity;
     let sumLevels = 0;
     let numWins = 0;
     let numLoss = 0;
     let numRaids = raidHistory.length;
-    if(numRaids > 0) {
-        minLevel = maxLevel = raidHistory[0]["level"];
-    }
+    let minXp = Infinity;
+    let maxXp = -Infinity;
+    let sumXp = 0;
     for(let r of raidHistory) {
         let level = r["level"];
         minLevel = Math.min(minLevel, level);
         maxLevel = Math.max(maxLevel, level);
         sumLevels += level;
         if(r["won"]) {
+            let xp = r["xp"];
             numWins++;
+            sumXp += xp;
+            minXp = Math.min(minXp, xp);
+            maxXp = Math.max(maxXp, xp);
         } else {
             numLoss++;
         }
@@ -618,7 +630,13 @@ function raidStats() {
     if(numRaids > 0) {
         let averageLevel = sumLevels / numRaids;
         let winRate = numWins / numRaids;
-        return `Recorded ${numRaids} raids, Winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, Max lvl: ${maxLevel}, Average lvl : ${averageLevel.toFixed(2)}. Wins ${numWins}, Losses ${numLoss}.`;
+        let averageXp = 0;
+        if(numWins > 0) {
+            averageXp = sumXp / numWins;
+        }
+        return `Recorded ${numRaids} raids, Winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, 
+        Max lvl: ${maxLevel}, Average lvl : ${averageLevel.toFixed(2)}. Wins ${numWins}, Losses ${numLoss}. 
+        Min xp : ${minXp}, Max xp : ${maxXp}, Average xp : ${averageXp.toFixed(2)}`;
     }
     return "No raids recorded yet";
 }
