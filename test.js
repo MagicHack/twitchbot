@@ -593,7 +593,7 @@ function raidStats() {
     let numWins = 0;
     let numLoss = 0;
     let numRaids = raidHistory.length;
-    for(let r in raidHistory) {
+    for(let r of raidHistory) {
         let level = r["level"];
         minLevel = Math.min(minLevel, level);
         maxLevel = Math.max(maxLevel, level);
