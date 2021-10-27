@@ -34,6 +34,18 @@ try {
     console.log(e);
 }
 
+const RAID_HISTORY_FILE = "raidHistory.json";
+let raidHistory = [];
+try {
+    raidHistory = readDataJson(RAID_HISTORY_FILE);
+    console.log("Successfully read history file");
+} catch (e) {
+    console.log(e);
+}
+let lastRaid = null;
+if(raidHistory.length > 0) {
+    lastRaid = raidHistory[raidHistory.length - 1];
+}
 const IGNORE_FILE = 'ignore.json';
 let peopleToIgnore = [];
 try {
@@ -281,14 +293,22 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessageRetry(channel, response);
                 })
             }
-        }
-        if (isCommand(cleanMessage.toLowerCase(), 'raidping')) {
+        } else if (isCommand(cleanMessage.toLowerCase(), 'raidping')) {
             raidPing(channel, tags.username);
         } else if (isCommand(cleanMessage.toLowerCase(), 'raidunping')) {
             raidUnPing(channel, tags.username);
+        } else if(isCommand(cleanMessage.toLowerCase(), "raidstats")) {
+            sendMessageRetry(channel, raidStats());
         } else if (isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
             'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
             help(channel, tags.username);
+        } else if(isCommand(cleanMessage.toLowerCase(), "lastraid")) {
+            if(lastRaid !== null) {
+                let timeSinceRaidSeconds = (Date.now() - new Date(lastRaid["ts"])) / 1000;
+                sendMessage(channel, "Last raid " + prettySeconds(timeSinceRaidSeconds) + " ago. (level " + lastRaid["level"] + ")");
+            } else {
+                sendMessage(channel, "No raids recorded yet");
+            }
         } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
             let amount = 1;
             let params = cleanMessage.split(" ").filter(x => x.length !== 0);
@@ -490,6 +510,7 @@ client.on("join", (channel) => {
     }
 });
 
+
 function checkIfRaid(tags, message) {
 
     //TODO : Make raid ping for each channel
@@ -505,6 +526,13 @@ function checkIfRaid(tags, message) {
         let matchWon = raidWonRE.exec(message);
         if (matchBegin !== null) {
             console.log("Raid detected");
+            let raidLevel = matchBegin[1];
+            try {
+                raidLevel = parseInt(raidLevel);
+            } catch (e) {
+                console.error("Failed to parse raid level");
+            }
+            lastRaid = {level : raidLevel, ts : new Date().toJSON()}
             // Notify me of a raid if I have my chat open
             if (channelsChatters["#hackmagic"].includes('hackmagic')) {
                 sendNotification("Join raid DinkDonk !!");
@@ -516,7 +544,7 @@ function checkIfRaid(tags, message) {
                 }
                 let pingEmote = raidData[notifyChannel]["emote"];
 
-                let baseMessage = pingEmote + ' +join (raid lvl ' + matchBegin[1] + ') ';
+                let baseMessage = pingEmote + ' +join (raid lvl ' + raidLevel + ') ';
                 let notifMessage = baseMessage;
                 const separator = ' @';
 
@@ -538,16 +566,48 @@ function checkIfRaid(tags, message) {
             }
         } else if (matchLost !== null) {
             console.log("Raid lost");
+            lastRaid["won"] = false;
+            raidHistory.push(lastRaid);
+            saveDataJson(raidHistory, RAID_HISTORY_FILE);
             for (let notifyChannel of raidPingChannels) {
                 sendMessageRetry(notifyChannel, "Raid L OMEGALULiguess ST");
             }
         } else if (matchWon !== null) {
             console.log("Raid won");
+            lastRaid["won"] = trusted;
+            raidHistory.push(lastRaid);
+            saveDataJson(raidHistory, RAID_HISTORY_FILE);
             for (let notifyChannel of raidPingChannels) {
                 sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + matchWon[1] + "xp)");
             }
         }
     }
+}
+
+function raidStats() {
+    let minLevel = 0;
+    let maxLevel = 0;
+    let sumLevels = 0;
+    let numWins = 0;
+    let numLoss = 0;
+    let numRaids = raidHistory.length;
+    for(let r in raidHistory) {
+        const level = r["level"];
+        minLevel = Math.min(minLevel, level);
+        maxLevel = Math.max(minLevel, level);
+        sumLevels += level;
+        if(r["won"]) {
+            numWins++;
+        } else {
+            numLoss++;
+        }
+    }
+    if(numRaids > 0) {
+        let averageLevel = sumLevels / numRaids;
+        let winRate = numWins / numRaids;
+        return `Recorded ${numRaids} raids, winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, max lvl: ${minLevel}, average lvl ${averageLevel}. Wins ${numWins}, Losses ${numLoss}`;
+    }
+    return "No raids recorded yet";
 }
 
 // Puts messages at the start of the queue
