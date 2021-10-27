@@ -815,6 +815,7 @@ function addChannelRaidPing(channel, emote) {
     if(raidData[channel] === undefined) {
         emote = emote === undefined ? "DinkDonk" : emote;
         raidData[channel] = {emote : emote, users : []};
+        saveDataJson(raidData, RAID_FILE);
     }
     sendMessageRetry(channel, "Raid pings enabled FeelsGoodMan , do " + prefix + "raidping to get pinged");
 }
