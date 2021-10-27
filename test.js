@@ -581,7 +581,7 @@ function checkIfRaid(tags, message) {
         } else if (matchWon !== null) {
             console.log("Raid won");
             if(lastRaid["won"] === undefined) {
-                lastRaid["won"] = trusted;
+                lastRaid["won"] = true;
                 raidHistory.push(lastRaid);
             } else {
                 console.log("Did not save raid result. Missed raid start");
