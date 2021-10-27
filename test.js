@@ -8,6 +8,7 @@ import momentTZ from 'moment-timezone';
 import moment from 'moment';
 import util from 'util';
 import childProcess from 'child_process';
+
 const exec = util.promisify(childProcess.exec);
 
 // Number of message that can be sent every 30 seconds
@@ -43,7 +44,7 @@ try {
     console.log(e);
 }
 let lastRaid = null;
-if(raidHistory.length > 0) {
+if (raidHistory.length > 0) {
     lastRaid = raidHistory[raidHistory.length - 1];
 }
 const IGNORE_FILE = 'ignore.json';
@@ -156,9 +157,10 @@ setInterval(saveBans, 10000);
 
 let lastBanCount = bans.length;
 let lastBanSaveTs = Date.now();
+
 function saveBans() {
-    if(bans.length > lastBanCount) {
-        if(Date.now() - lastBanSaveTs > 30 * 1000) {
+    if (bans.length > lastBanCount) {
+        if (Date.now() - lastBanSaveTs > 30 * 1000) {
             lastBanCount = bans.length;
             lastBanSaveTs = Date.now();
             saveDataJson(bans, "bans.json");
@@ -168,7 +170,7 @@ function saveBans() {
 
 client.on("ban", (channel, username) => {
     // Log all bans
-    let user = {channel : channel, username : username, ts : Date.now()};
+    let user = {channel: channel, username: username, ts: Date.now()};
     bans.push(user);
 });
 
@@ -186,7 +188,7 @@ client.on('message', (channel, tags, message, self) => {
     }
 
 
-    if(peopleToIgnore.includes(tags.username.toLowerCase())) {
+    if (peopleToIgnore.includes(tags.username.toLowerCase())) {
         return;
     }
 
@@ -197,8 +199,8 @@ client.on('message', (channel, tags, message, self) => {
 
     let cleanMessage = message.replace(blankchar, '').trim();
 
-    if(channel === "#pajlada") {
-        if(tags.username === "pajbot" && cleanMessage === "pajaS 🚨 ALERT") {
+    if (channel === "#pajlada") {
+        if (tags.username === "pajbot" && cleanMessage === "pajaS 🚨 ALERT") {
             sendMessageRetry(channel, "/me DANKNAD 🚨 ALERTE");
             console.log("pajaS 🚨 ALERT");
         }
@@ -247,7 +249,8 @@ client.on('message', (channel, tags, message, self) => {
                 sendMessage(channel, `FeelsDonkMan TeaTimeU`);
             } else if (cleanMessage.startsWith('FeelsDonkMan TeaTimeU')) {
                 sendMessage(channel, `TeaTimeU FeelsDonkMan`);
-            } if (cleanMessage.startsWith('TeaTime FeelsDonkMan')) {
+            }
+            if (cleanMessage.startsWith('TeaTime FeelsDonkMan')) {
                 sendMessage(channel, `FeelsDonkMan TeaTime`);
             } else if (cleanMessage.startsWith('FeelsDonkMan TeaTime')) {
                 sendMessage(channel, `TeaTime FeelsDonkMan`);
@@ -291,7 +294,7 @@ client.on('message', (channel, tags, message, self) => {
         if (isCommand(cleanMessage.toLowerCase(), 'players')) {
             let params = cleanMessage.split(' ').filter(x => x.length !== 0);
             let game;
-            if(params[0] === prefix) {
+            if (params[0] === prefix) {
                 console.log("splice");
                 params.splice(0, 2);
             } else {
@@ -307,13 +310,13 @@ client.on('message', (channel, tags, message, self) => {
             raidPing(channel, tags.username);
         } else if (isCommand(cleanMessage.toLowerCase(), 'raidunping')) {
             raidUnPing(channel, tags.username);
-        } else if(isCommand(cleanMessage.toLowerCase(), "raidstats")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "raidstats")) {
             sendMessageRetry(channel, raidStats());
         } else if (isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
             'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
             help(channel, tags.username);
-        } else if(isCommand(cleanMessage.toLowerCase(), "lastraid")) {
-            if(lastRaid !== null) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "lastraid")) {
+            if (lastRaid !== null) {
                 let timeSinceRaidSeconds = (Date.now() - new Date(lastRaid["ts"])) / 1000;
                 sendMessage(channel, "Last raid " + prettySeconds(timeSinceRaidSeconds) + " ago. (level " + lastRaid["level"] + ")");
             } else {
@@ -322,7 +325,7 @@ client.on('message', (channel, tags, message, self) => {
         } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
             let amount = 1;
             let params = cleanMessage.split(" ").filter(x => x.length !== 0);
-            if(params.length >= 2) {
+            if (params.length >= 2) {
                 try {
                     amount = parseInt(params[1]);
                 } catch (e) {
@@ -377,7 +380,7 @@ client.on('message', (channel, tags, message, self) => {
                 try {
                     let size = parseInt(args[0]);
                     let emote = args[1];
-                    if(size > maxSize) {
+                    if (size > maxSize) {
                         sendMessage(channel, "The maximum pyramid width is " + maxSize);
                     } else if (emote.trim() !== '' && size > 1) {
                         let emoteSpace = emote.trim() + " ";
@@ -392,14 +395,14 @@ client.on('message', (channel, tags, message, self) => {
                     console.log("Error while parsing supamodpyramid");
                     console.error(typeof e + " : " + e.message);
                 }
-            } else if(isCommand(cleanMessage.toLowerCase(), "enableraid")) {
+            } else if (isCommand(cleanMessage.toLowerCase(), "enableraid")) {
                 let params = splitNoEmptyNoPrefix(cleanMessage);
-                if(params.length >= 2) {
+                if (params.length >= 2) {
                     addChannelRaidPing(channel, params[1]);
                 } else {
                     addChannelRaidPing(channel);
                 }
-            } else if(isCommand(cleanMessage.toLowerCase(), "disableraid")) {
+            } else if (isCommand(cleanMessage.toLowerCase(), "disableraid")) {
                 removeChannelRaidPing(channel);
             }
         }
@@ -407,16 +410,16 @@ client.on('message', (channel, tags, message, self) => {
 
         // Admin only commands
         if (trusted.includes(tags.username)) {
-            if(isCommand(cleanMessage, "runlist")) {
+            if (isCommand(cleanMessage, "runlist")) {
                 runList(channel, tags, cleanMessage);
             }
-            if(isCommand(cleanMessage, "clear")) {
+            if (isCommand(cleanMessage, "clear")) {
                 const numberOfMessages = messageQueue.length;
                 messageQueue = [];
                 console.log("Cleared message queue : " + numberOfMessages + " messages");
                 sendMessageRetry(channel, "@" + tags.username + " cleared queue of " + numberOfMessages + " messages");
             }
-            if(isCommand(cleanMessage, 'queue')) {
+            if (isCommand(cleanMessage, 'queue')) {
                 const numberOfMessages = messageQueue.length;
                 let message = "Number of messages in queue : " + numberOfMessages;
                 console.log(message);
@@ -458,7 +461,7 @@ client.on('message', (channel, tags, message, self) => {
                 }
             } else if (isCommand(cleanMessage.toLowerCase(), "fetch")) {
                 let params = splitNoEmptyNoPrefix(cleanMessage);
-                if(params.length>= 2) {
+                if (params.length >= 2) {
                     let url = params[1].startsWith("http") ? params[1] : "https://" + params[1];
                     sendMessageRetry(channel, getUrl(url));
                 } else {
@@ -544,13 +547,13 @@ function checkIfRaid(tags, message) {
             } catch (e) {
                 console.error("Failed to parse raid level");
             }
-            lastRaid = {level : raidLevel, ts : new Date().toJSON()}
+            lastRaid = {level: raidLevel, ts: new Date().toJSON()}
             // Notify me of a raid if I have my chat open
             if (channelsChatters["#hackmagic"].includes('hackmagic')) {
                 sendNotification("Join raid DinkDonk !!");
             }
             for (let notifyChannel of raidPingChannels) {
-                if(raidData[notifyChannel] === undefined) {
+                if (raidData[notifyChannel] === undefined) {
                     console.error("Raid channel has no data in json file");
                     continue;
                 }
@@ -578,7 +581,7 @@ function checkIfRaid(tags, message) {
             }
         } else if (matchLost !== null) {
             console.log("Raid lost");
-            if(lastRaid["won"] === undefined) {
+            if (lastRaid["won"] === undefined) {
                 lastRaid["won"] = false;
                 lastRaid["xp"] = 0;
                 raidHistory.push(lastRaid);
@@ -597,7 +600,7 @@ function checkIfRaid(tags, message) {
             } catch (e) {
                 console.error("Failed to convert xp to int");
             }
-            if(lastRaid["won"] === undefined) {
+            if (lastRaid["won"] === undefined) {
                 lastRaid["won"] = true;
                 lastRaid["xp"] = xp;
                 raidHistory.push(lastRaid);
@@ -622,12 +625,12 @@ function raidStats() {
     let minXp = Infinity;
     let maxXp = -Infinity;
     let sumXp = 0;
-    for(let r of raidHistory) {
+    for (let r of raidHistory) {
         let level = r["level"];
         minLevel = Math.min(minLevel, level);
         maxLevel = Math.max(maxLevel, level);
         sumLevels += level;
-        if(r["won"]) {
+        if (r["won"]) {
             let xp = r["xp"];
             numWins++;
             sumXp += xp;
@@ -637,14 +640,14 @@ function raidStats() {
             numLoss++;
         }
     }
-    if(numRaids > 0) {
+    if (numRaids > 0) {
         let averageLevel = sumLevels / numRaids;
         let winRate = numWins / numRaids;
         let averageXp = 0;
-        if(numWins > 0) {
+        if (numWins > 0) {
             averageXp = sumXp / numWins;
         }
-        return `Recorded ${numRaids} raids, Winrate: ${(winRate*100).toFixed(2)}%. Min lvl: ${minLevel}, 
+        return `Recorded ${numRaids} raids, Winrate: ${(winRate * 100).toFixed(2)}%. Min lvl: ${minLevel}, 
         Max lvl: ${maxLevel}, Average lvl: ${averageLevel.toFixed(2)}. Wins: ${numWins}, Losses: ${numLoss}. 
         Min xp: ${minXp}, Max xp: ${maxXp}, Average xp: ${averageXp.toFixed(2)}`;
     }
@@ -653,30 +656,31 @@ function raidStats() {
 
 // Puts messages at the start of the queue
 function sendMessageRetryPriority(channel, message) {
-    messagePriorityQueue.push({channel : channel, message : message});
+    messagePriorityQueue.push({channel: channel, message: message});
     sendMessageRetry(channel, '');
 }
 
 let timerHandle = null;
+
 // Retries to send messages if they fail
 function sendMessageRetry(channel, message) {
     let currentQueue = messageQueue;
-    if(message !== '') {
-        currentQueue.push({channel : channel, message : message});
+    if (message !== '') {
+        currentQueue.push({channel: channel, message: message});
         // console.log("Queue length : " + messageQueue.length);
     }
-    if(messagePriorityQueue.length > 0) {
+    if (messagePriorityQueue.length > 0) {
         currentQueue = messagePriorityQueue;
     }
-    if(currentQueue.length > 0) {
+    if (currentQueue.length > 0) {
         let messageToSend = currentQueue[0];
-        if(timerHandle === null) {
+        if (timerHandle === null) {
             console.log("Starting interval for sending messages");
             timerHandle = setInterval(sendMessageRetry, 300, channel, '');
         }
-        while(sendMessage(messageToSend.channel, messageToSend.message)) {
+        while (sendMessage(messageToSend.channel, messageToSend.message)) {
             currentQueue.shift();
-            if(currentQueue.length > 0) {
+            if (currentQueue.length > 0) {
                 messageToSend = currentQueue[0];
             } else {
                 break;
@@ -692,6 +696,7 @@ function sendMessageRetry(channel, message) {
 // We assume normal bucket is full on start, 30 seconds before being able to send messages on startup
 let sentMessagesTS = new Array(Math.round(rateLimitMessagesMod)).fill(Date.now());
 let logSendMessages = false;
+
 function sendMessage(channel, message) {
     const charLimit = 500;
     // TODO implement banphrase api
@@ -729,7 +734,7 @@ function sendMessage(channel, message) {
     let currentLimit = rateLimitMessages;
 
     if (isMod || isVip) {
-        if(logSendMessages) {
+        if (logSendMessages) {
             console.log("using mod/vip rate limit");
         }
         currentRate = rateLimitDelayMod;
@@ -737,7 +742,7 @@ function sendMessage(channel, message) {
 
         if (modSpamChannels.includes(channel)) {
             modSpam = true;
-            if(logSendMessages) {
+            if (logSendMessages) {
                 console.log("Mod spam enabled TriHard");
             }
         }
@@ -746,18 +751,18 @@ function sendMessage(channel, message) {
     if (!modSpam && Date.now() - lastMessageTimeStampMs < currentRate * 1000) {
         // We send messages at most every 30s/ratelimit, another mesure to not go over the rate limit
         // except in channel where mod spam is enabled.
-        if(logSendMessages) {
+        if (logSendMessages) {
             console.log("Dropped message cause we are sending too fast");
         }
         return false;
     } else {
-        if(logSendMessages) {
+        if (logSendMessages) {
             console.log("Current message counter is : " + messageCounter);
         }
 
         if (messageCounter >= currentLimit - 1) {
             // 1 message buffer monkaGIGA...
-            if(logSendMessages) {
+            if (logSendMessages) {
                 console.log("Dropped message cause we are approching max number of message every 30s");
             }
             return false;
@@ -836,8 +841,8 @@ function prettySeconds(seconds) {
 
 function isCommand(message, command) {
     let params = message.split(" ").filter(x => x.length !== 0);
-    if(params.length >= 2) {
-        if(params[0] === prefix && params[1] === command) {
+    if (params.length >= 2) {
+        if (params[0] === prefix && params[1] === command) {
             return true;
         }
     }
@@ -845,15 +850,15 @@ function isCommand(message, command) {
 }
 
 function addChannelRaidPing(channel, emote) {
-    if(raidPingChannels.includes(channel)) {
+    if (raidPingChannels.includes(channel)) {
         sendMessageRetry(channel, "This channel already has raid pings enabled...");
         return;
     }
     raidPingChannels.push(channel);
     saveDataJson(raidPingChannels, PING_CHANNELS_FILE);
-    if(raidData[channel] === undefined) {
+    if (raidData[channel] === undefined) {
         emote = emote === undefined ? "DinkDonk" : emote;
-        raidData[channel] = {emote : emote, users : []};
+        raidData[channel] = {emote: emote, users: []};
         saveDataJson(raidData, RAID_FILE);
     }
     sendMessageRetry(channel, "Raid pings enabled FeelsGoodMan , do " + prefix + "raidping to get pinged");
@@ -861,7 +866,7 @@ function addChannelRaidPing(channel, emote) {
 
 function removeChannelRaidPing(channel) {
     let index = raidPingChannels.indexOf(channel);
-    if(index !== -1) {
+    if (index !== -1) {
         raidPingChannels.splice(index, 1);
         sendMessageRetry(channel, "Raid pings disabled FeelsOkayMan");
         saveDataJson(raidPingChannels, PING_CHANNELS_FILE);
@@ -871,7 +876,7 @@ function removeChannelRaidPing(channel) {
 }
 
 function raidPing(channel, user) {
-    if(!raidPingChannels.includes(channel)) {
+    if (!raidPingChannels.includes(channel)) {
         sendMessage(channel, "raid pings aren't enabled in this channel :(");
         return;
     }
@@ -895,7 +900,7 @@ function raidPing(channel, user) {
 }
 
 function raidUnPing(channel, user) {
-    if(raidData[channel] === undefined) {
+    if (raidData[channel] === undefined) {
         sendMessage(channel, "You aren't in the ping list for this channel");
         return;
     }
@@ -928,6 +933,7 @@ function help(channel, user) {
 let lastMessage = Date.now();
 let notifMessages = [];
 let notifTimer = null;
+
 function phoneNotifications(rawChannel, message, user) {
     // Time with no message before a it sends a ping
     const afkTime = 15;
@@ -942,7 +948,7 @@ function phoneNotifications(rawChannel, message, user) {
     if (user.username === 'hackmagic') {
         lastMessage = Date.now();
         notifMessages = [];
-        if(notifTimer !== null) {
+        if (notifTimer !== null) {
             clearTimeout(notifTimer);
             notifTimer = null;
         }
@@ -969,7 +975,7 @@ function phoneNotifications(rawChannel, message, user) {
                 console.log("Message matched ping regex");
                 notifMessages.push(`[${rawChannel}] ${displayName}: ${message}`);
                 // remove old timeout and start a new one
-                if(notifTimer !== null) {
+                if (notifTimer !== null) {
                     console.log("Clear old timer");
                     clearTimeout(notifTimer);
                 }
@@ -987,7 +993,7 @@ function sendQueueNotification() {
 
     console.log("Sending queued " + notifMessages.length + " notifications...");
 
-    if(notifMessages.length === 1) {
+    if (notifMessages.length === 1) {
         sendNotification(notifMessages[0]);
     } else {
         let notifMessage = `${notifMessages.length} notifications : `;
@@ -998,7 +1004,7 @@ function sendQueueNotification() {
         // remove last separator
         notifMessage = notifMessage.substring(0, notifMessage.length - sepStr.length);
         // remove excess chars
-        if(notifMessage.length > MAX_LENGTH) {
+        if (notifMessage.length > MAX_LENGTH) {
             const endStr = ' ...';
             console.log("Full notification : " + notifMessage);
             notifMessage = notifMessage.substring(0, MAX_LENGTH - endStr.length) + endStr;
@@ -1063,7 +1069,7 @@ function flashbangselector(command) {
     } catch (e) {
         console.log("error parsing number in flashbang");
     }
-    if(num < 0 || num > flashbangs.length) {
+    if (num < 0 || num > flashbangs.length) {
         throw new Error("Valid flashbangs are from 1 to " + flashbangs.length);
     } else {
         return flashbangs[num - 1];
@@ -1144,20 +1150,20 @@ async function progress(channel) {
 function moderation(channel, tags, message) {
     const hossRe = /\b@?(\S*[h]+[0o]+[s]+[t_]*[o0-9]+\S*)\b/gi;
     let enableChannels = ['#hackmagic', '#pepto__bismol'];
-    if(!enableChannels.includes(channel)) {
+    if (!enableChannels.includes(channel)) {
         return;
     }
     // hoss bots follows annouced by streamelements
-    if(tags.username === "streamelements") {
+    if (tags.username === "streamelements") {
         let match = hossRe.exec(message);
-        if(match !== null) {
+        if (match !== null) {
             let user = match[1];
             sendMessageRetry(channel, "/ban " + user + " automated bot ban");
         }
     } else if (tags.username === "doo_dul") {
-        if(/has followed/gi.test(message)) {
+        if (/has followed/gi.test(message)) {
             let match = hossRe.exec(message);
-            if(match !== null) {
+            if (match !== null) {
                 let user = match[1];
                 sendMessageRetry(channel, "/ban " + user + " automated bot ban");
             }
@@ -1166,13 +1172,13 @@ function moderation(channel, tags, message) {
 }
 
 function runList(channel, tags, message) {
-    if(!trusted.includes(tags.username)) {
+    if (!trusted.includes(tags.username)) {
         console.log("ERROR untrusted user tried to run a list " + tags.username);
         return;
     }
     console.log("Start of runlist, invocation : " + message + " by " + tags.username);
     let params = message.split(" ");
-    if(params.length >= 2 && params[1].length !== 0) {
+    if (params.length >= 2 && params[1].length !== 0) {
         let path = params[1];
         let lines = [];
         try {
@@ -1182,19 +1188,19 @@ function runList(channel, tags, message) {
             console.log(e);
             sendMessageRetry(channel, String(e));
         }
-        if(params.length >= 3 && params[2].length !== 0) {
+        if (params.length >= 3 && params[2].length !== 0) {
             let command = "";
             let reason = " automated ban";
-            if(params[2] === 'name' || params[2] === 'names') {
+            if (params[2] === 'name' || params[2] === 'names') {
                 command = "/ban ";
-                if(params >= 4 && params[3].length !== 0) {
+                if (params >= 4 && params[3].length !== 0) {
                     reason = " " + params[3];
                 }
             }
             lines = lines.map(l => command + l + reason);
         }
         console.log("Running " + lines.length + " lines in the list");
-        if(lines.length > 0) {
+        if (lines.length > 0) {
             console.log("first line : " + lines[0]);
         }
         lines.forEach(l => sendMessageRetry(channel, l));
@@ -1216,8 +1222,8 @@ function readDataJson(filePath) {
 function timeouts(channel, username) {
     try {
         let timeout = timeoutList.find(user => user.username === username);
-        if(timeout !== undefined) {
-            if(Math.random() <= timeout["probability"]) {
+        if (timeout !== undefined) {
+            if (Math.random() <= timeout["probability"]) {
                 sendMessageRetryPriority(channel, `/timeout ${timeout.username} ${timeout.duration} ${timeout.reason}`);
             }
         }
@@ -1229,15 +1235,15 @@ function timeouts(channel, username) {
 async function update(channel) {
     // pull repo
     sendMessageRetry(channel, "Pulling repo...");
-    let {stdout : gitOut} = await exec('git pull', {encoding: 'utf8'});
+    let {stdout: gitOut} = await exec('git pull', {encoding: 'utf8'});
     console.log(gitOut);
-    if(gitOut.includes("Already up to date.")) {
+    if (gitOut.includes("Already up to date.")) {
         sendMessageRetry(channel, "No new commits to pull FeelsDankMan");
     } else {
-        if(gitOut.includes("package-lock.json") || gitOut.includes("package.json")) {
+        if (gitOut.includes("package-lock.json") || gitOut.includes("package.json")) {
             sendMessageRetry(channel, "Updating npm packages...");
             // update npm packages
-            let {stdout : npmOut} = await exec("npm i", {encoding: 'utf8'});
+            let {stdout: npmOut} = await exec("npm i", {encoding: 'utf8'});
             console.log(npmOut);
         }
         sendMessageRetry(channel, "restarting...");
