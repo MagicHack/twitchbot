@@ -1045,7 +1045,7 @@ function addUserIgnore(channel, username) {
 
 function flashbangselector(command) {
     // TODO: load from json
-    const flashbangs = ["FreePoggersEmote", "bruhFAINT", "GotCaughtTrolling", "NothingHere", "KartComback", "TriFall"];
+    const flashbangs = ["FP", "bruhFAINT", "GotCaughtTrolling", "NothingHere", "KartComback", "TriFall"];
     let num = 1;
     try {
         num = parseInt(command.match(/\d+/)[0]);
