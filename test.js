@@ -357,6 +357,8 @@ client.on('message', (channel, tags, message, self) => {
             isCommand(cleanMessage.toLowerCase(), "fallking")) {
             progress(channel).then();
         }
+
+        // MODS broadcaster and admin commands
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
             const maxSize = 50;
             if (isCommand(cleanMessage.toLowerCase(), 'supamodpyramid ')) {
@@ -380,10 +382,20 @@ client.on('message', (channel, tags, message, self) => {
                     console.log("Error while parsing supamodpyramid");
                     console.error(typeof e + " : " + e.message);
                 }
+            } else if(isCommand(cleanMessage.toLowerCase(), "enableraid")) {
+                let params = splitNoEmptyNoPrefix(cleanMessage);
+                if(params.length >= 2) {
+                    addChannelRaidPing(channel, params[1]);
+                } else {
+                    addChannelRaidPing(channel);
+                }
+            } else if(isCommand(cleanMessage.toLowerCase(), "disableraid")) {
+                removeChannelRaidPing(channel);
             }
         }
 
 
+        // Admin only commands
         if (trusted.includes(tags.username)) {
             if(isCommand(cleanMessage, "runlist")) {
                 runList(channel, tags, cleanMessage);
@@ -442,17 +454,7 @@ client.on('message', (channel, tags, message, self) => {
                 } else {
                     sendMessage(channel, "No url provided FeelsDankMan");
                 }
-            } else if(isCommand(cleanMessage.toLowerCase(), "enableraid")) {
-                let params = splitNoEmptyNoPrefix(cleanMessage);
-                if(params.length >= 2) {
-                    addChannelRaidPing(channel, params[1]);
-                } else {
-                    addChannelRaidPing(channel);
-                }
-            } else if(isCommand(cleanMessage.toLowerCase(), "disableraid")) {
-                removeChannelRaidPing(channel);
-            }
-            if (isCommand(cleanMessage.toLowerCase(), 'quit')) {
+            } else if (isCommand(cleanMessage.toLowerCase(), 'quit')) {
                 console.log("Received quit command, bye Sadge");
                 sendMessageRetry(channel, 'Quitting PepeHands');
                 setTimeout(process.exit, 1500);
@@ -592,9 +594,9 @@ function raidStats() {
     let numLoss = 0;
     let numRaids = raidHistory.length;
     for(let r in raidHistory) {
-        const level = r["level"];
+        let level = r["level"];
         minLevel = Math.min(minLevel, level);
-        maxLevel = Math.max(minLevel, level);
+        maxLevel = Math.max(maxLevel, level);
         sumLevels += level;
         if(r["won"]) {
             numWins++;
