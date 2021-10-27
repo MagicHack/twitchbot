@@ -568,16 +568,24 @@ function checkIfRaid(tags, message) {
             }
         } else if (matchLost !== null) {
             console.log("Raid lost");
-            lastRaid["won"] = false;
-            raidHistory.push(lastRaid);
-            saveDataJson(raidHistory, RAID_HISTORY_FILE);
+            if(lastRaid["won"] === undefined) {
+                lastRaid["won"] = false;
+                raidHistory.push(lastRaid);
+                saveDataJson(raidHistory, RAID_HISTORY_FILE);
+            } else {
+                console.log("Did not save raid result. Missed raid start");
+            }
             for (let notifyChannel of raidPingChannels) {
                 sendMessageRetry(notifyChannel, "Raid L OMEGALULiguess ST");
             }
         } else if (matchWon !== null) {
             console.log("Raid won");
-            lastRaid["won"] = trusted;
-            raidHistory.push(lastRaid);
+            if(lastRaid["won"] === undefined) {
+                lastRaid["won"] = trusted;
+                raidHistory.push(lastRaid);
+            } else {
+                console.log("Did not save raid result. Missed raid start");
+            }
             saveDataJson(raidHistory, RAID_HISTORY_FILE);
             for (let notifyChannel of raidPingChannels) {
                 sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + matchWon[1] + "xp)");
@@ -610,7 +618,7 @@ function raidStats() {
     if(numRaids > 0) {
         let averageLevel = sumLevels / numRaids;
         let winRate = numWins / numRaids;
-        return `Recorded ${numRaids} raids, winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, max lvl: ${maxLevel}, average lvl ${averageLevel}. Wins ${numWins}, Losses ${numLoss}`;
+        return `Recorded ${numRaids} raids, Winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, Max lvl: ${maxLevel}, Average lvl : ${averageLevel}. Wins ${numWins}, Losses ${numLoss}.`;
     }
     return "No raids recorded yet";
 }
