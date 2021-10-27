@@ -130,7 +130,7 @@ const client = new tmi.Client({
     },
     channels: ['magichackbot', 'ron__bot', 'pepto__bismol', 'hackmagic', 'swushwoi', 'minusinsanity', 'ron__johnson_', 'katelynerika',
         'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro', 'yung_randd', 'sunephef', 'schooleo', 'illyaow',
-        'qu0te_if_forsen_threw', 'benjxxm']
+        'qu0te_if_forsen_threw', 'benjxxm', 'pajlada']
 });
 
 let channelsChatters = {};
@@ -185,6 +185,7 @@ client.on('message', (channel, tags, message, self) => {
         return;
     }
 
+
     if(peopleToIgnore.includes(tags.username.toLowerCase())) {
         return;
     }
@@ -195,6 +196,15 @@ client.on('message', (channel, tags, message, self) => {
     }
 
     let cleanMessage = message.replace(blankchar, '').trim();
+
+    if(channel === "#pajlada") {
+        if(tags.username === "pajbot" && cleanMessage === "pajaS 🚨 ALERT") {
+            sendMessageRetry(channel, "/me DANKNAD 🚨 ALERTE");
+            console.log("pajaS 🚨 ALERT");
+        }
+        // Don't do anything else in paj's channel for now
+        return;
+    }
 
     checkIfRaid(tags, cleanMessage);
     phoneNotifications(channel, cleanMessage, tags);
