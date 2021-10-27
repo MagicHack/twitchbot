@@ -818,7 +818,7 @@ function addChannelRaidPing(channel, emote) {
 }
 
 function removeChannelRaidPing(channel) {
-    let index = raidPingChannels.find(channel);
+    let index = raidPingChannels.indexOf(channel);
     if(index !== -1) {
         raidPingChannels.splice(index, 1);
         sendMessageRetry(channel, "Raid pings disabled FeelsOkayMan");
