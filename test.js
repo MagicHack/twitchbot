@@ -593,6 +593,9 @@ function raidStats() {
     let numWins = 0;
     let numLoss = 0;
     let numRaids = raidHistory.length;
+    if(numRaids > 0) {
+        minLevel = maxLevel = raidHistory[0]["level"];
+    }
     for(let r of raidHistory) {
         let level = r["level"];
         minLevel = Math.min(minLevel, level);
@@ -607,7 +610,7 @@ function raidStats() {
     if(numRaids > 0) {
         let averageLevel = sumLevels / numRaids;
         let winRate = numWins / numRaids;
-        return `Recorded ${numRaids} raids, winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, max lvl: ${minLevel}, average lvl ${averageLevel}. Wins ${numWins}, Losses ${numLoss}`;
+        return `Recorded ${numRaids} raids, winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, max lvl: ${maxLevel}, average lvl ${averageLevel}. Wins ${numWins}, Losses ${numLoss}`;
     }
     return "No raids recorded yet";
 }
