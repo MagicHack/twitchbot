@@ -618,7 +618,7 @@ function raidStats() {
     if(numRaids > 0) {
         let averageLevel = sumLevels / numRaids;
         let winRate = numWins / numRaids;
-        return `Recorded ${numRaids} raids, Winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, Max lvl: ${maxLevel}, Average lvl : ${averageLevel}. Wins ${numWins}, Losses ${numLoss}.`;
+        return `Recorded ${numRaids} raids, Winrate ${(winRate*100).toFixed(2)}%. Min lvl : ${minLevel}, Max lvl: ${maxLevel}, Average lvl : ${averageLevel.toFixed(2)}. Wins ${numWins}, Losses ${numLoss}.`;
     }
     return "No raids recorded yet";
 }
