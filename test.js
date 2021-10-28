@@ -1148,6 +1148,9 @@ async function progress(channel) {
 }
 
 function moderation(channel, tags, message) {
+
+    bigfollows(channel, tags, message);
+
     const hossRe = /\b@?(\S*[h]+[0o]+[s]+[t_]*[o0-9]+\S*)\b/gi;
     let enableChannels = ['#hackmagic', '#pepto__bismol'];
     if (!enableChannels.includes(channel)) {
@@ -1262,4 +1265,21 @@ function getUrl(url) {
 
 function splitNoEmptyNoPrefix(message) {
     return message.split(" ").filter(x => (x !== prefix && x.length !== 0));
+}
+
+function bigfollows(channel, tags, message) {
+    const enabledChannels = ["#minusinsanity", "#hackmagic", "#pepto__bismol"];
+
+    const bigfollowsRE = /Want\s*to\s*become\s*famous\s*\?\s*Buy\s*followers\s*and\s*viewers\s*on/ig;
+
+    let firstMessage = false;
+    if(tags["first-msg"] !== undefined) {
+        firstMessage = tags["first-msg"];
+    }
+    if(firstMessage && enabledChannels.includes(channel) && bigfollowsRE.test(message)) {
+        let message = "Banned user : " + tags.username + " in channel " + channel + " for bigfollows";
+        console.log(message);
+        sendMessageRetryPriority(channel, `/ban ${tags.username} bigfollows (automated)`);
+        sendNotification(message);
+    }
 }
