@@ -178,6 +178,8 @@ client.on("connected", () => {
     client.say("#" + username, "connected " + (new Date()).toISOString());
     sentMessagesTS.push(Date.now());
 });
+let lastSingleReply = Date.now();
+let lastNewCommandReply = Date.now();
 
 client.on('message', (channel, tags, message, self) => {
     if (self) return;
@@ -187,6 +189,10 @@ client.on('message', (channel, tags, message, self) => {
         return;
     }
 
+    // remove chatterino char and extra spaces
+    let cleanMessage = message.replace(blankchar, '').trim();
+
+    phoneNotifications(channel, cleanMessage, tags);
 
     if (peopleToIgnore.includes(tags.username.toLowerCase())) {
         return;
@@ -196,8 +202,6 @@ client.on('message', (channel, tags, message, self) => {
     if (channel === "#pepto__bismol") {
         timeouts(channel, tags.username);
     }
-
-    let cleanMessage = message.replace(blankchar, '').trim();
 
     if (channel === "#pajlada") {
         if (tags.username === "pajbot" && cleanMessage === "pajaS 🚨 ALERT") {
@@ -209,7 +213,6 @@ client.on('message', (channel, tags, message, self) => {
     }
 
     checkIfRaid(tags, cleanMessage);
-    phoneNotifications(channel, cleanMessage, tags);
     moderation(channel, tags, cleanMessage);
 
     if (isCommand(cleanMessage.toLowerCase(), 'ping')) {
@@ -224,7 +227,10 @@ client.on('message', (channel, tags, message, self) => {
     }
     const singleCharReply = ['!', prefix];
     if (singleCharReply.includes(cleanMessage)) {
-        sendMessage(channel, cleanMessage);
+        if(Date.now() - lastSingleReply > 15 * 1000) {
+            lastSingleReply = Date.now();
+            sendMessage(channel, cleanMessage);
+        }
     }
 
     if (tags.username !== client.getUsername()) {
@@ -274,7 +280,10 @@ client.on('message', (channel, tags, message, self) => {
         }
         const newCommand = 'I made a new command HeyGuys';
         if (cleanMessage.startsWith(newCommand)) {
-            sendMessage(channel, newCommand);
+            if(Date.now() - lastNewCommandReply > 15 * 1000) {
+                lastNewCommandReply = Date.now();
+                sendMessage(channel, newCommand);
+            }
         }
         let sameRepliesChannel = ['#hackmagic', '#pepto__bismol'];
         let sameReplies = ['DinkDonk', 'YEAHBUTBTTV', 'TrollDespair', 'MODS', 'monkaE', 'POGGERS', 'VeryPog',
