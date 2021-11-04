@@ -180,6 +180,9 @@ client.on("connected", () => {
 });
 let lastSingleReply = Date.now();
 let lastNewCommandReply = Date.now();
+let lastDonkReply = Date.now();
+let donkCoolDown = 15;
+let spamReplyCoolDown = 30;
 
 client.on('message', (channel, tags, message, self) => {
     if (self) return;
@@ -227,7 +230,7 @@ client.on('message', (channel, tags, message, self) => {
     }
     const singleCharReply = ['!', prefix];
     if (singleCharReply.includes(cleanMessage)) {
-        if(Date.now() - lastSingleReply > 15 * 1000) {
+        if(Date.now() - lastSingleReply > spamReplyCoolDown * 1000) {
             lastSingleReply = Date.now();
             sendMessage(channel, cleanMessage);
         }
@@ -249,38 +252,29 @@ client.on('message', (channel, tags, message, self) => {
             }
         }
 
-        if (donkUsername === '' || tags.username === donkUsername) {
-            // TODO make list of emote combos
-            if (cleanMessage.startsWith('TeaTimeU FeelsDonkMan')) {
-                sendMessage(channel, `FeelsDonkMan TeaTimeU`);
-            } else if (cleanMessage.startsWith('FeelsDonkMan TeaTimeU')) {
-                sendMessage(channel, `TeaTimeU FeelsDonkMan`);
-            }
-            if (cleanMessage.startsWith('TeaTime FeelsDonkMan')) {
-                sendMessage(channel, `FeelsDonkMan TeaTime`);
-            } else if (cleanMessage.startsWith('FeelsDonkMan TeaTime')) {
-                sendMessage(channel, `TeaTime FeelsDonkMan`);
-            } else if (cleanMessage.startsWith('bigTeaTime FeelsDonkMan')) {
-                sendMessage(channel, `FeelsDonkMan bigTeaTime`);
-            } else if (cleanMessage.startsWith('FeelsDonkMan bigTeaTime')) {
-                sendMessage(channel, `bigTeaTime FeelsDonkMan`);
-            } else if (cleanMessage.startsWith('WIDEGIGADONK TeaTime')) {
-                sendMessage(channel, `TeaTime WIDEGIGADONK`);
-            } else if (cleanMessage.startsWith('TeaTime WIDEGIGADONK')) {
-                sendMessage(channel, `WIDEGIGADONK TeaTime`);
-            } else if (cleanMessage.startsWith('WIDEGIGADONK bigTeaTime')) {
-                sendMessage(channel, `bigTeaTime WIDEGIGADONK`);
-            } else if (cleanMessage.startsWith('bigTeaTime WIDEGIGADONK')) {
-                sendMessage(channel, `WIDEGIGADONK bigTeaTime`);
-            } else if (cleanMessage.startsWith('MiniTeaTime FeelsDonkMan')) {
-                sendMessage(channel, `FeelsDonkMan MiniTeaTime`);
-            } else if (cleanMessage.startsWith('FeelsDonkMan MiniTeaTime')) {
-                sendMessage(channel, `MiniTeaTime FeelsDonkMan`);
+        if(Date.now() - lastDonkReply > donkCoolDown * 1000) {
+            const donkCombos = [["FeelsDonkMan", "TeaTimeU"], ["FeelsDonkMan", "TeaTime"], ["FeelsDonkMan", "bigTeaTime"],
+                ["WIDEGIGADONK", "TeaTime"], ["WIDEGIGADONK", "bigTeaTime"], ["FeelsDonkMan", "MiniTeaTime"]];
+
+            if (donkUsername === '' || tags.username === donkUsername) {
+                for(let donk of donkCombos) {
+                    const donk1 = `${donk[0]} ${donk[1]}`;
+                    const donk2 = `${donk[1]} ${donk[0]}`;
+
+                    if(cleanMessage === donk1) {
+                        sendMessage(channel, donk2);
+                        lastDonkReply = Date.now();
+                    } else if(cleanMessage === donk2) {
+                        sendMessage(channel, donk1);
+                        lastDonkReply = Date.now();
+                    }
+                }
             }
         }
+
         const newCommand = 'I made a new command HeyGuys';
         if (cleanMessage.startsWith(newCommand)) {
-            if(Date.now() - lastNewCommandReply > 15 * 1000) {
+            if(Date.now() - lastNewCommandReply > spamReplyCoolDown * 1000) {
                 lastNewCommandReply = Date.now();
                 sendMessage(channel, newCommand);
             }
