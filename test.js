@@ -131,7 +131,7 @@ const client = new tmi.Client({
     },
     channels: ['magichackbot', 'ron__bot', 'pepto__bismol', 'hackmagic', 'swushwoi', 'minusinsanity', 'ron__johnson_', 'katelynerika',
         'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro', 'yung_randd', 'sunephef', 'schooleo', 'illyaow',
-        'qu0te_if_forsen_threw', 'benjxxm', 'pajlada']
+        'qu0te_if_forsen_threw', 'benjxxm', 'pajlada', 'cairoxo']
 });
 
 let channelsChatters = {};
@@ -1080,7 +1080,7 @@ function flashbangselector(command) {
 }
 
 function flashbang(channel, user, amount, text) {
-    let enabledChannels = ["#pepto__bismol", "#ryuuiro", '#sunephef'];
+    let enabledChannels = ["#pepto__bismol", "#ryuuiro", '#sunephef', '#cairoxo'];
     if (amount > 50) {
         amount = 50;
     }
