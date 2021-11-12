@@ -82,6 +82,8 @@ try {
 }
 
 const configFilePath = 'config.json';
+const channelsFilePath = 'channels.json';
+let channels = [];
 
 let username = '';
 let password = '';
@@ -102,6 +104,7 @@ try {
 
 try {
     let configData = readDataJson(configFilePath);
+    channels = readDataJson(channelsFilePath);
     username = configData["username"];
     password = configData["token"];
     weatherApiKey = configData["weatherKey"];
@@ -109,7 +112,7 @@ try {
     pushoverUser = configData["puser"];
 } catch (err) {
     console.error(typeof err + " " + err.message);
-    console.log("Error, could not read config file. Quitting");
+    console.log("Error, could not read config/channels file. Quitting");
     process.exit(1);
 }
 
@@ -129,9 +132,7 @@ const client = new tmi.Client({
         username: username,
         password: password
     },
-    channels: ['magichackbot', 'ron__bot', 'pepto__bismol', 'hackmagic', 'swushwoi', 'minusinsanity', 'ron__johnson_', 'katelynerika',
-        'huwobot', 'dontkermitsueside', 'prog0ldfish', 'ryuuiro', 'yung_randd', 'sunephef', 'schooleo', 'illyaow',
-        'qu0te_if_forsen_threw', 'benjxxm', 'pajlada', 'cairoxo']
+    channels: channels
 });
 
 let channelsChatters = {};
@@ -491,6 +492,20 @@ client.on('message', (channel, tags, message, self) => {
                 process.exit();
             } else if (isCommand(cleanMessage.toLowerCase(), "update")) {
                 update(channel).then();
+            } else if(isCommand(cleanMessage.toLowerCase(), "join")) {
+                let params = splitNoEmptyNoPrefix(cleanMessage);
+                if(params.length >= 2) {
+                    join(params[1]);
+                } else {
+                    sendMessageRetry("Specify a channel to join FeelsDankMan");
+                }
+            }else if(isCommand(cleanMessage.toLowerCase(), "leave")) {
+                let params = splitNoEmptyNoPrefix(cleanMessage);
+                if(params.length >= 2) {
+                    leave(params[1]);
+                } else {
+                    sendMessageRetry("Specify a channel to leave FeelsDankMan");
+                }
             }
         }
     }
@@ -1408,4 +1423,41 @@ function formatJustlog(message) {
 function checkUserMessage(message) {
     const racismRegex = /(?:(?:\b(?<![-=\.])|monka)(?:[Nnñ]|[Ii7]V)|[\/|]\\[\/|])[\s\.]*?[liI1y!j\/|]+[\s\.]*?(?:[GgbB6934Q🅱qğĜƃ၅5\*][\s\.]*?){2,}(?!arcS|l|Ktlw|ylul|ie217|64|\d? ?times)/;
     return !racismRegex.test(message);
+}
+
+function join(channel, newChannel) {
+    newChannel = newChannel.toLowerCase();
+    const index = channels.indexOf(newChannel);
+    if(index !== -1) {
+        sendMessageRetry(channel, "I'm already in this channel FeelsDonkMan");
+        return;
+    }
+    channels.push(newChannel);
+    saveDataJson(channels, channelsFilePath);
+    client.join(newChannel)
+        .then(() => {
+            sendMessageRetryPriority("#" + newChannel, "Joined channel");
+            sendMessageRetryPriority(channel, "Successfully joined new channel");
+        }).catch(() => {
+        console.error("Failed to join channel");
+        sendMessageRetryPriority(channel, "Error joining channel monkaS");
+    });
+}
+
+function leave(channel, channelToRemove) {
+    channelToRemove = channelToRemove.toLowerCase();
+    const index = channels.indexOf(channelToRemove);
+    if(index === -1) {
+        sendMessageRetry(channel, "I'm not in this channel FeelsDonkMan");
+        return;
+    }
+    channels.splice(index,1);
+    saveDataJson(channels, channelsFilePath);
+    client.part(channelToRemove)
+        .then(() => {
+            sendMessageRetryPriority(channel, "Successfully leaved channel FeelsBadMan");
+        }).catch(() => {
+        console.error("Failed to part channel");
+        sendMessageRetryPriority(channel, "Error leaving channel monkaS");
+    });
 }
