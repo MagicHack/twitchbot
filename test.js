@@ -378,6 +378,12 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessage(channel, message);
                 }
             });
+        } else if(isCommand(cleanMessage.toLowerCase(), "fl")) {
+            fl(channel, tags.username).then(message => {
+                if(message.length > 0) {
+                    sendMessage(channel, message);
+                }
+            });
         }
 
         // MODS broadcaster and admin commands
@@ -1320,6 +1326,54 @@ async function rq(channel, user){
     if(message.length === 0) {
         return "Error fetching logs";
     }
+    return formatJustlog(message);
+}
+
+function removeRqCd(user) {
+    let index = rqCd.indexOf(user);
+    if(index !== -1) {
+        rqCd.splice(index, 1);
+    }
+}
+
+let rqFl = [];
+async function fl(channel, user) {
+    if(rqFl.includes(user)) {
+        // cooldown
+        return "";
+    }
+    rqFl.push(user);
+    setTimeout(removeRqFl, 60000, user);
+    if(channel.startsWith('#')) {
+        channel = channel.substring(1);
+    }
+    const url = `https://logs.magichack.xyz/list?channel=${channel}&user=${user}`;
+    const response = await fetch(url);
+    if(!response.ok) {
+        return "No logs found for this channel/user";
+    }
+    const dates = await response.json();
+    const earliestDate = dates["availableLogs"][dates["availableLogs"].length - 1];
+
+    const firstMonthLogsUrl = `https://logs.magichack.xyz/channel/${channel}/user/${user}/${earliestDate["year"]}/${earliestDate["month"]}`;
+    const responseLogs = await fetch(firstMonthLogsUrl);
+
+    if(!responseLogs.ok) {
+        return "Error fetching logs";
+    }
+    let firstLine = (await responseLogs.text()).split('\n', 1)[0];
+    return formatJustlog(firstLine);
+}
+
+function removeRqFl(user) {
+    let index = rqFl.indexOf(user);
+    if(index !== -1) {
+        rqCd.splice(index, 1);
+    }
+}
+
+
+function formatJustlog(message) {
     let words = message.split(' ');
 
     // fix leading zero on day returned by justlog
@@ -1338,11 +1392,4 @@ async function rq(channel, user){
     }
 
     return words.join(" ");
-}
-
-function removeRqCd(user) {
-    let index = rqCd.indexOf(user);
-    if(index !== -1) {
-        rqCd.splice(index, 1);
-    }
 }
