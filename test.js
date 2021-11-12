@@ -941,7 +941,7 @@ function raidUnPing(channel, user) {
 
 function help(channel, user) {
     const helpText = "&raidping to get notified of raids, &players to check the current online player count of a steam game," +
-        "&raidstats, &lastraid and &enable/disableraid (mod only)";
+        " &fl, &rq, &raidstats, &lastraid and &enable/disableraid (mod only)";
     sendMessageRetry(channel, `@${user}, ${helpText}`);
 }
 
