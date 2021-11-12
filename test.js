@@ -1326,7 +1326,13 @@ async function rq(channel, user){
     if(message.length === 0) {
         return "Error fetching logs";
     }
-    return formatJustlog(message);
+    const randomLine = formatJustlog(message);
+    if(checkUserMessage(randomLine)) {
+        return randomLine;
+    } else {
+        return "Banphrase detect monkaS";
+    }
+    return ;
 }
 
 function removeRqCd(user) {
@@ -1336,14 +1342,14 @@ function removeRqCd(user) {
     }
 }
 
-let rqFl = [];
+let cdFl = [];
 async function fl(channel, user) {
-    if(rqFl.includes(user)) {
+    if(cdFl.includes(user)) {
         // cooldown
         return "";
     }
-    rqFl.push(user);
-    setTimeout(removeRqFl, 60000, user);
+    cdFl.push(user);
+    setTimeout(removeCdFl, 60000, user);
     if(channel.startsWith('#')) {
         channel = channel.substring(1);
     }
@@ -1361,14 +1367,19 @@ async function fl(channel, user) {
     if(!responseLogs.ok) {
         return "Error fetching logs";
     }
-    let firstLine = (await responseLogs.text()).split('\n', 1)[0];
-    return formatJustlog(firstLine);
+    let firstLine = formatJustlog((await responseLogs.text()).split('\n', 1)[0]);
+
+    if(checkUserMessage(firstLine)) {
+        return firstLine;
+    } else {
+        return "Banphrase detect monkaS";
+    }
 }
 
-function removeRqFl(user) {
-    let index = rqFl.indexOf(user);
+function removeCdFl(user) {
+    let index = cdFl.indexOf(user);
     if(index !== -1) {
-        rqFl.splice(index, 1);
+        cdFl.splice(index, 1);
     }
 }
 
@@ -1392,4 +1403,9 @@ function formatJustlog(message) {
     }
 
     return words.join(" ");
+}
+
+function checkUserMessage(message) {
+    const racismRegex = /(?:(?:\b(?<![-=\.])|monka)(?:[Nnñ]|[Ii7]V)|[\/|]\\[\/|])[\s\.]*?[liI1y!j\/|]+[\s\.]*?(?:[GgbB6934Q🅱qğĜƃ၅5\*][\s\.]*?){2,}(?!arcS|l|Ktlw|ylul|ie217|64|\d? ?times)/;
+    return !racismRegex.test(message);
 }
