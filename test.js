@@ -373,7 +373,11 @@ client.on('message', (channel, tags, message, self) => {
             isCommand(cleanMessage.toLowerCase(), "fallking")) {
             progress(channel).then();
         } else if(isCommand(cleanMessage.toLowerCase(), "rq")) {
-            rq(channel, tags.username).then(message => sendMessage(channel, message));
+            rq(channel, tags.username).then(message => {
+                if(message.length > 0) {
+                    sendMessage(channel, message);
+                }
+            });
         }
 
         // MODS broadcaster and admin commands
@@ -1289,7 +1293,18 @@ function bigfollows(channel, tags, message) {
     }
 }
 
+
+let rqCd = [];
+
 async function rq(channel, user){
+    if(rqCd.includes(user)) {
+        // cooldown
+        return "";
+    }
+    //
+    rqCd.push(user);
+    setTimeout(removeRqCd, 15000, user);
+
     if(channel.startsWith('#')) {
         channel = channel.substring(1);
     }
@@ -1321,9 +1336,13 @@ async function rq(channel, user){
             break;
         }
     }
+
     return words.join(" ");
 }
 
-async function checkBanphrase(channel, message) {
-
+function removeRqCd(user) {
+    let index = rqCd.indexOf(user);
+    if(index !== -1) {
+        rqCd.splice(index, 1);
+    }
 }
