@@ -1294,7 +1294,7 @@ async function rq(channel, user){
         channel = channel.substring(1);
     }
     const logsUrl = "https://logs.magichack.xyz";
-    const callUrl = logsUrl +  `${logsUrl}/channel/${channel}/user/${user}/random`;
+    const callUrl = `${logsUrl}/channel/${channel}/user/${user}/random`;
 
     const response = await fetch(callUrl);
 
