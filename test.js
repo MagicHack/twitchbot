@@ -375,13 +375,13 @@ client.on('message', (channel, tags, message, self) => {
         } else if(isCommand(cleanMessage.toLowerCase(), "rq")) {
             rq(channel, tags.username).then(message => {
                 if(message.length > 0) {
-                    sendMessage(channel, message);
+                    sendMessageRetry(channel, message);
                 }
             });
         } else if(isCommand(cleanMessage.toLowerCase(), "fl")) {
             fl(channel, tags.username).then(message => {
                 if(message.length > 0) {
-                    sendMessage(channel, message);
+                    sendMessageRetry(channel, message);
                 }
             });
         }
