@@ -372,6 +372,8 @@ client.on('message', (channel, tags, message, self) => {
             isCommand(cleanMessage.toLowerCase(), "peptobprogress") ||
             isCommand(cleanMessage.toLowerCase(), "fallking")) {
             progress(channel).then();
+        } else if(isCommand(cleanMessage.toLowerCase(), "rq")) {
+            rq(channel, tags.username).then(message => sendMessage(channel, message));
         }
 
         // MODS broadcaster and admin commands
@@ -1285,4 +1287,29 @@ function bigfollows(channel, tags, message) {
         sendMessageRetryPriority(channel, `/ban ${tags.username} bigfollows (automated)`);
         sendNotification(message);
     }
+}
+
+async function rq(channel, user){
+    if(channel.startsWith('#')) {
+        channel = channel.substring(1);
+    }
+    const logsUrl = "https://logs.magichack.xyz";
+    const callUrl = logsUrl +  `${logsUrl}/channel/${channel}/user/${user}/random`;
+
+    const response = await fetch(callUrl);
+
+    if(!response.ok) {
+        return "No logs found this channel/user";
+    }
+    const message = await response.text();
+    let words = message.split(' ');
+
+    for(let i in words) {
+        // Remove channel from message
+        if(words[i].startsWith("#")) {
+            words.splice(i, 1);
+            break;
+        }
+    }
+    return words.join(" ");
 }
