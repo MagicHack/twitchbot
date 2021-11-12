@@ -1368,7 +1368,7 @@ async function fl(channel, user) {
 function removeRqFl(user) {
     let index = rqFl.indexOf(user);
     if(index !== -1) {
-        rqCd.splice(index, 1);
+        rqFl.splice(index, 1);
     }
 }
 
