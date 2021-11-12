@@ -680,7 +680,7 @@ function sendMessageRetry(channel, message) {
     if (currentQueue.length > 0) {
         let messageToSend = currentQueue[0];
         if (timerHandle === null) {
-            console.log("Starting interval for sending messages");
+            // console.log("Starting interval for sending messages");
             timerHandle = setInterval(sendMessageRetry, 300, channel, '');
         }
         while (sendMessage(messageToSend.channel, messageToSend.message)) {
@@ -692,7 +692,7 @@ function sendMessageRetry(channel, message) {
             }
         }
     } else {
-        console.log("Stopping retry message timer, no messages in queue");
+        // console.log("Stopping retry message timer, no messages in queue");
         clearInterval(timerHandle);
         timerHandle = null;
     }
@@ -1299,10 +1299,20 @@ async function rq(channel, user){
     const response = await fetch(callUrl);
 
     if(!response.ok) {
-        return "No logs found this channel/user";
+        return "No logs found for this channel/user";
     }
     const message = await response.text();
+    if(message.length === 0) {
+        return "Error fetching logs";
+    }
     let words = message.split(' ');
+
+    // fix leading zero on day returned by justlog
+    let date = words[0].split('-');
+    if(date.length>= 3 && date[2].length === 1) {
+        date[2] = "0" + date[2];
+        words[0] = date.join('-');
+    }
 
     for(let i in words) {
         // Remove channel from message
@@ -1312,4 +1322,8 @@ async function rq(channel, user){
         }
     }
     return words.join(" ");
+}
+
+async function checkBanphrase(channel, message) {
+
 }
