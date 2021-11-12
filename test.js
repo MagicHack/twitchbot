@@ -1438,8 +1438,9 @@ function join(channel, newChannel) {
         .then(() => {
             sendMessageRetryPriority("#" + newChannel, "Joined channel");
             sendMessageRetryPriority(channel, "Successfully joined new channel");
-        }).catch(() => {
+        }).catch((err) => {
         console.error("Failed to join channel");
+        console.error(err);
         sendMessageRetryPriority(channel, "Error joining channel monkaS");
     });
 }
@@ -1456,8 +1457,9 @@ function leave(channel, channelToRemove) {
     client.part(channelToRemove)
         .then(() => {
             sendMessageRetryPriority(channel, "Successfully leaved channel FeelsBadMan");
-        }).catch(() => {
+        }).catch((err) => {
         console.error("Failed to part channel");
+        console.error(err);
         sendMessageRetryPriority(channel, "Error leaving channel monkaS");
     });
 }
