@@ -1427,6 +1427,9 @@ function checkUserMessage(message) {
 
 function join(channel, newChannel) {
     newChannel = newChannel.toLowerCase();
+    if(!newChannel.startsWith("#")) {
+        newChannel = "#" + newChannel;
+    }
     const index = channels.indexOf(newChannel);
     if(index !== -1) {
         sendMessageRetry(channel, "I'm already in this channel FeelsDonkMan");
@@ -1436,7 +1439,7 @@ function join(channel, newChannel) {
     saveDataJson(channels, channelsFilePath);
     client.join(newChannel)
         .then(() => {
-            sendMessageRetryPriority("#" + newChannel, "Joined channel");
+            sendMessageRetryPriority(newChannel, "Joined channel");
             sendMessageRetryPriority(channel, "Successfully joined new channel");
         }).catch((err) => {
         console.error("Failed to join channel");
@@ -1447,6 +1450,9 @@ function join(channel, newChannel) {
 
 function leave(channel, channelToRemove) {
     channelToRemove = channelToRemove.toLowerCase();
+    if(!channelToRemove.startsWith("#")) {
+        channelToRemove = "#" + channelToRemove;
+    }
     const index = channels.indexOf(channelToRemove);
     if(index === -1) {
         sendMessageRetry(channel, "I'm not in this channel FeelsDonkMan");
