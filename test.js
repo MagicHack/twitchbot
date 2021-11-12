@@ -969,7 +969,7 @@ function phoneNotifications(rawChannel, message, user) {
     if (channel.startsWith('#')) {
         channel = channel.substring(1);
     }
-    const noPingChannels = ['forsen', 'huwobot'];
+    const noPingChannels = ['forsen', 'huwobot', 'pajlada'];
     const pingRE = [/hackmagic/i, /(?<![a-z])hack(?![a-z])/i, /(?<![a-z])magic(?![a-z])/i];
 
     if (!noPingChannels.includes(channel)) {
@@ -979,10 +979,10 @@ function phoneNotifications(rawChannel, message, user) {
                 notifMessages.push(`[${rawChannel}] ${displayName}: ${message}`);
                 // remove old timeout and start a new one
                 if (notifTimer !== null) {
-                    console.log("Clear old timer");
+                    // console.log("Clear old timer");
                     clearTimeout(notifTimer);
                 }
-                console.log("Set new notification timeout");
+                // console.log("Set new notification timeout");
                 notifTimer = setTimeout(sendQueueNotification, notificationDelay * 1000);
                 break;
             }
