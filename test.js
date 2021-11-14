@@ -1341,6 +1341,9 @@ async function rq(channel, user, target){
         target = user;
     }
     target = target.toLowerCase();
+    if(target.startsWith("@")) {
+        target = target.substring(1);
+    }
 
     // don't rq/fl bot that pings a lot of people
     if(invalidTargets.includes(target)) {
@@ -1390,6 +1393,9 @@ async function fl(channel, user, target) {
         target = user;
     }
     target = target.toLowerCase();
+    if(target.startsWith("@")) {
+        target = target.substring(1);
+    }
 
     // don't rq/fl bot that pings a lot of people
     if(invalidTargets.includes(target)) {
