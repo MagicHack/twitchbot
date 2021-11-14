@@ -1341,7 +1341,7 @@ async function rq(channel, user, target){
         target = user;
     }
     target = target.toLowerCase();
-    if(target.startsWith("@")) {
+    while(target.startsWith("@")) {
         target = target.substring(1);
     }
 
@@ -1393,7 +1393,7 @@ async function fl(channel, user, target) {
         target = user;
     }
     target = target.toLowerCase();
-    if(target.startsWith("@")) {
+    while(target.startsWith("@")) {
         target = target.substring(1);
     }
 
