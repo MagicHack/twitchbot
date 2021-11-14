@@ -1327,6 +1327,8 @@ function bigfollows(channel, tags, message) {
 
 let rqCd = [];
 
+let invalidTargets = ["titlechange_bot", "magichackbot", "magichack_", "g0ldfishbot"];
+
 async function rq(channel, user, target){
     if(rqCd.includes(user)) {
         // cooldown
@@ -1339,6 +1341,12 @@ async function rq(channel, user, target){
         target = user;
     }
     target = target.toLowerCase();
+
+    // don't rq/fl bot that pings a lot of people
+    if(invalidTargets.includes(target)) {
+        target = user;
+    }
+
     if(channel.startsWith('#')) {
         channel = channel.substring(1);
     }
@@ -1382,6 +1390,12 @@ async function fl(channel, user, target) {
         target = user;
     }
     target = target.toLowerCase();
+
+    // don't rq/fl bot that pings a lot of people
+    if(invalidTargets.includes(target)) {
+        target = user;
+    }
+
     if(channel.startsWith('#')) {
         channel = channel.substring(1);
     }
