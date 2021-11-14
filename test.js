@@ -374,13 +374,23 @@ client.on('message', (channel, tags, message, self) => {
             isCommand(cleanMessage.toLowerCase(), "fallking")) {
             progress(channel).then();
         } else if(isCommand(cleanMessage.toLowerCase(), "rq")) {
-            rq(channel, tags.username).then(message => {
+            let params = splitNoEmptyNoPrefix(cleanMessage);
+            let target = tags.username;
+            if(params.length >= 2) {
+                target = params[1];
+            }
+            rq(channel, tags.username, target).then(message => {
                 if(message.length > 0) {
                     sendMessageRetry(channel, message);
                 }
             });
         } else if(isCommand(cleanMessage.toLowerCase(), "fl")) {
-            fl(channel, tags.username).then(message => {
+            let params = splitNoEmptyNoPrefix(cleanMessage);
+            let target = tags.username;
+            if(params.length >= 2) {
+                target = params[1];
+            }
+            fl(channel, tags.username, target).then(message => {
                 if(message.length > 0) {
                     sendMessageRetry(channel, message);
                 }
@@ -1317,7 +1327,7 @@ function bigfollows(channel, tags, message) {
 
 let rqCd = [];
 
-async function rq(channel, user){
+async function rq(channel, user, target){
     if(rqCd.includes(user)) {
         // cooldown
         return "";
@@ -1325,12 +1335,15 @@ async function rq(channel, user){
     //
     rqCd.push(user);
     setTimeout(removeRqCd, 15000, user);
-
+    if(target === undefined) {
+        target = user;
+    }
+    target = target.toLowerCase();
     if(channel.startsWith('#')) {
         channel = channel.substring(1);
     }
     const logsUrl = "https://logs.magichack.xyz";
-    const callUrl = `${logsUrl}/channel/${channel}/user/${user}/random`;
+    const callUrl = `${logsUrl}/channel/${channel}/user/${target}/random`;
 
     const response = await fetch(callUrl);
 
@@ -1358,17 +1371,21 @@ function removeRqCd(user) {
 }
 
 let cdFl = [];
-async function fl(channel, user) {
+async function fl(channel, user, target) {
     if(cdFl.includes(user)) {
         // cooldown
         return "";
     }
     cdFl.push(user);
     setTimeout(removeCdFl, 60000, user);
+    if(target === undefined) {
+        target = user;
+    }
+    target = target.toLowerCase();
     if(channel.startsWith('#')) {
         channel = channel.substring(1);
     }
-    const url = `https://logs.magichack.xyz/list?channel=${channel}&user=${user}`;
+    const url = `https://logs.magichack.xyz/list?channel=${channel}&user=${target}`;
     const response = await fetch(url);
     if(!response.ok) {
         return "No logs found for this channel/user";
@@ -1376,7 +1393,7 @@ async function fl(channel, user) {
     const dates = await response.json();
     const earliestDate = dates["availableLogs"][dates["availableLogs"].length - 1];
 
-    const firstMonthLogsUrl = `https://logs.magichack.xyz/channel/${channel}/user/${user}/${earliestDate["year"]}/${earliestDate["month"]}`;
+    const firstMonthLogsUrl = `https://logs.magichack.xyz/channel/${channel}/user/${target}/${earliestDate["year"]}/${earliestDate["month"]}`;
     const responseLogs = await fetch(firstMonthLogsUrl);
 
     if(!responseLogs.ok) {
