@@ -182,7 +182,7 @@ client.on("connected", () => {
 let lastSingleReply = Date.now();
 let lastNewCommandReply = Date.now();
 let lastDonkReply = Date.now();
-let donkCoolDown = 15;
+let donkCoolDown = 5;
 let spamReplyCoolDown = 30;
 
 client.on('message', (channel, tags, message, self) => {
