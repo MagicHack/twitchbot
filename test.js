@@ -255,7 +255,8 @@ client.on('message', (channel, tags, message, self) => {
 
         if(Date.now() - lastDonkReply > donkCoolDown * 1000) {
             const donkCombos = [["FeelsDonkMan", "TeaTimeU"], ["FeelsDonkMan", "TeaTime"], ["FeelsDonkMan", "bigTeaTime"],
-                ["WIDEGIGADONK", "TeaTime"], ["WIDEGIGADONK", "bigTeaTime"], ["FeelsDonkMan", "MiniTeaTime"]];
+                ["WIDEGIGADONK", "TeaTime"], ["WIDEGIGADONK", "bigTeaTime"], ["FeelsDonkMan", "MiniTeaTime"],
+                ["Donki", "TeaTimeU"], ["Donki", "TeaTime"], ["Donki", "bigTeaTime"]];
 
             if (donkUsername === '' || tags.username === donkUsername) {
                 for(let donk of donkCombos) {
