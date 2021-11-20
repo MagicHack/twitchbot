@@ -1519,7 +1519,21 @@ function formatJustlog(message) {
         }
     }
 
-    return words.join(" ");
+    return replaceDateByTimeAgo(words.join(" "));
+}
+
+function replaceDateByTimeAgo (message) {
+    // [2021-11-1 00:04:08] #minusinsanity hackmagic: BatChest
+    try {
+        let date = message.split("[")[1].split("]")[0];
+        // Add utc indicator
+        date += ".000Z";
+        let messageDate = new Date(date);
+        return "(" + prettySeconds((Date.now() - messageDate) / 1000) + " ago) " + message.split("]")[1];
+    } catch (e) {
+        console.error(e);
+        return "Error formatting date ...";
+    }
 }
 
 function checkUserMessage(message) {
