@@ -396,13 +396,13 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessageRetry(channel, message);
                 }
             });
-        } else if(isCommand(cleanMessage.toLowerCase(), "stalk")) {
+        } else if(isCommand(cleanMessage.toLowerCase(), "ll") || isCommand(cleanMessage.toLowerCase(), "lastline")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
             let target = tags.username;
             if(params.length >= 2) {
                 target = params[1];
             }
-            stalk(channel, tags.username, target).then(message => {
+            lastLine(channel, tags.username, target).then(message => {
                 if(message.length > 0) {
                     sendMessageRetry(channel, message);
                 }
@@ -1383,7 +1383,6 @@ async function rq(channel, user, target){
     } else {
         return "Banphrase detect monkaS";
     }
-    return ;
 }
 
 function removeRqCd(user) {
@@ -1447,14 +1446,14 @@ function removeCdFl(user) {
     }
 }
 
-let cdStalk = [];
-async function stalk(channel, user, target) {
-    if(cdStalk.includes(user)) {
+let cdLl = [];
+async function lastLine(channel, user, target) {
+    if(cdLl.includes(user)) {
         // cooldown
         return "";
     }
-    cdStalk.push(user);
-    setTimeout(removeCdStalk, 15000, user);
+    cdLl.push(user);
+    setTimeout(removeCdLl, 15000, user);
     if(target === undefined) {
         target = user;
     }
@@ -1494,10 +1493,10 @@ async function stalk(channel, user, target) {
     }
 }
 
-function removeCdStalk(user) {
-    let index = cdStalk.indexOf(user);
+function removeCdLl(user) {
+    let index = cdLl.indexOf(user);
     if(index !== -1) {
-        cdStalk.splice(index, 1);
+        cdLl.splice(index, 1);
     }
 }
 
