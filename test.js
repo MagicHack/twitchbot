@@ -1529,7 +1529,7 @@ function replaceDateByTimeAgo (message) {
         // Add utc indicator
         date += ".000Z";
         let messageDate = new Date(date);
-        return "(" + shortEnglishHumanizer((Date.now() - messageDate), { units: ["y", "d", "h", "m", "s"] }.split(" ").join()) + " ago) " + message.split("]")[1];
+        return "(" + shortEnglishHumanizer((Date.now() - messageDate), { units: ["y", "d", "h", "m", "s"] }).split(" ").join() + " ago) " + message.split("]")[1];
     } catch (e) {
         console.error(e);
         return "Error formatting date ...";
