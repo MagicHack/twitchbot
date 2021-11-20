@@ -1529,7 +1529,7 @@ function replaceDateByTimeAgo (message) {
         // Add utc indicator
         date += ".000Z";
         let messageDate = new Date(date);
-        return "(" + prettySeconds((Date.now() - messageDate) / 1000) + " ago) " + message.split("]")[1];
+        return "(" + shortEnglishHumanizer((Date.now() - messageDate)) + " ago) " + message.split("]")[1];
     } catch (e) {
         console.error(e);
         return "Error formatting date ...";
@@ -1585,3 +1585,20 @@ function leave(channel, channelToRemove) {
         sendMessageRetryPriority(channel, "Error leaving channel monkaS");
     });
 }
+
+
+const shortEnglishHumanizer = humanizeDuration.humanizer({
+    language: "shortEn",
+    languages: {
+        shortEn: {
+            y: () => "y",
+            mo: () => "mo",
+            w: () => "w",
+            d: () => "d",
+            h: () => "h",
+            m: () => "m",
+            s: () => "s",
+            ms: () => "ms",
+        },
+    },
+});
