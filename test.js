@@ -374,7 +374,7 @@ client.on('message', (channel, tags, message, self) => {
             isCommand(cleanMessage.toLowerCase(), "peptobprogress") ||
             isCommand(cleanMessage.toLowerCase(), "fallking")) {
             progress(channel).then();
-        } else if(isCommand(cleanMessage.toLowerCase(), "rq")) {
+        } else if(isCommand(cleanMessage.toLowerCase(), "rq") || isCommand(cleanMessage.toLowerCase(), "rl")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
             let target = tags.username;
             if(params.length >= 2) {
@@ -392,6 +392,17 @@ client.on('message', (channel, tags, message, self) => {
                 target = params[1];
             }
             fl(channel, tags.username, target).then(message => {
+                if(message.length > 0) {
+                    sendMessageRetry(channel, message);
+                }
+            });
+        } else if(isCommand(cleanMessage.toLowerCase(), "stalk")) {
+            let params = splitNoEmptyNoPrefix(cleanMessage);
+            let target = tags.username;
+            if(params.length >= 2) {
+                target = params[1];
+            }
+            stalk(channel, tags.username, target).then(message => {
                 if(message.length > 0) {
                     sendMessageRetry(channel, message);
                 }
@@ -1433,6 +1444,60 @@ function removeCdFl(user) {
     let index = cdFl.indexOf(user);
     if(index !== -1) {
         cdFl.splice(index, 1);
+    }
+}
+
+let cdStalk = [];
+async function stalk(channel, user, target) {
+    if(cdStalk.includes(user)) {
+        // cooldown
+        return "";
+    }
+    cdStalk.push(user);
+    setTimeout(removeCdStalk, 15000, user);
+    if(target === undefined) {
+        target = user;
+    }
+    target = target.toLowerCase();
+    while(target.startsWith("@")) {
+        target = target.substring(1);
+    }
+
+    // don't rq/fl bot that pings a lot of people
+    if(invalidTargets.includes(target)) {
+        target = user;
+    }
+
+    if(channel.startsWith('#')) {
+        channel = channel.substring(1);
+    }
+    const url = `https://logs.magichack.xyz/list?channel=${channel}&user=${target}`;
+    const response = await fetch(url);
+    if(!response.ok) {
+        return "No logs found for this channel/user";
+    }
+    const dates = await response.json();
+    const latestDate = dates["availableLogs"][0];
+
+    const lastMonthLogsUrl = `https://logs.magichack.xyz/channel/${channel}/user/${target}/${latestDate["year"]}/${latestDate["month"]}`;
+    const responseLogs = await fetch(lastMonthLogsUrl);
+
+    if(!responseLogs.ok) {
+        return "Error fetching logs";
+    }
+    let lastLine = formatJustlog((await responseLogs.text()).split('\n', 1)[0]);
+
+    if(checkUserMessage(lastLine)) {
+        return lastLine;
+    } else {
+        return "Banphrase detect monkaS";
+    }
+}
+
+function removeCdStalk(user) {
+    let index = cdStalk.indexOf(user);
+    if(index !== -1) {
+        cdStalk.splice(index, 1);
     }
 }
 
