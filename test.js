@@ -1478,7 +1478,7 @@ async function lastLine(channel, user, target) {
     const dates = await response.json();
     const latestDate = dates["availableLogs"][0];
 
-    const lastMonthLogsUrl = `https://logs.magichack.xyz/channel/${channel}/user/${target}/${latestDate["year"]}/${latestDate["month"]}`;
+    const lastMonthLogsUrl = `https://logs.magichack.xyz/channel/${channel}/user/${target}/${latestDate["year"]}/${latestDate["month"]}?reverse`;
     const responseLogs = await fetch(lastMonthLogsUrl);
 
     if(!responseLogs.ok) {
