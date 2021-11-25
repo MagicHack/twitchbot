@@ -138,6 +138,9 @@ const client = new tmi.Client({
 let channelsChatters = {};
 let chattersRoles = {};
 
+let uniqueChatters = [];
+let massPingNum = 3;
+
 let lastMessageTimeStampMs = 0;
 let lastSentMessage = '';
 let messageQueue = [];
@@ -880,6 +883,9 @@ function getChatters(channelName) {
             }
             channelsChatters[channelName] = chatters;
             chattersRoles[channelName] = json;
+
+            // Update unique chatters
+            addMultipleUniqueChatters(chatters);
         }).catch((error) => {
         console.error("Failed to get chatters list from tmi");
         console.error(typeof error + " " + error.message);
@@ -1539,8 +1545,9 @@ function replaceDateByTimeAgo (message) {
 }
 
 function checkUserMessage(message) {
+    // TODO : banphrase api
     const racismRegex = /(?:(?:\b(?<![-=\.])|monka)(?:[Nnñ]|[Ii7]V)|[\/|]\\[\/|])[\s\.]*?[liI1y!j\/|]+[\s\.]*?(?:[GgbB6934Q🅱qğĜƃ၅5\*][\s\.]*?){2,}(?!arcS|l|Ktlw|ylul|ie217|64|\d? ?times)/;
-    return !racismRegex.test(message);
+    return !racismRegex.test(message) && !isMassPing(message);
 }
 
 function join(channel, newChannel) {
@@ -1604,3 +1611,27 @@ const shortEnglishHumanizer = humanizeDuration.humanizer({
         },
     },
 });
+
+function isMassPing(message) {
+    let pingCount = 0;
+    // get each unique words of the message
+    const words = message.toLowerCase().match(/\w+/g).filter((x, i, a) => a.indexOf(x) === i);
+    words.forEach((w) => {
+        if(uniqueChatters.includes(w)) {
+            pingCount++
+        }
+    });
+    return pingCount >= massPingNum;
+}
+
+function addMultipleUniqueChatters(chatters) {
+    for(let c of chatters) {
+        addUniqueChatter(c);
+    }
+}
+
+function addUniqueChatter(username) {
+    if(!uniqueChatters.includes(username)) {
+        uniqueChatters.push(username);
+    }
+}
