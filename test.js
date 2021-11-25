@@ -1531,7 +1531,7 @@ function replaceDateByTimeAgo (message) {
         let messageDate = new Date(date);
         return "(" + shortEnglishHumanizer((Math.round((Date.now() - messageDate) / 1000) * 1000),
             { units: ["y", "d", "h", "m", "s"] }).split(" ").join("").split(",").join(" ") + " ago) "
-            + message.split("]")[1];
+            + message.split("]").slice(1);
     } catch (e) {
         console.error(e);
         return "Error formatting date ...";
