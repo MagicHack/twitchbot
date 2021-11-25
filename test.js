@@ -1387,7 +1387,7 @@ async function rq(channel, user, target){
     if(checkUserMessage(randomLine)) {
         return randomLine;
     } else {
-        return "Banphrase detect monkaS";
+        return "Banphrase detected monkaS";
     }
 }
 
@@ -1441,7 +1441,7 @@ async function fl(channel, user, target) {
     if(checkUserMessage(firstLine)) {
         return firstLine;
     } else {
-        return "Banphrase detect monkaS";
+        return "Banphrase detected monkaS";
     }
 }
 
@@ -1495,7 +1495,7 @@ async function lastLine(channel, user, target) {
     if(checkUserMessage(lastLine)) {
         return lastLine;
     } else {
-        return "Banphrase detect monkaS";
+        return "Banphrase detected monkaS";
     }
 }
 
