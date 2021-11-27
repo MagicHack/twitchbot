@@ -1360,7 +1360,7 @@ function bigfollows(channel, tags, message) {
 let rqCd = [];
 
 // users that can't be rled/rq/fled
-let invalidTargets = ["MagicHackBot"];
+let invalidTargets = ["magichackbot"];
 
 async function rq(channel, user, target){
     if(rqCd.includes(user)) {
