@@ -377,9 +377,21 @@ client.on('message', (channel, tags, message, self) => {
             isCommand(cleanMessage.toLowerCase(), "peptobprogress") ||
             isCommand(cleanMessage.toLowerCase(), "fallking")) {
             progress(channel).then();
-        } else if(isCommand(cleanMessage.toLowerCase(), "rq") || isCommand(cleanMessage.toLowerCase(), "rl")) {
+        } else if(isCommand(cleanMessage.toLowerCase(), "rq") || isCommand(cleanMessage.toLowerCase(), "randomquote")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
             let target = tags.username;
+            if(params.length >= 2) {
+                target = params[1];
+            }
+            rq(channel, tags.username, target).then(message => {
+                if(message.length > 0) {
+                    sendMessageRetry(channel, message);
+                }
+            });
+        } else if(isCommand(cleanMessage.toLowerCase(), "rl") || isCommand(cleanMessage.toLowerCase(), "randomline")) {
+            let params = splitNoEmptyNoPrefix(cleanMessage);
+            // TODO make it actually random and not just a person in chat
+            let target = channelsChatters[channel][Math.floor(Math.random() * channelsChatters[channel].length)];
             if(params.length >= 2) {
                 target = params[1];
             }
@@ -1345,7 +1357,8 @@ function bigfollows(channel, tags, message) {
 
 let rqCd = [];
 
-let invalidTargets = ["titlechange_bot", "magichackbot", "magichack_", "g0ldfishbot"];
+// users that can't be rled/rq/fled
+let invalidTargets = [];
 
 async function rq(channel, user, target){
     if(rqCd.includes(user)) {
@@ -1618,7 +1631,7 @@ function isMassPing(message) {
     const words = message.toLowerCase().match(/\w+/g).filter((x, i, a) => a.indexOf(x) === i);
     words.forEach((w) => {
         if(uniqueChatters.includes(w)) {
-            pingCount++
+            pingCount++;
         }
     });
     return pingCount >= massPingNum;
