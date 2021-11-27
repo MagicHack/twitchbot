@@ -422,6 +422,8 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessageRetry(channel, message);
                 }
             });
+        } else if(isCommand(cleanMessage.toLowerCase(), "random")) {
+            random(channel, cleanMessage);
         }
 
         // MODS broadcaster and admin commands
@@ -1358,7 +1360,7 @@ function bigfollows(channel, tags, message) {
 let rqCd = [];
 
 // users that can't be rled/rq/fled
-let invalidTargets = [];
+let invalidTargets = ["MagicHackBot"];
 
 async function rq(channel, user, target){
     if(rqCd.includes(user)) {
@@ -1647,4 +1649,29 @@ function addUniqueChatter(username) {
     if(!uniqueChatters.includes(username)) {
         uniqueChatters.push(username);
     }
+}
+
+function getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min) ) + min;
+}
+
+function random(channel, message) {
+    let params = splitNoEmptyNoPrefix(message);
+    let min = 1;
+    let max = 0;
+    try {
+        if(params.length >= 3) {
+            min = parseInt(params[1]);
+            max = parseInt(params[2]);
+        } else if (params.length >= 2) {
+            max = parseInt(params[1]);
+        } else {
+            sendMessage(channel, "Enter a max number or a min and a max, ex: " + prefix + "random 1 6");
+            return;
+        }
+        sendMessage(channel, String(getRndInteger(min, max)));
+    } catch (e) {
+        sendMessage(channel, "Enter a max number or a min and a max, ex: " + prefix + "random 1 6");
+    }
+
 }
