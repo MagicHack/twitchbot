@@ -211,7 +211,7 @@ client.on('message', (channel, tags, message, self) => {
     }
 
     if (channel === "#pajlada") {
-        if (tags.username === "pajbot" && cleanMessage === "pajaS 🚨 ALERT") {
+        if (tags.username === "pajbot" && tags["message-type"] === "action" && cleanMessage === "pajaS 🚨 ALERT") {
             sendMessageRetry(channel, "/me DANKNAD 🚨 ALERTE");
             console.log("pajaS 🚨 ALERT");
         }
@@ -1360,7 +1360,7 @@ function bigfollows(channel, tags, message) {
 let rqCd = [];
 
 // users that can't be rled/rq/fled
-let invalidTargets = ["magichackbot"];
+let invalidTargets = ["magichackbot", "cleobotra", "minusibot", "harrybottah"];
 
 async function rq(channel, user, target){
     if(rqCd.includes(user)) {
