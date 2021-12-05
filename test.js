@@ -1690,7 +1690,7 @@ async function evalCommand(channel, message) {
 async function asyncEvalCommand(channel, message) {
     console.log("Eval monkaGIGA");
     try {
-        let result = String(eval(await '(' + message.substring('&aeval '.length) + ')'));
+        let result = String(await eval(message.substring('&aeval '.length)));
         sendMessageRetry(channel, result);
     } catch (e) {
         console.error(e.message);
