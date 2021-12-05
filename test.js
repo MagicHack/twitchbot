@@ -1732,7 +1732,7 @@ async function streamInfo(channel, message) {
                 let lastStreamDate = new Date(streamInfo["lastBroadcast"]["startedAt"]);
                 let title = streamInfo["lastBroadcast"]["title"];
                 formattedDate = prettySeconds(Math.round((Date.now() - lastStreamDate) / 1000)) + " ago";
-                reply = `${name} has last streamed ${formattedDate} : ${title}`;
+                reply = `${name} last streamed ${formattedDate} : ${title}`;
             } else {
                 reply = `${name} has never streamed.`;
             }
