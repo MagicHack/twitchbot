@@ -508,6 +508,8 @@ client.on('message', (channel, tags, message, self) => {
             }
             if (isCommand(cleanMessage.toLowerCase(), 'eval ')) {
                 evalCommand(channel, cleanMessage).then();
+            } else if (isCommand(cleanMessage.toLowerCase(), 'aeval ')) {
+                asyncEvalCommand(channel, cleanMessage).then();
             } else if (isCommand(cleanMessage.toLowerCase(), "fetch")) {
                 let params = splitNoEmptyNoPrefix(cleanMessage);
                 if (params.length >= 2) {
@@ -1678,6 +1680,17 @@ async function evalCommand(channel, message) {
     console.log("Eval monkaGIGA");
     try {
         let result = String(eval('(' + message.substring('&eval '.length) + ')'));
+        sendMessageRetry(channel, result);
+    } catch (e) {
+        console.error(e.message);
+        sendMessageRetry(channel, "Eval failed, check console for details.");
+    }
+}
+
+async function asyncEvalCommand(channel, message) {
+    console.log("Eval monkaGIGA");
+    try {
+        let result = String(eval('await (' + message.substring('&aeval '.length) + ')'));
         sendMessageRetry(channel, result);
     } catch (e) {
         console.error(e.message);
