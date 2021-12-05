@@ -461,9 +461,9 @@ client.on('message', (channel, tags, message, self) => {
             } else if (isCommand(cleanMessage.toLowerCase(), "disableraid")) {
                 removeChannelRaidPing(channel);
             } else if(isCommand(cleanMessage.toLowerCase(), "si") || isCommand(cleanMessage.toLowerCase(), "streaminfo")) {
-                streamInfo(channel, cleanMessage);
+                streamInfo(channel, cleanMessage).then();
             } else if(isCommand(cleanMessage.toLowerCase(), "uid") || isCommand(cleanMessage.toLowerCase(), "userid")) {
-                userId(channel, cleanMessage);
+                userId(channel, cleanMessage, tags.username).then();
             }
         }
 
@@ -1751,9 +1751,9 @@ async function streamInfo(channel, message) {
     sendMessageRetry(channel, reply);
 }
 
-async function userId(channel, message) {
+async function userId(channel, message, username) {
     let params = splitNoEmptyNoPrefix(message);
-    let target = channel;
+    let target = username;
     if(params.length >= 2) {
         target = params[1].toLowerCase();
     }
