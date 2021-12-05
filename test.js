@@ -1766,7 +1766,8 @@ async function userId(channel, message, username) {
         let userInfo = await response.json();
         let uid = userInfo["id"];
         let banned = userInfo["banned"];
-        reply = `${uid} ${banned ? '🚫' : ''}`;
+        let verifiedBot = userInfo["verifiedBot"];
+        reply = `${uid} ${banned ? '🚫' : ''} ${verifiedBot ? 'verified bot : true' : ''}`;
     }
     sendMessageRetry(channel, reply);
 }
