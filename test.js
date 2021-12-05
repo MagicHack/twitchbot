@@ -8,6 +8,7 @@ import momentTZ from 'moment-timezone';
 import moment from 'moment';
 import util from 'util';
 import childProcess from 'child_process';
+import {isLive, getStream} from "./twitchapi.js";
 
 const exec = util.promisify(childProcess.exec);
 
@@ -219,7 +220,7 @@ client.on('message', (channel, tags, message, self) => {
         return;
     }
 
-    checkIfRaid(tags, cleanMessage);
+    checkIfRaid(tags, cleanMessage).then();
     moderation(channel, tags, cleanMessage);
 
     if (isCommand(cleanMessage.toLowerCase(), 'ping')) {
@@ -506,14 +507,7 @@ client.on('message', (channel, tags, message, self) => {
                 // = cleanMessage.substring(3).split(' ');
             }
             if (isCommand(cleanMessage.toLowerCase(), 'eval ')) {
-                console.log("Eval monkaGIGA");
-                try {
-                    let result = String(eval('(' + cleanMessage.substring('&eval '.length) + ')'));
-                    sendMessageRetry(channel, result);
-                } catch (e) {
-                    console.error(e.message);
-                    sendMessageRetry(channel, "Eval failed, check console for details.");
-                }
+                evalCommand(channel, cleanMessage).then();
             } else if (isCommand(cleanMessage.toLowerCase(), "fetch")) {
                 let params = splitNoEmptyNoPrefix(cleanMessage);
                 if (params.length >= 2) {
@@ -595,9 +589,7 @@ client.on("join", (channel) => {
 });
 
 
-function checkIfRaid(tags, message) {
-
-    //TODO : Make raid ping for each channel
+async function checkIfRaid(tags, message) {
 
     // How many chars to split a message
     const MAX_CHARS = 500;
@@ -625,6 +617,12 @@ function checkIfRaid(tags, message) {
                 if (raidData[notifyChannel] === undefined) {
                     console.error("Raid channel has no data in json file");
                     continue;
+                }
+                if(notifyChannel === "#minusinsanity") {
+                    if(await isLive(notifyChannel)) {
+                        console.log("didn't send raid in channel " + notifyChannel + " : live");
+                        continue;
+                    }
                 }
                 let pingEmote = raidData[notifyChannel]["emote"];
 
@@ -1674,4 +1672,15 @@ function random(channel, message) {
         sendMessage(channel, "Enter a max number or a min and a max, ex: " + prefix + "random 1 6");
     }
 
+}
+
+async function evalCommand(channel, message) {
+    console.log("Eval monkaGIGA");
+    try {
+        let result = String(eval('(' + message.substring('&eval '.length) + ')'));
+        sendMessageRetry(channel, result);
+    } catch (e) {
+        console.error(e.message);
+        sendMessageRetry(channel, "Eval failed, check console for details.");
+    }
 }
