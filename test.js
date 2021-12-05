@@ -460,6 +460,10 @@ client.on('message', (channel, tags, message, self) => {
                 }
             } else if (isCommand(cleanMessage.toLowerCase(), "disableraid")) {
                 removeChannelRaidPing(channel);
+            } else if(isCommand(cleanMessage.toLowerCase(), "si") || isCommand(cleanMessage.toLowerCase(), "streaminfo")) {
+                streamInfo(channel, cleanMessage);
+            } else if(isCommand(cleanMessage.toLowerCase(), "uid") || isCommand(cleanMessage.toLowerCase(), "userid")) {
+                userId(channel, cleanMessage);
             }
         }
 
@@ -1696,4 +1700,73 @@ async function asyncEvalCommand(channel, message) {
         console.error(e.message);
         sendMessageRetry(channel, "Eval failed, check console for details.");
     }
+}
+
+function removeHashtag(channel) {
+    if(channel.startsWith('#')) {
+        return channel.substring(1);
+    }
+    return channel;
+}
+
+async function streamInfo(channel, message) {
+    let params = splitNoEmptyNoPrefix(message);
+    let target = channel;
+    if(params.length >= 2) {
+        target = params[1].toLowerCase();
+    }
+    target = removeHashtag(target);
+
+    let info = await getStream(target);
+    let reply = "";
+    if(info["data"].length === 0) {
+        let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
+        if(!response.ok) {
+            reply = "could no find specified user";
+        } else {
+            let streamInfo = await response.json();
+            let name = streamInfo["displayName"];
+            let lastDate = streamInfo["lastBroadcast"]["startedAt"];
+            let formattedDate;
+            if(lastDate !== null) {
+                let lastStreamDate = new Date(streamInfo["lastBroadcast"]["startedAt"]);
+                let title = streamInfo["lastBroadcast"]["title"];
+                formattedDate = prettySeconds(Math.round((Date.now() - lastStreamDate) / 1000)) + " ago";
+                reply = `${name} has last streamed ${formattedDate} : ${title}`;
+            } else {
+                reply = `${name} has never streamed.`;
+            }
+        }
+    } else {
+        let streamInfo = info["data"][0];
+        let title = streamInfo["title"];
+        let game = streamInfo["game"];
+        let streamer_name = streamInfo["user_name"];
+        let start_date = new Date(streamInfo["started_at"]);
+        let time_since_start = Date.now() - start_date;
+        let viewCount = streamInfo["viewer_count"];
+        let timeFormatted = prettySeconds(Math.round(time_since_start / 1000));
+        reply = `${streamer_name} is playing ${game} for ${viewCount} viewers. Title : ${title}, stream started ${timeFormatted} ago.`;
+    }
+    sendMessageRetry(channel, reply);
+}
+
+async function userId(channel, message) {
+    let params = splitNoEmptyNoPrefix(message);
+    let target = channel;
+    if(params.length >= 2) {
+        target = params[1].toLowerCase();
+    }
+    target = removeHashtag(target);
+    let reply;
+    let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
+    if(!response.ok) {
+        reply = "could no find specified user";
+    } else {
+        let userInfo = await response.json();
+        let uid = userInfo["id"];
+        let banned = userInfo["banned"];
+        reply = `${uid} ${banned ? '🚫' : ''}`;
+    }
+    sendMessageRetry(channel, reply);
 }
