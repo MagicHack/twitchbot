@@ -1740,7 +1740,7 @@ async function streamInfo(channel, message) {
     } else {
         let streamInfo = info["data"][0];
         let title = streamInfo["title"];
-        let game = streamInfo["game"];
+        let game = streamInfo["game_name"];
         let streamer_name = streamInfo["user_name"];
         let start_date = new Date(streamInfo["started_at"]);
         let time_since_start = Date.now() - start_date;
