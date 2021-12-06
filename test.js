@@ -682,6 +682,12 @@ async function checkIfRaid(tags, message) {
             }
             saveDataJson(raidHistory, RAID_HISTORY_FILE);
             for (let notifyChannel of raidPingChannels) {
+                if(notifyChannel === "#minusinsanity") {
+                    if(await isLive(notifyChannel)) {
+                        console.log("didn't send won raid in channel " + notifyChannel + " : live");
+                        continue;
+                    }
+                }
                 sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + xp + "xp)");
             }
         }
