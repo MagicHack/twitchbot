@@ -665,7 +665,7 @@ async function checkIfRaid(tags, message) {
             for (let notifyChannel of raidPingChannels) {
                 if(notifyChannel === "#minusinsanity") {
                     if(await isLive(notifyChannel)) {
-                        console.log("didn't send won raid in channel " + notifyChannel + " : live");
+                        console.log("didn't send lost raid in channel " + notifyChannel + " : live");
                         continue;
                     }
                 }
