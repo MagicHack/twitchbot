@@ -663,6 +663,12 @@ async function checkIfRaid(tags, message) {
                 console.log("Did not save raid result. Missed raid start");
             }
             for (let notifyChannel of raidPingChannels) {
+                if(notifyChannel === "#minusinsanity") {
+                    if(await isLive(notifyChannel)) {
+                        console.log("didn't send won raid in channel " + notifyChannel + " : live");
+                        continue;
+                    }
+                }
                 sendMessageRetry(notifyChannel, "Raid L OMEGALULiguess ST");
             }
         } else if (matchWon !== null) {
