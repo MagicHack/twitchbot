@@ -425,6 +425,10 @@ client.on('message', (channel, tags, message, self) => {
             });
         } else if(isCommand(cleanMessage.toLowerCase(), "random")) {
             random(channel, cleanMessage);
+        } else if(isCommand(cleanMessage.toLowerCase(), "si") || isCommand(cleanMessage.toLowerCase(), "streaminfo")) {
+            streamInfo(channel, cleanMessage).then();
+        } else if(isCommand(cleanMessage.toLowerCase(), "uid") || isCommand(cleanMessage.toLowerCase(), "userid")) {
+            userId(channel, cleanMessage, tags.username).then();
         }
 
         // MODS broadcaster and admin commands
@@ -460,10 +464,6 @@ client.on('message', (channel, tags, message, self) => {
                 }
             } else if (isCommand(cleanMessage.toLowerCase(), "disableraid")) {
                 removeChannelRaidPing(channel);
-            } else if(isCommand(cleanMessage.toLowerCase(), "si") || isCommand(cleanMessage.toLowerCase(), "streaminfo")) {
-                streamInfo(channel, cleanMessage).then();
-            } else if(isCommand(cleanMessage.toLowerCase(), "uid") || isCommand(cleanMessage.toLowerCase(), "userid")) {
-                userId(channel, cleanMessage, tags.username).then();
             }
         }
 
