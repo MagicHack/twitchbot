@@ -1745,7 +1745,7 @@ async function streamInfo(channel, message) {
                 let lastStreamDate = new Date(streamInfo["lastBroadcast"]["startedAt"]);
                 let title = streamInfo["lastBroadcast"]["title"];
                 formattedDate = prettySeconds(Math.round((Date.now() - lastStreamDate) / 1000)) + " ago";
-                reply = `${name} last streamed ${formattedDate} : ${title}`;
+                reply = `${name} last streamed ${formattedDate}: ${title}`;
             } else {
                 reply = `${name} has never streamed.`;
             }
@@ -1759,7 +1759,7 @@ async function streamInfo(channel, message) {
         let time_since_start = Date.now() - start_date;
         let viewCount = streamInfo["viewer_count"];
         let timeFormatted = prettySeconds(Math.round(time_since_start / 1000));
-        reply = `${streamer_name} is playing ${game} for ${viewCount} viewers. Title : ${title}, stream started ${timeFormatted} ago.`;
+        reply = `${streamer_name} is playing ${game} for ${viewCount} viewers. Title: ${title}, stream started ${timeFormatted} ago.`;
     }
     sendMessageRetry(channel, reply);
 }
