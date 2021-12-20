@@ -625,8 +625,14 @@ async function checkIfRaid(tags, message) {
                     continue;
                 }
                 if(notifyChannel === "#minusinsanity") {
-                    if(await isLive(notifyChannel)) {
-                        console.log("didn't send raid in channel " + notifyChannel + " : live");
+                    try {
+                        if(await isLive(notifyChannel)) {
+                            console.log("didn't send raid in channel " + notifyChannel + " : live");
+                            continue;
+                        }
+                    } catch (e) {
+                        sendMessageRetryPriority("#magichackbot", "Failed to check if channel " + notifyChannel + " is live");
+                        // don't send if live status can't be verified
                         continue;
                     }
                 }
