@@ -1793,11 +1793,11 @@ async function userId(channel, message, username) {
     sendMessageRetry(channel, reply);
 }
 
-function asd(message, channel) {
+function asd(channel, message) {
     const reply = "Wideg WideFBCatch WideEgg"
     if(channel === "#liptongod") {
         if(message.startsWith("asd")) {
-            sendMessage(channel, reply)
+            sendMessage(channel, reply);
         }
     }
 }
