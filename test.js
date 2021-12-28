@@ -223,6 +223,8 @@ client.on('message', (channel, tags, message, self) => {
     checkIfRaid(tags, cleanMessage).then();
     moderation(channel, tags, cleanMessage);
 
+    asd(channel, cleanMessage);
+
     if (isCommand(cleanMessage.toLowerCase(), 'ping')) {
         let timeSeconds = process.uptime();
         sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}`);
@@ -1789,4 +1791,13 @@ async function userId(channel, message, username) {
         reply = `${uid} ${banned ? '⛔' : ''} ${verifiedBot ? 'verified bot : true' : ''}`;
     }
     sendMessageRetry(channel, reply);
+}
+
+function asd(message, channel) {
+    const reply = "Wideg WideFBCatch WideEgg"
+    if(channel === "#liptongod") {
+        if(message.startsWith("asd")) {
+            sendMessage(channel, reply)
+        }
+    }
 }
