@@ -466,6 +466,8 @@ client.on('message', (channel, tags, message, self) => {
                 }
             } else if (isCommand(cleanMessage.toLowerCase(), "disableraid")) {
                 removeChannelRaidPing(channel);
+            } else if (isCommand(cleanMessage.toLowerCase(), "massping")) {
+                massPing(channel, message);
             }
         }
 
@@ -1799,5 +1801,23 @@ function asd(channel, message) {
         if(message.startsWith("asd")) {
             sendMessage(channel, reply);
         }
+    }
+}
+
+function massPing(channel, message) {
+    let params = splitNoEmptyNoPrefix(message);
+    let pingMessage = '';
+
+    if(params.length >= 2) {
+        params.shift();
+        pingMessage = params.join(' ');
+    }
+
+    try {
+        for(let c of channelsChatters[channel]) {
+            sendMessageRetry(channel, `@${c} ${pingMessage}`)
+        }
+    } catch (e) {
+        console.error(e);
     }
 }
