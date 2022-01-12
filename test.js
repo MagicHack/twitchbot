@@ -1828,5 +1828,6 @@ function massPing(channel, message) {
         }
     } catch (e) {
         console.error(e);
+        sendMessageRetry(channel, "Error fetching the chatter list...");
     }
 }
