@@ -433,6 +433,13 @@ client.on('message', (channel, tags, message, self) => {
             userId(channel, cleanMessage, tags.username).then();
         }
 
+        // Broadcaster and admin command
+        if (trusted.includes(tags.username) || isBroadCaster(tags.username, channel)) {
+            if (isCommand(cleanMessage.toLowerCase(), "massping")) {
+                massPing(channel, message);
+            }
+        }
+
         // MODS broadcaster and admin commands
         if (trusted.includes(tags.username) || isMod(tags, channel)) {
             const maxSize = 50;
@@ -466,8 +473,6 @@ client.on('message', (channel, tags, message, self) => {
                 }
             } else if (isCommand(cleanMessage.toLowerCase(), "disableraid")) {
                 removeChannelRaidPing(channel);
-            } else if (isCommand(cleanMessage.toLowerCase(), "massping")) {
-                massPing(channel, message);
             }
         }
 
@@ -1190,12 +1195,16 @@ function flashbang(channel, user, amount, text) {
     }
 }
 
-function isMod(user, channel) {
+function isBroadCaster(username, channel) {
     let chan = channel;
     if (channel.startsWith("#")) {
         chan = channel.substring(1);
     }
-    return user.mod || user.username === chan;
+    return chan === username;
+}
+
+function isMod(user, channel) {
+    return user.mod || isBroadCaster(user.username, channel);
 }
 
 function callingTheImpostor(channel) {
