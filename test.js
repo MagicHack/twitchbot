@@ -563,38 +563,76 @@ let lastTS = Date.now();
 
 function getPlayers(game, trusted) {
     const cooldown = 15;
-    const apiUrl = "https://api.magichack.xyz/steam/players/pajbot/";
-    const url = apiUrl + encodeURIComponent(game);
+    const apiUrl = "https://api.magichack.xyz/steam/players/";
     let elapsedTime = (Date.now() - lastTS) / 1000;
 
-    return new Promise((resolve) => {
-        if (game === "/") {
-            return resolve("Invalid game name");
-        }
-        let settings = {method: "Get"};
-        if (elapsedTime > cooldown || trusted) {
-            console.log("Game : " + game);
-            console.log("Request : " + url);
-            lastTS = Date.now();
-            fetch(url, settings)
-                .then((res) => {
-                    if (!res.ok) {
-                        throw new Error("Not 2xx response");
-                    }
-                    return res.text();
-                })
-                .then((text) => {
-                    return resolve(text);
-                }).catch((error) => {
-                console.error("Failed to get player info from steamapi");
-                console.error(typeof error + " " + error.message);
-                // Idk, maybe we should reject eShrug
-                return resolve("Error fetching steam players info")
-            });
-        } else {
-            return resolve("Command on cooldown, wait " + (cooldown - elapsedTime).toFixed(2) + "s")
-        }
-    });
+    if(game.toLowerCase().startsWith('id:') || game.toLowerCase().startsWith('appid:')) {
+        return new Promise((resolve) => {
+            let id = 0;
+            try {
+                id = parseInt(game.split(':')[1]);
+            } catch (e) {
+                return "Invalid format, use id:appid like id:105600";
+            }
+            const url = apiUrl + encodeURIComponent(id);
+
+            let settings = {method: "Get"};
+            if (elapsedTime > cooldown || trusted) {
+                console.log("Game : " + game);
+                console.log("Request : " + url);
+                lastTS = Date.now();
+                fetch(url, settings)
+                    .then((res) => {
+                        if (!res.ok) {
+                            throw new Error("Not 2xx response");
+                        }
+                        return res.text();
+                    })
+                    .then((text) => {
+                        return resolve(`The game with appid ${id} has ${text} players online.`);
+                    }).catch((error) => {
+                    console.error("Failed to get player info from steamapi");
+                    console.error(typeof error + " " + error.message);
+                    // Idk, maybe we should reject eShrug
+                    return resolve("Error fetching steam players info")
+                });
+            } else {
+                return resolve("Command on cooldown, wait " + (cooldown - elapsedTime).toFixed(2) + "s")
+            }
+        });
+
+    } else {
+        const url = apiUrl + 'pajbot/' + encodeURIComponent(game);
+
+        return new Promise((resolve) => {
+            if (game === "/") {
+                return resolve("Invalid game name");
+            }
+            let settings = {method: "Get"};
+            if (elapsedTime > cooldown || trusted) {
+                console.log("Game : " + game);
+                console.log("Request : " + url);
+                lastTS = Date.now();
+                fetch(url, settings)
+                    .then((res) => {
+                        if (!res.ok) {
+                            throw new Error("Not 2xx response");
+                        }
+                        return res.text();
+                    })
+                    .then((text) => {
+                        return resolve(text);
+                    }).catch((error) => {
+                    console.error("Failed to get player info from steamapi");
+                    console.error(typeof error + " " + error.message);
+                    // Idk, maybe we should reject eShrug
+                    return resolve("Error fetching steam players info")
+                });
+            } else {
+                return resolve("Command on cooldown, wait " + (cooldown - elapsedTime).toFixed(2) + "s")
+            }
+        });
+    }
 }
 
 client.on("join", (channel) => {
