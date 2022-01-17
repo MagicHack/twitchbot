@@ -1391,7 +1391,7 @@ async function update(channel) {
         if (gitOut.includes("package-lock.json") || gitOut.includes("package.json")) {
             sendMessageRetry(channel, "Updating npm packages...");
             // update npm packages
-            let {stdout: npmOut} = await exec("npm i", {encoding: 'utf8'});
+            let {stdout: npmOut} = await exec("npm ci", {encoding: 'utf8'});
             console.log(npmOut);
         }
         sendMessageRetry(channel, "restarting...");
