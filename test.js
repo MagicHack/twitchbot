@@ -1831,7 +1831,7 @@ async function userId(channel, message, username) {
     let reply;
     let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
     if(!response.ok) {
-        reply = "could no find specified user";
+        reply = "could not find the specified user";
     } else {
         let userInfo = await response.json();
         let uid = userInfo["id"];
