@@ -1792,7 +1792,7 @@ async function streamInfo(channel, message) {
     if(info["data"].length === 0) {
         let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
         if(!response.ok) {
-            reply = "could no find specified user";
+            reply = "could not find the specified user";
         } else {
             let streamInfo = await response.json();
             let name = streamInfo["displayName"];
