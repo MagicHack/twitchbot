@@ -1371,7 +1371,7 @@ function timeouts(channel, message, username) {
     try {
         let timeout = timeoutList.find(user => user.username === username);
         if (timeout !== undefined) {
-            if(message !== "!roll" || !message.startsWith("!roll ")) {
+            if(message !== "!roll" && !message.startsWith("!roll ")) {
                 if (Math.random() <= timeout["probability"]) {
                     sendMessageRetryPriority(channel, `/timeout ${timeout.username} ${timeout.duration} ${timeout.reason}`);
                 }
