@@ -208,7 +208,7 @@ client.on('message', (channel, tags, message, self) => {
 
     // Anti weeb tech
     if (channel === "#pepto__bismol") {
-        timeouts(channel, tags.username);
+        timeouts(channel, cleanMessage, tags.username);
     }
 
     if (channel === "#pajlada") {
@@ -1367,12 +1367,14 @@ function readDataJson(filePath) {
     return JSON.parse(data);
 }
 
-function timeouts(channel, username) {
+function timeouts(channel, message, username) {
     try {
         let timeout = timeoutList.find(user => user.username === username);
         if (timeout !== undefined) {
-            if (Math.random() <= timeout["probability"]) {
-                sendMessageRetryPriority(channel, `/timeout ${timeout.username} ${timeout.duration} ${timeout.reason}`);
+            if(message !== "!roll" || !message.startsWith("!roll ")) {
+                if (Math.random() <= timeout["probability"]) {
+                    sendMessageRetryPriority(channel, `/timeout ${timeout.username} ${timeout.duration} ${timeout.reason}`);
+                }
             }
         }
     } catch (e) {
