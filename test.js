@@ -431,6 +431,8 @@ client.on('message', (channel, tags, message, self) => {
             streamInfo(channel, cleanMessage).then();
         } else if(isCommand(cleanMessage.toLowerCase(), "uid") || isCommand(cleanMessage.toLowerCase(), "userid")) {
             userId(channel, cleanMessage, tags.username).then();
+        } else if(isCommand(cleanMessage.toLowerCase(), "stalkhack") || isCommand(cleanMessage.toLowerCase(), "whereishack")) {
+            whereIsHack(channel);
         }
 
         // Broadcaster and admin command
@@ -978,6 +980,11 @@ function getChatters(channelName) {
 function prettySeconds(seconds) {
     // return a formatted string days, hours, minutes, seconds
     return humanizeDuration(Math.round(seconds) * 1000);
+}
+
+function prettyMs(milliSeconds) {
+    // return a formatted string days, hours, minutes, seconds
+    return humanizeDuration(Math.round(milliSeconds / 1000) * 1000);
 }
 
 function isCommand(message, command) {
@@ -1870,4 +1877,8 @@ function massPing(channel, message) {
         console.error(e);
         sendMessageRetry(channel, "Error fetching the chatter list...");
     }
+}
+
+function whereIsHack(channel) {
+    sendMessageRetry(channel, `HackMagic last typed in chat ${prettyMs(lastMessage)} ago.`);
 }
