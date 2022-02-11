@@ -984,7 +984,7 @@ function prettySeconds(seconds) {
 
 function prettyMs(milliSeconds) {
     // return a formatted string days, hours, minutes, seconds
-    return humanizeDuration(Math.round(milliSeconds / 1000) * 1000);
+    return prettySeconds(milliSeconds / 1000);
 }
 
 function isCommand(message, command) {
