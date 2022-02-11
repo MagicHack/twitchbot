@@ -1880,5 +1880,5 @@ function massPing(channel, message) {
 }
 
 function whereIsHack(channel) {
-    sendMessageRetry(channel, `HackMagic last typed in chat ${prettyMs(lastMessage)} ago.`);
+    sendMessageRetry(channel, `HackMagic last typed in chat ${prettyMs(Date.now() - lastMessage)} ago.`);
 }
