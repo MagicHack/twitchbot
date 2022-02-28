@@ -9,6 +9,7 @@ import moment from 'moment';
 import util from 'util';
 import childProcess from 'child_process';
 import {isLive, getStream} from "./twitchapi.js";
+import prettyBytes from 'pretty-bytes';
 
 const exec = util.promisify(childProcess.exec);
 
@@ -317,6 +318,8 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessageRetry(channel, response);
                 })
             }
+        } else if(isCommand(cleanMessage.toLowerCase(), "logssize") || isCommand(cleanMessage.toLowerCase(), "logsize")) {
+            logsSize(channel);
         } else if (isCommand(cleanMessage.toLowerCase(), 'raidping')) {
             raidPing(channel, tags.username);
         } else if (isCommand(cleanMessage.toLowerCase(), 'raidunping')) {
@@ -1881,4 +1884,15 @@ function massPing(channel, message) {
 
 function whereIsHack(channel) {
     sendMessageRetry(channel, `HackMagic last typed in chat ${prettyMs(Date.now() - lastMessage)} ago.`);
+}
+
+function logsSize(channel) {
+    const logsDir = '~/backup/logs';
+    try {
+        let bytes = childProcess.execSync("du -sb " + logsDir, {'encoding': 'UTF-8'}).split("\t")[0];
+        let formattedBytes = prettyBytes(bytes, {minimumFractionDigits: 3});
+        sendMessageRetry(channel, "Current logs size (updated every hour) : " + formattedBytes);
+    } catch (e) {
+        console.log(e);
+    }
 }
