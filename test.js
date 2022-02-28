@@ -1887,7 +1887,7 @@ function whereIsHack(channel) {
 }
 
 function logsSize(channel) {
-    const logsDir = '~/backup/logs';
+    const logsDir = '~/backups/logs';
     try {
         let bytes = childProcess.execSync("du -sb " + logsDir, {'encoding': 'UTF-8'}).split("\t")[0];
         let formattedBytes = prettyBytes(bytes, {minimumFractionDigits: 3});
