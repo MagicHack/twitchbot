@@ -1307,7 +1307,7 @@ function moderation(channel, tags, message) {
     bigfollows(channel, tags, message);
 
     const hossRe = /\b@?(\S*[h]+[0o]+[s]+[t_]*[o0-9]+\S*)\b/gi;
-    let enableChannels = ['#hackmagic', '#pepto__bismol'];
+    let enableChannels = ['#hackmagic', '#pepto__bismol', "#prog0ldfish"];
     if (!enableChannels.includes(channel)) {
         return;
     }
