@@ -1307,7 +1307,7 @@ function moderation(channel, tags, message) {
     bigfollows(channel, tags, message);
 
     const hossRe = /\b@?(\S*[h]+[0o]+[s]+[t_]*[o0-9]+\S*)\b/gi;
-    let enableChannels = ['#hackmagic', '#pepto__bismol', "#prog0ldfish"];
+    let enableChannels = ['#hackmagic', '#pepto__bismol'];
     if (!enableChannels.includes(channel)) {
         return;
     }
@@ -1425,7 +1425,7 @@ function splitNoEmptyNoPrefix(message) {
 }
 
 function bigfollows(channel, tags, message) {
-    const enabledChannels = ["#minusinsanity", "#hackmagic", "#pepto__bismol", "#liptongod"];
+    const enabledChannels = ["#minusinsanity", "#hackmagic", "#pepto__bismol", "#liptongod", "#prog0ldfish"];
 
     // const bigfollowsRE = /(Want\s*to\s*become\s*famous\s*\?\s*Buy\s*followers\s*and\s*viewers\s*on)|(Buy\s*followers.\s*primes\s*and\s*viewers\s*on)/ig;
     const bigfollowsRE = /Buy\s*follower.?s(.\s*prime.?s)?\s*and\s*viewer.?s\s*on/ig;
