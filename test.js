@@ -1428,7 +1428,7 @@ function bigfollows(channel, tags, message) {
     const enabledChannels = ["#minusinsanity", "#hackmagic", "#pepto__bismol", "#liptongod", "#prog0ldfish"];
 
     // const bigfollowsRE = /(Want\s*to\s*become\s*famous\s*\?\s*Buy\s*followers\s*and\s*viewers\s*on)|(Buy\s*followers.\s*primes\s*and\s*viewers\s*on)/ig;
-    const bigfollowsRE = /Buy\s*follower.?s(.\s*prime.?s)?\s*and\s*viewer.?s\s*on/ig;
+    const bigfollowsRE = /(Buy|Best)\s*follower.?s(.\s*prime.?s)?\s*and\s*viewer.?s\s*on/ig;
 
     let firstMessage = false;
     if(tags["first-msg"] !== undefined) {
