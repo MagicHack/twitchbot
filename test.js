@@ -58,6 +58,13 @@ try {
     console.log(e);
 }
 
+const PROGRESS_FILE = 'progress.txt';
+let maxProgress = 0;
+readProgress();
+
+const progressUrl = "https://forsenjk-default-rtdb.firebaseio.com/forsen2/last.json";
+
+
 const PING_CHANNELS_FILE = 'pingChannels.json';
 let raidPingChannels = [];
 try {
@@ -336,6 +343,8 @@ client.on('message', (channel, tags, message, self) => {
             } else {
                 sendMessage(channel, "No raids recorded yet");
             }
+        } else if(isCommand(cleanMessage.toLowerCase(), "maxprogress")) {
+            sendMessage(channel, String(maxProgress) + "%");
         } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
             let amount = 1;
             let params = cleanMessage.split(" ").filter(x => x.length !== 0);
@@ -1306,8 +1315,36 @@ async function pingPajbotApi(url) {
 }
 
 async function progress(channel) {
-    // TODO : new progress tracker Copesen
-    sendMessageRetry(channel, "TrollDespair progress meter comming soon™");
+    let response = await fetch(progressUrl, {});
+    let data = await response.json();
+    let percent = data["percent"];
+    let message = "";
+    if (percent > 90) {
+        message = "PagMan finishing the game today";
+    } else if (percent > 80) {
+        message = "Don't doubt the god gamer";
+    } else if (percent > 70) {
+        message = "HandsUp I believe";
+    } else if (percent > 60) {
+        message = "Clueless lot of progress today";
+    } else if (percent > 50) {
+        message = "Clueless must be a max jump";
+    } else if (percent > 40) {
+        message = "TrollDespair progress soon";
+    } else if (percent > 30) {
+        message = "ZULOL never ending cycle ♻";
+    } else if (percent > 20) {
+        message = "TrollDespair who is forsen";
+    } else if (percent > 10) {
+        message = "peptobProgress";
+    } else if (percent > 5) {
+        message = "Almost at the bottom Mr. Fors FeelsOkayMan 👍";
+    } else {
+        message = "TrollDespair can't go any lower right peptobProgress";
+    }
+    message += " " + percent + "%";
+    sendMessageRetry(channel, message);
+    // sendMessageRetry(channel, "TrollDespair progress meter comming soon™");
 }
 
 function moderation(channel, tags, message) {
@@ -1902,5 +1939,40 @@ function logsSize(channel) {
         sendMessageRetry(channel, "Current logs size (updated every hour) : " + formattedBytes);
     } catch (e) {
         console.log(e);
+    }
+}
+
+// get progress every few seconds
+setInterval(checkProgress, 5000);
+
+async function checkProgress() {
+    let response = await fetch(progressUrl, {});
+    let data = await response.json();
+    let percent = data["percent"];
+    if(percent > maxProgress) {
+        const message = "New progress : " + percent + " > " + maxProgress;
+        sendNotification(message);
+        console.log("New progress : " + percent + " > " + maxProgress);
+        maxProgress = percent;
+        writeProgress();
+    }
+}
+
+function readProgress() {
+    try {
+        let data = fs.readFileSync(PROGRESS_FILE, 'utf8');
+        maxProgress = parseFloat(data);
+        console.log("Read progress file");
+    } catch (e) {
+        console.log("Could not read progress file " + e);
+    }
+}
+
+function writeProgress() {
+    try {
+        fs.writeFileSync(PROGRESS_FILE, String(maxProgress));
+        console.log("Wrote progress file");
+    } catch (e) {
+        console.log("error writing progress file" + e);
     }
 }
