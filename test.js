@@ -1306,7 +1306,8 @@ async function pingPajbotApi(url) {
 }
 
 async function progress(channel) {
-    sendMessageRetry(channel, "@forsen the god gamer 100%");
+    // TODO : new progress tracker Copesen
+    sendMessageRetry(channel, "TrollDespair progress meter comming soon™");
 }
 
 function moderation(channel, tags, message) {
