@@ -651,6 +651,7 @@ async function checkIfRaid(tags, message) {
 
     // How many chars to split a message
     const MAX_CHARS = 500;
+    const MIN_LEVEL = 1000;
     if (tags.username === 'huwobot') {
         let raidBeginRE = /A Raid Event at Level \[([0-9]+)] has appeared./;
         let raidLostRE = /\d+ users? failed to beat the raid level \[\d+] - No experience rewarded!/;
@@ -671,43 +672,45 @@ async function checkIfRaid(tags, message) {
             if (channelsChatters["#hackmagic"].includes('hackmagic')) {
                 sendNotification("Join raid DinkDonk !!");
             }
-            for (let notifyChannel of raidPingChannels) {
-                if (raidData[notifyChannel] === undefined) {
-                    console.error("Raid channel has no data in json file");
-                    continue;
-                }
-                if(notifyChannel === "#minusinsanity") {
-                    try {
-                        if(await isLive(notifyChannel)) {
-                            console.log("didn't send raid in channel " + notifyChannel + " : live");
-                            continue;
-                        }
-                    } catch (e) {
-                        sendMessageRetryPriority("#magichackbot", "Failed to check if channel " + notifyChannel + " is live");
-                        // don't send if live status can't be verified
+            if (raidLevel < MIN_LEVEL) {
+                for (let notifyChannel of raidPingChannels) {
+                    if (raidData[notifyChannel] === undefined) {
+                        console.error("Raid channel has no data in json file");
                         continue;
                     }
-                }
-                let pingEmote = raidData[notifyChannel]["emote"];
-
-                let baseMessage = pingEmote + ' +join (raid lvl ' + raidLevel + ') ';
-                let notifMessage = baseMessage;
-                const separator = ' @';
-
-                let peopleToNotify = raidData[notifyChannel]["users"];
-
-                for (let p of peopleToNotify) {
-                    // Send and create a new message when it's too long
-                    if (notifMessage.length + p.length + separator.length >= MAX_CHARS) {
-                        sendMessageRetryPriority(notifyChannel, notifMessage);
-                        notifMessage = baseMessage;
+                    if (notifyChannel === "#minusinsanity") {
+                        try {
+                            if (await isLive(notifyChannel)) {
+                                console.log("didn't send raid in channel " + notifyChannel + " : live");
+                                continue;
+                            }
+                        } catch (e) {
+                            sendMessageRetryPriority("#magichackbot", "Failed to check if channel " + notifyChannel + " is live");
+                            // don't send if live status can't be verified
+                            continue;
+                        }
                     }
-                    notifMessage += separator + p;
-                }
-                if (notifMessage.length !== 0) {
-                    sendMessageRetryPriority(notifyChannel, notifMessage);
-                } else {
-                    console.log("No one to notify Sadge");
+                    let pingEmote = raidData[notifyChannel]["emote"];
+
+                    let baseMessage = pingEmote + ' +join (raid lvl ' + raidLevel + ') ';
+                    let notifMessage = baseMessage;
+                    const separator = ' @';
+
+                    let peopleToNotify = raidData[notifyChannel]["users"];
+
+                    for (let p of peopleToNotify) {
+                        // Send and create a new message when it's too long
+                        if (notifMessage.length + p.length + separator.length >= MAX_CHARS) {
+                            sendMessageRetryPriority(notifyChannel, notifMessage);
+                            notifMessage = baseMessage;
+                        }
+                        notifMessage += separator + p;
+                    }
+                    if (notifMessage.length !== 0) {
+                        sendMessageRetryPriority(notifyChannel, notifMessage);
+                    } else {
+                        console.log("No one to notify Sadge");
+                    }
                 }
             }
         } else if (matchLost !== null) {
@@ -720,14 +723,16 @@ async function checkIfRaid(tags, message) {
             } else {
                 console.log("Did not save raid result. Missed raid start");
             }
-            for (let notifyChannel of raidPingChannels) {
-                if(notifyChannel === "#minusinsanity") {
-                    if(await isLive(notifyChannel)) {
-                        console.log("didn't send lost raid in channel " + notifyChannel + " : live");
-                        continue;
+            if (lastRaid.level < MIN_LEVEL) {
+                for (let notifyChannel of raidPingChannels) {
+                    if (notifyChannel === "#minusinsanity") {
+                        if (await isLive(notifyChannel)) {
+                            console.log("didn't send lost raid in channel " + notifyChannel + " : live");
+                            continue;
+                        }
                     }
+                    sendMessageRetry(notifyChannel, "Raid L OMEGALULiguess ST");
                 }
-                sendMessageRetry(notifyChannel, "Raid L OMEGALULiguess ST");
             }
         } else if (matchWon !== null) {
             console.log("Raid won");
@@ -745,14 +750,16 @@ async function checkIfRaid(tags, message) {
                 console.log("Did not save raid result. Missed raid start");
             }
             saveDataJson(raidHistory, RAID_HISTORY_FILE);
-            for (let notifyChannel of raidPingChannels) {
-                if(notifyChannel === "#minusinsanity") {
-                    if(await isLive(notifyChannel)) {
-                        console.log("didn't send won raid in channel " + notifyChannel + " : live");
-                        continue;
+            if (lastRaid.level < MIN_LEVEL) {
+                for (let notifyChannel of raidPingChannels) {
+                    if (notifyChannel === "#minusinsanity") {
+                        if (await isLive(notifyChannel)) {
+                            console.log("didn't send won raid in channel " + notifyChannel + " : live");
+                            continue;
+                        }
                     }
+                    sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + xp + "xp)");
                 }
-                sendMessageRetry(notifyChannel, "Raid W PagMan N (+" + xp + "xp)");
             }
         }
     }
