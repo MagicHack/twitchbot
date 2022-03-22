@@ -1342,7 +1342,7 @@ async function progress(channel) {
     } else {
         message = "TrollDespair can't go any lower right peptobProgress";
     }
-    message += " " + percent + "%";
+    message += " " + percent.toFixed(2) + "%";
     sendMessageRetry(channel, message);
     // sendMessageRetry(channel, "TrollDespair progress meter comming soon™");
 }
