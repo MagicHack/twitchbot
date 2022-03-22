@@ -672,7 +672,7 @@ async function checkIfRaid(tags, message) {
             if (channelsChatters["#hackmagic"].includes('hackmagic')) {
                 sendNotification("Join raid DinkDonk !!");
             }
-            if (raidLevel < MIN_LEVEL) {
+            if (raidLevel >= MIN_LEVEL) {
                 for (let notifyChannel of raidPingChannels) {
                     if (raidData[notifyChannel] === undefined) {
                         console.error("Raid channel has no data in json file");
@@ -723,7 +723,7 @@ async function checkIfRaid(tags, message) {
             } else {
                 console.log("Did not save raid result. Missed raid start");
             }
-            if (lastRaid.level < MIN_LEVEL) {
+            if (lastRaid.level >= MIN_LEVEL) {
                 for (let notifyChannel of raidPingChannels) {
                     if (notifyChannel === "#minusinsanity") {
                         if (await isLive(notifyChannel)) {
@@ -750,7 +750,7 @@ async function checkIfRaid(tags, message) {
                 console.log("Did not save raid result. Missed raid start");
             }
             saveDataJson(raidHistory, RAID_HISTORY_FILE);
-            if (lastRaid.level < MIN_LEVEL) {
+            if (lastRaid.level >= MIN_LEVEL) {
                 for (let notifyChannel of raidPingChannels) {
                     if (notifyChannel === "#minusinsanity") {
                         if (await isLive(notifyChannel)) {
