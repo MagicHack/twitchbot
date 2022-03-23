@@ -1944,17 +1944,20 @@ function logsSize(channel) {
 
 // get progress every few seconds
 setInterval(checkProgress, 5000);
-
+let progressChannels = ["#pepto__bismol"];
 async function checkProgress() {
     let response = await fetch(progressUrl, {});
     let data = await response.json();
     let percent = data["percent"];
     if(percent > maxProgress) {
-        const message = "New progress : " + percent + " > " + maxProgress;
+        const message = `New max progress:  ${percent.toFixed(2)}% up from ${maxProgress.toFixed(2)}%`;
         sendNotification(message);
-        console.log("New progress : " + percent + " > " + maxProgress);
+        console.log(message);
         maxProgress = percent;
         writeProgress();
+        for(let c in progressChannels) {
+            sendMessageRetry(c, message);
+        }
     }
 }
 
