@@ -699,7 +699,7 @@ async function checkIfRaid(tags, message) {
                             continue;
                         }
                     }
-                    let pingEmote = "YOURM0M"; //raidData[notifyChannel]["emote"];
+                    let pingEmote = raidData[notifyChannel]["emote"];
 
                     let baseMessage = pingEmote + ' +join (raid lvl ' + raidLevel + ') ';
                     let notifMessage = baseMessage;
@@ -740,7 +740,7 @@ async function checkIfRaid(tags, message) {
                             continue;
                         }
                     }
-                    sendMessageRetry(notifyChannel, "S OMEGALUL BAD");// "Raid L OMEGALULiguess ST");
+                    sendMessageRetry(notifyChannel, "Raid L OMEGALULiguess ST");
                 }
             }
         } else if (matchWon !== null) {
