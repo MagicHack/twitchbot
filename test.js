@@ -1306,8 +1306,8 @@ async function pingPajbotApi(url) {
         method: 'POST', body:
             JSON.stringify({message: testPhrase}), headers: {'Content-Type': 'application/json'}
     });
-    if (!result.ok) {
-        throw new Error("Response code not 2xx api");
+    if (result.status !== 200) {
+        throw new Error("Response code not 200 from api");
     }
     let decoded = await result.json();
     try {
@@ -1319,10 +1319,11 @@ async function pingPajbotApi(url) {
         }
     } catch (e) {
         // kinda weird to throw and catch then rethrow the same error FeelsDankMan
+        console.log(e);
         throw e;
     }
     let elapsed = Date.now() - start;
-    console.log("pinged " + url + "in " + elapsed + "ms");
+    console.log("pinged " + url + " in " + elapsed + "ms");
     return elapsed;
 }
 
