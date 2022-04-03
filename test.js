@@ -1309,6 +1309,18 @@ async function pingPajbotApi(url) {
     if (!result.ok) {
         throw new Error("Response code not 2xx api");
     }
+    let decoded = await result.json();
+    try {
+        if(decoded["input_message"] !== testPhrase) {
+            throw new Error("input message doesn't match test phrase");
+        }
+        if(!(decoded["banned"] === true || decoded["banned"] === false)){
+            throw new Error("bad banned value from pajbot api");
+        }
+    } catch (e) {
+        // kinda weird to throw and catch then rethrow the same error FeelsDankMan
+        throw e;
+    }
     let elapsed = Date.now() - start;
     console.log("pinged " + url + "in " + elapsed + "ms");
     return elapsed;
