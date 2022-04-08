@@ -1324,34 +1324,39 @@ async function pingPajbotApi(url) {
 }
 
 async function progress(channel) {
-    let response = await fetch(progressUrl, {});
-    let data = await response.json();
-    let percent = data["percent"];
     let message = "";
-    if (percent > 90) {
-        message = "PagMan finishing the game today";
-    } else if (percent > 80) {
-        message = "Don't doubt the god gamer";
-    } else if (percent > 70) {
-        message = "HandsUp I believe";
-    } else if (percent > 60) {
-        message = "Clueless lot of progress today";
-    } else if (percent > 50) {
-        message = "Clueless must be a max jump";
-    } else if (percent > 40) {
-        message = "TrollDespair progress soon";
-    } else if (percent > 30) {
-        message = "ZULOL never ending cycle ♻";
-    } else if (percent > 20) {
-        message = "TrollDespair who is forsen";
-    } else if (percent > 10) {
-        message = "peptobProgress";
-    } else if (percent > 5) {
-        message = "Almost at the bottom Mr. Fors FeelsOkayMan 👍";
-    } else {
-        message = "TrollDespair can't go any lower right peptobProgress";
+    try {
+        let response = await fetch(progressUrl, {});
+        let data = await response.json();
+        let percent = data["percent"];
+        if (percent > 90) {
+            message = "PagMan finishing the game today";
+        } else if (percent > 80) {
+            message = "Don't doubt the god gamer";
+        } else if (percent > 70) {
+            message = "HandsUp I believe";
+        } else if (percent > 60) {
+            message = "Clueless lot of progress today";
+        } else if (percent > 50) {
+            message = "Clueless must be a max jump";
+        } else if (percent > 40) {
+            message = "TrollDespair progress soon";
+        } else if (percent > 30) {
+            message = "ZULOL never ending cycle ♻";
+        } else if (percent > 20) {
+            message = "TrollDespair who is forsen";
+        } else if (percent > 10) {
+            message = "peptobProgress";
+        } else if (percent > 5) {
+            message = "Almost at the bottom Mr. Fors FeelsOkayMan 👍";
+        } else {
+            message = "TrollDespair can't go any lower right peptobProgress";
+        }
+        message += " " + percent.toFixed(2) + "%";
+    } catch (e) {
+        message = "Failed to check progress APU";
     }
-    message += " " + percent.toFixed(2) + "%";
+
     sendMessageRetry(channel, message);
     // sendMessageRetry(channel, "TrollDespair progress meter comming soon™");
 }
@@ -1955,18 +1960,22 @@ function logsSize(channel) {
 setInterval(checkProgress, 5000);
 let progressChannels = ["#pepto__bismol"];
 async function checkProgress() {
-    let response = await fetch(progressUrl, {});
-    let data = await response.json();
-    let percent = data["percent"];
-    if(percent > maxProgress) {
-        const message = `New max progress:  ${percent.toFixed(2)}% up from ${maxProgress.toFixed(2)}%`;
-        sendNotification(message);
-        console.log(message);
-        maxProgress = percent;
-        writeProgress();
-        for(let c in progressChannels) {
-            sendMessageRetry(c, message);
+    try {
+        let response = await fetch(progressUrl, {});
+        let data = await response.json();
+        let percent = data["percent"];
+        if(percent > maxProgress) {
+            const message = `New max progress:  ${percent.toFixed(2)}% up from ${maxProgress.toFixed(2)}%`;
+            sendNotification(message);
+            console.log(message);
+            maxProgress = percent;
+            writeProgress();
+            for(let c in progressChannels) {
+                sendMessageRetry(c, message);
+            }
         }
+    } catch (e) {
+        console.log("Failed to get progress: " + e);
     }
 }
 
