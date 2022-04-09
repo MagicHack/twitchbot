@@ -8,7 +8,7 @@ import momentTZ from 'moment-timezone';
 import moment from 'moment';
 import util from 'util';
 import childProcess from 'child_process';
-import {isLive, getStream} from "./twitchapi.js";
+import {isLive, getStream, usernameToId} from "./twitchapi.js";
 import prettyBytes from 'pretty-bytes';
 
 const exec = util.promisify(childProcess.exec);
@@ -326,7 +326,12 @@ client.on('message', (channel, tags, message, self) => {
                 })
             }
         } else if(isCommand(cleanMessage.toLowerCase(), "logssize") || isCommand(cleanMessage.toLowerCase(), "logsize")) {
-            logsSize(channel);
+            let params = splitNoEmptyNoPrefix(cleanMessage);
+            if(params.length >= 2) {
+                logsSize(channel, params[1]).then();
+            } else {
+                logsSize(channel, "").then();
+            }
         } else if (isCommand(cleanMessage.toLowerCase(), 'raidping')) {
             raidPing(channel, tags.username);
         } else if (isCommand(cleanMessage.toLowerCase(), 'raidunping')) {
@@ -1945,12 +1950,27 @@ function whereIsHack(channel) {
     sendMessageRetry(channel, `HackMagic last typed in chat ${prettyMs(Date.now() - lastMessage)} ago.`);
 }
 
-function logsSize(channel) {
-    const logsDir = '~/backups/logs';
+async function logsSize(channel, channelName) {
+    if(channelName === "channel") {
+        channelName = channel;
+    }
+    let logsDir = '~/backups/logs';
+    if(channelName !== "") {
+        try {
+            let id = await usernameToId(channelName);
+            logsDir += "/" + id;
+            if(!fs.existsSync(logsDir)) {
+                throw "xd"; // xdddd
+            }
+        } catch (e) {
+            sendMessageRetry(channel, "Did not find provided channel.");
+            return;
+        }
+    }
     try {
         let bytes = parseInt(childProcess.execSync("du -s --block-size=1 " + logsDir, {'encoding': 'UTF-8'}).split("\t")[0]);
         let formattedBytes = prettyBytes(bytes, {minimumFractionDigits: 3});
-        sendMessageRetry(channel, "Current logs size (updated every hour) : " + formattedBytes);
+        sendMessageRetry(channel, `Current logs size (updated every hour) : ${formattedBytes}`);
     } catch (e) {
         console.log(e);
     }
