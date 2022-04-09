@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import 'dotenv/config'
 import fs from "fs";
 
-let url = "https://api.twitch.tv/helix/streams";
+let url = "https://api.twitch.tv/helix";
 const tokenFile = "token.txt";
 
 let token = "";
@@ -27,7 +27,7 @@ export async function getStream(streamer_login) {
     let retryCounter = 0;
     let response;
     do {
-        response = await fetch(url + "?user_login=" + streamer_login, {method : 'GET', headers : {
+        response = await fetch(url + "/streams" + "?user_login=" + streamer_login, {method : 'GET', headers : {
                 'Authorization' : "Bearer " + token,
                 'Client-Id' : process.env.TWITCH_CLIENT_ID
             }});
@@ -70,4 +70,22 @@ export async function isLive(stream) {
         return true;
     }
     console.error("Error checking if channel is live");
+}
+
+export async function usernameToId(username) {
+    // TODO version taking multiple usernames
+    if(username.startsWith("#")) {
+        username = username.substring(1);
+    }
+    let response = await fetch(url + "/users" + "?login=" + username, {method : 'GET', headers : {
+            'Authorization' : "Bearer " + token,
+            'Client-Id' : process.env.TWITCH_CLIENT_ID
+        }});
+    let data = await response.json();
+    if(data["data"].length === 0) {
+        console.log(`Username "${username}" not found...`);
+        throw `Username "${username}" not found...`;
+    } else {
+        return data["data"][0]["id"];
+    }
 }
