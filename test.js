@@ -10,6 +10,7 @@ import util from 'util';
 import childProcess from 'child_process';
 import {isLive, getStream, usernameToId} from "./twitchapi.js";
 import prettyBytes from 'pretty-bytes';
+import { existsSync } from 'fs';
 
 const exec = util.promisify(childProcess.exec);
 
@@ -1954,15 +1955,16 @@ async function logsSize(channel, channelName) {
     if(channelName === "channel") {
         channelName = channel;
     }
-    let logsDir = '~/backups/logs';
+    let logsDir = '/home/pi/backups/logs';
     if(channelName !== "") {
         try {
             let id = await usernameToId(channelName);
             logsDir += "/" + id;
-            if(!fs.existsSync(logsDir)) {
+            if(!existsSync(logsDir)) {
                 throw "xd"; // xdddd
             }
         } catch (e) {
+            console.log(e);
             sendMessageRetry(channel, "Did not find provided channel.");
             return;
         }
