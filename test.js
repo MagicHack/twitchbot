@@ -565,14 +565,14 @@ client.on('message', (channel, tags, message, self) => {
                 if(params.length >= 2) {
                     join(channel, params[1]);
                 } else {
-                    sendMessageRetry("Specify a channel to join FeelsDankMan");
+                    sendMessageRetry(channel, "Specify a channel to join FeelsDankMan");
                 }
             }else if(isCommand(cleanMessage.toLowerCase(), "leave")) {
                 let params = splitNoEmptyNoPrefix(cleanMessage);
                 if(params.length >= 2) {
                     leave(channel, params[1]);
                 } else {
-                    sendMessageRetry("Specify a channel to leave FeelsDankMan");
+                    sendMessageRetry(channel, "Specify a channel to leave FeelsDankMan");
                 }
             }
         }
