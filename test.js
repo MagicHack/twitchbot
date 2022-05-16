@@ -1753,7 +1753,7 @@ function leave(channel, channelToRemove) {
     saveDataJson(channels, channelsFilePath);
     client.part(channelToRemove)
         .then(() => {
-            sendMessageRetryPriority(channel, "Successfully leaved channel FeelsBadMan");
+            sendMessageRetryPriority(channel, "Successfully left channel FeelsBadMan");
         }).catch((err) => {
         console.error("Failed to part channel");
         console.error(err);
