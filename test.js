@@ -181,6 +181,24 @@ function saveBans() {
         }
     }
 }
+let joinNotifs = false;
+// join messages
+client.on("join", (channel, username, self) => {
+    if(self || !joinNotifs) return;
+    // Do your stuff.
+    if(channel === "#hackmagic") {
+        sendMessageRetry(channel, `${username} joined the channel :)`);
+    }
+});
+
+// leave
+client.on("part", (channel, username, self) => {
+    if(self || !joinNotifs) return;
+    // Do your stuff.
+    if(channel === "#hackmagic") {
+        sendMessageRetry(channel, `${username} left the channel :(`);
+    }
+});
 
 client.on("ban", (channel, username) => {
     // Log all bans
@@ -190,6 +208,7 @@ client.on("ban", (channel, username) => {
 
 client.on("connected", () => {
     client.say("#" + username, "connected " + (new Date()).toISOString());
+    client.raw("CAP REQ :twitch.tv/commands twitch.tv/tags twitch.tv/membership");
     sentMessagesTS.push(Date.now());
 });
 let lastSingleReply = Date.now();
