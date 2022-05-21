@@ -246,7 +246,7 @@ client.on('message', (channel, tags, message, self) => {
         }
         // feelsokaybot
         if(tags["user-id"] === "196500227" && cleanMessage.startsWith("/announce")) {
-            let possibilities = ["G", "🇬", "DankG", "𝕲", "𝔊", "𝓖", "𝒢", "𝔾", "⅁", "Ⓖ", "₲", "ᧁ", "ɢ"];
+            let possibilities = ["g", "G", "🇬", "DankG", "gopherDance", "𝕲", "𝔊", "𝓖", "𝒢", "𝔾", "⅁", "Ⓖ", "₲", "ᧁ", "ɢ"];
             sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]}`);
         }
         // Don't do anything else in paj's channel for now
