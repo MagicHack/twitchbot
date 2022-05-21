@@ -240,9 +240,12 @@ client.on('message', (channel, tags, message, self) => {
     }
 
     if (channel === "#pajlada") {
-        if (tags.username === "pajbot" && tags["message-type"] === "action" && cleanMessage === "pajaS 🚨 ALERT") {
+        if (tags["user-id"] === "82008718" && tags["message-type"] === "action" && cleanMessage === "pajaS 🚨 ALERT") {
             sendMessageRetry(channel, "/me DANKNAD 🚨 ALERTE");
             console.log("pajaS 🚨 ALERT");
+        }
+        if(tags["user-id"] === "196500227" && cleanMessage.startsWith("/announce ")) {
+            sendMessageRetry(channel, " /announce 🇬");
         }
         // Don't do anything else in paj's channel for now
         return;
