@@ -216,6 +216,7 @@ let lastNewCommandReply = Date.now();
 let lastDonkReply = Date.now();
 let donkCoolDown = 5;
 let spamReplyCoolDown = 30;
+let lastAnnouceA = Date.now();
 
 client.on('message', (channel, tags, message, self) => {
     if (self) return;
@@ -243,9 +244,11 @@ client.on('message', (channel, tags, message, self) => {
         if (tags["user-id"] === "82008718" && tags["message-type"] === "action" && cleanMessage === "pajaS 🚨 ALERT") {
             sendMessageRetry(channel, "/me DANKNAD 🚨 ALERTE");
             console.log("pajaS 🚨 ALERT");
+        } else if(tags["user-id"] === "82008718" && cleanMessage === "/announce a") {
+            lastAnnouceA = Date.now();
         }
-        // mldsbt  https://gist.github.com/treuks/fead3312bf0d0284c0dd8dff4f51d30b
-        if(tags["user-id"] === "743355647" && cleanMessage.startsWith("/announce")) {
+        // mldsbt (list)  https://gist.github.com/treuks/fead3312bf0d0284c0dd8dff4f51d30b  less then 60s since pajbot annouce
+        if(tags["user-id"] === "743355647" && cleanMessage.startsWith("/announce") && Date.now() - lastAnnouceA < 60 * 1000) {
             console.log("y");
             let possibilities = ["z", "ⓩ", "𝔃", "𝕫", "🆉", "𝐳", "peepoZ", ":-z", ":Z", "FrankerZ"];
             sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]} 💤`);
