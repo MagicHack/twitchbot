@@ -250,7 +250,7 @@ client.on('message', (channel, tags, message, self) => {
         // mldsbt (list)  https://gist.github.com/treuks/fead3312bf0d0284c0dd8dff4f51d30b  less then 60s since pajbot annouce
         if(tags["user-id"] === "743355647" && cleanMessage.startsWith("/announce") && Date.now() - lastAnnouceA < 60 * 1000) {
             console.log("y");
-            let possibilities = ["z", "ⓩ", "𝔃", "𝕫", "🆉", "𝐳", "peepoZ", ":-z", ":Z", "FrankerZ"];
+            let possibilities = ["z", "ⓩ", "𝔃", "𝕫", "🆉", "𝐳", "peepoZ", ":-z", ":Z", "FrankerZ", "ZULUL"];
             sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]} 💤`);
             // reset timer to not reply twice
             lastAnnouceA = 0;
