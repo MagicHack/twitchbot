@@ -252,6 +252,8 @@ client.on('message', (channel, tags, message, self) => {
             console.log("y");
             let possibilities = ["z", "ⓩ", "𝔃", "𝕫", "🆉", "𝐳", "peepoZ", ":-z", ":Z", "FrankerZ"];
             sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]} 💤`);
+            // reset timer to not reply twice
+            lastAnnouceA = 0;
         }
     }
 
