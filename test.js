@@ -253,8 +253,6 @@ client.on('message', (channel, tags, message, self) => {
             let possibilities = ["z", "ⓩ", "𝔃", "𝕫", "🆉", "𝐳", "peepoZ", ":-z", ":Z", "FrankerZ"];
             sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]} 💤`);
         }
-        // Don't do anything else in paj's channel for now
-        return;
     }
 
     checkIfRaid(tags, cleanMessage).then();
