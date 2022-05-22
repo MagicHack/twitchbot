@@ -245,7 +245,7 @@ client.on('message', (channel, tags, message, self) => {
             console.log("pajaS 🚨 ALERT");
         }
         // mldsbt  https://gist.github.com/treuks/fead3312bf0d0284c0dd8dff4f51d30b
-        if(tags["user-id"] === "743355647 " && cleanMessage.startsWith("/announce")) {
+        if(tags["user-id"] === "743355647" && cleanMessage.startsWith("/announce")) {
             console.log("y");
             let possibilities = ["z", "ⓩ", "𝔃", "𝕫", "🆉", "𝐳", "peepoZ", ":-z", ":Z", "FrankerZ"];
             sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]} 💤`);
