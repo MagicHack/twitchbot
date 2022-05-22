@@ -247,7 +247,7 @@ client.on('message', (channel, tags, message, self) => {
         // slchbot https://gist.github.com/treuks/fead3312bf0d0284c0dd8dff4f51d30b
         if(tags["user-id"] === "477589350" && cleanMessage.startsWith("/announce")) {
             let possibilities = ["w", "🇼", "𝖜", "𝔴", "𝔀", "𝕨", "🅆", "ⓦ", "🆆"];
-            sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]}`);
+            sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]} KKonaWeird`);
         }
         // Don't do anything else in paj's channel for now
         return;
