@@ -244,9 +244,9 @@ client.on('message', (channel, tags, message, self) => {
             sendMessageRetry(channel, "/me DANKNAD 🚨 ALERTE");
             console.log("pajaS 🚨 ALERT");
         }
-        // feelsokaybot
-        if(tags["user-id"] === "196500227" && cleanMessage.startsWith("/announce")) {
-            let possibilities = ["g", "G", "🇬", "DankG", "gopherDance", "𝕲", "𝔊", "𝓖", "𝒢", "𝔾", "⅁", "Ⓖ", "₲", "ᧁ", "ɢ"];
+        // slchbot https://gist.github.com/treuks/fead3312bf0d0284c0dd8dff4f51d30b
+        if(tags["user-id"] === "477589350" && cleanMessage.startsWith("/announce")) {
+            let possibilities = ["w", "🇼", "𝖜", "𝔴", "𝔀", "𝕨", "🅆", "ⓦ", "🆆"];
             sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]}`);
         }
         // Don't do anything else in paj's channel for now
