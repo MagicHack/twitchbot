@@ -11,6 +11,7 @@ import childProcess from 'child_process';
 import {isLive, getStream, usernameToId} from "./twitchapi.js";
 import prettyBytes from 'pretty-bytes';
 import { existsSync } from 'fs';
+import puppeteer from 'puppeteer-core';
 
 const exec = util.promisify(childProcess.exec);
 
@@ -1942,7 +1943,11 @@ async function userId(channel, message, username) {
         let uid = userInfo["id"];
         let banned = userInfo["banned"];
         let verifiedBot = userInfo["verifiedBot"];
-        reply = `${uid} ${banned ? '⛔' : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
+        let tosInfo = "";
+        if(banned) {
+            tosInfo = tosCheck(target);
+        }
+        reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
     }
     sendMessageRetry(channel, reply);
 }
@@ -2045,5 +2050,26 @@ function writeProgress() {
         console.log("Wrote progress file");
     } catch (e) {
         console.log("error writing progress file" + e);
+    }
+}
+
+
+async function tosCheck(username) {
+    // super hacky
+    const browser = await puppeteer.launch({executablePath: "/usr/bin/chromium"});
+    const page = await browser.newPage();
+    await page.goto('https://www.twitch.tv/' + username);
+    const text = await page.evaluate(() => {
+        return document.body.innerText;
+    });
+
+    if(/temporarily unavailable/g.test(text)) {
+        return "TOS_TEMPORARY";
+    } else if(/currently unavailable/g.test(text)) {
+        return "TOS_INDEFINITE";
+    } else if (/This channel has been closed by the user/g.test(text)) {
+        return "DEACTIVATED";
+    } else {
+        return "UNKNOWN";
     }
 }
