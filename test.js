@@ -1945,11 +1945,11 @@ async function userId(channel, message, username) {
         let verifiedBot = userInfo["verifiedBot"];
         let tosInfo = "";
         if(banned) {
-            tosInfo = tosCheck(target);
+            tosInfo = await tosCheck(target);
         }
         reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
     }
-    sendMessageRetry(channel, reply);
+    sendMessageRetry(channel, `@${username}, ${reply}`);
 }
 
 function asd(channel, message) {
