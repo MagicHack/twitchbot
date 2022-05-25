@@ -2064,12 +2064,18 @@ async function tosCheck(username) {
     });
 
     if(/temporarily unavailable/g.test(text)) {
-        return "TOS_TEMPORARY";
+        // TOS_TEMPORARY
+        return "account temporarily suspended";
     } else if(/currently unavailable/g.test(text)) {
-        return "TOS_INDEFINITE";
+        // TOS_INDEFINITE
+        return "account indefinitely suspended";
     } else if (/This channel has been closed by the user/g.test(text)) {
-        return "DEACTIVATED";
+        // DEACTIVATED
+        return "account deactivated by the user";
     } else {
-        return "UNKNOWN";
+        console.log("unknown tos_status:");
+        console.log(text);
+        // unknown
+        return "";
     }
 }
