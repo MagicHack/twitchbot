@@ -1927,6 +1927,8 @@ async function streamInfo(channel, message) {
     sendMessageRetry(channel, reply);
 }
 
+let tosCheckCount = 0;
+
 async function userId(channel, message, username) {
     let params = splitNoEmptyNoPrefix(message);
     let target = username;
@@ -1945,7 +1947,18 @@ async function userId(channel, message, username) {
         let verifiedBot = userInfo["verifiedBot"];
         let tosInfo = "";
         if(banned) {
-            tosInfo = await tosCheck(target);
+            try {
+                if(tosCheckCount < 3) { // we don't wanna run more then 3 browser at the same time
+                    console.log(`Starting tosCheck count: ${tosCheckCount}`)
+                    tosCheckCount++;
+                    tosInfo = await tosCheck(target);
+                    tosCheckCount--;
+                }
+            } catch (e) {
+                // usually timeout error
+                tosCheckCount--;
+                console.log(e);
+            }
         }
         reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
     }
