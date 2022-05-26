@@ -1907,7 +1907,7 @@ async function userId(channel, message, username) {
     let login = "";
     if(/^\d+$/.test(target)) {
         try {
-            login = uidToUsername(target);
+            login = await uidToUsername(target);
             reply = `${target} = ${login}`;
         } catch (e) {
             reply = e;
