@@ -182,6 +182,13 @@ function saveBans() {
         }
     }
 }
+
+let tmiLatency = NaN;
+
+client.on("pong", (latency) => {
+    tmiLatency = latency;
+});
+
 let joinNotifs = false;
 // join messages
 client.on("join", (channel, username, self) => {
@@ -265,7 +272,7 @@ client.on('message', (channel, tags, message, self) => {
 
     if (isCommand(cleanMessage.toLowerCase(), 'ping')) {
         let timeSeconds = process.uptime();
-        sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}`);
+        sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}, latency to tmi: ${tmiLatency}`);
     }
     if (isCommand(cleanMessage.toLowerCase(), 'code')) {
         sendMessage(channel, `@${tags.username}, lidl code is here https://github.com/MagicHack/twitchbot`);
@@ -887,8 +894,8 @@ function sendMessageRetry(channel, message) {
     }
 }
 
-// We assume normal bucket is full on start, 30 seconds before being able to send messages on startup
-let sentMessagesTS = new Array(Math.round(rateLimitMessagesMod)).fill(Date.now());
+// We assume normal bucket is half full on start, 30 seconds before being able to send messages on startup
+let sentMessagesTS = new Array(Math.round(rateLimitMessagesMod / 2)).fill(Date.now());
 let logSendMessages = false;
 
 function sendMessage(channel, message) {
