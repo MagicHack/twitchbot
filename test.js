@@ -11,7 +11,6 @@ import childProcess from 'child_process';
 import {isLive, getStream, usernameToId} from "./twitchapi.js";
 import prettyBytes from 'pretty-bytes';
 import { existsSync } from 'fs';
-import puppeteer from 'puppeteer-core';
 
 const exec = util.promisify(childProcess.exec);
 
@@ -1935,8 +1934,6 @@ async function streamInfo(channel, message) {
     sendMessageRetry(channel, reply);
 }
 
-let tosCheckCount = 0;
-
 async function userId(channel, message, username) {
     let params = splitNoEmptyNoPrefix(message);
     let target = username;
@@ -2063,7 +2060,6 @@ function writeProgress() {
     }
 }
 
-
 function tosToString(str) {
     switch (str) {
         case "TOS_TEMPORARY":
@@ -2076,31 +2072,5 @@ function tosToString(str) {
             console.log("unknown tos_status:");
             console.log(str);
             return "";
-    }
-}
-
-async function tosCheck(username) {
-    // super hacky
-    const browser = await puppeteer.launch({executablePath: "/usr/bin/chromium"});
-    const page = await browser.newPage();
-    await page.goto('https://www.twitch.tv/' + username);
-    const text = await page.evaluate(() => {
-        return document.body.innerText;
-    });
-
-    if(/temporarily unavailable/g.test(text)) {
-        // TOS_TEMPORARY
-        return "account temporarily suspended";
-    } else if(/currently unavailable/g.test(text)) {
-        // TOS_INDEFINITE
-        return "account indefinitely suspended";
-    } else if (/This channel has been closed by the user/g.test(text)) {
-        // DEACTIVATED
-        return "account deactivated by the user";
-    } else {
-        console.log("unknown tos_status:");
-        console.log(text);
-        // unknown
-        return "";
     }
 }
