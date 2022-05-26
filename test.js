@@ -59,13 +59,6 @@ try {
     console.log(e);
 }
 
-const PROGRESS_FILE = 'progress.txt';
-let maxProgress = 0;
-readProgress();
-
-const progressUrl = "https://forsenjk-default-rtdb.firebaseio.com/forsen2/last.json";
-
-
 const PING_CHANNELS_FILE = 'pingChannels.json';
 let raidPingChannels = [];
 try {
@@ -385,9 +378,7 @@ client.on('message', (channel, tags, message, self) => {
             } else {
                 sendMessage(channel, "No raids recorded yet");
             }
-        } else if(isCommand(cleanMessage.toLowerCase(), "maxprogress")) {
-            sendMessage(channel, String(maxProgress) + "%");
-        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
+        }else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
             let amount = 1;
             let params = cleanMessage.split(" ").filter(x => x.length !== 0);
             if (params.length >= 2) {
@@ -429,11 +420,6 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessageRetry(channel, "error pinging the pajbotapi provided");
                 });
             }
-        } else if (isCommand(cleanMessage.toLowerCase(), "progress") ||
-            isCommand(cleanMessage.toLowerCase(), "forsendespair") ||
-            isCommand(cleanMessage.toLowerCase(), "peptobprogress") ||
-            isCommand(cleanMessage.toLowerCase(), "fallking")) {
-            progress(channel).then();
         } else if(isCommand(cleanMessage.toLowerCase(), "rq") || isCommand(cleanMessage.toLowerCase(), "randomquote")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
             let target = tags.username;
@@ -1365,44 +1351,6 @@ async function pingPajbotApi(url) {
     return elapsed;
 }
 
-async function progress(channel) {
-    let message = "";
-    try {
-        let response = await fetch(progressUrl, {});
-        let data = await response.json();
-        let percent = data["percent"];
-        if (percent > 90) {
-            message = "PagMan finishing the game today";
-        } else if (percent > 80) {
-            message = "Don't doubt the god gamer";
-        } else if (percent > 70) {
-            message = "HandsUp I believe";
-        } else if (percent > 60) {
-            message = "Clueless lot of progress today";
-        } else if (percent > 50) {
-            message = "Clueless must be a max jump";
-        } else if (percent > 40) {
-            message = "TrollDespair progress soon";
-        } else if (percent > 30) {
-            message = "ZULOL never ending cycle ♻";
-        } else if (percent > 20) {
-            message = "TrollDespair who is forsen";
-        } else if (percent > 10) {
-            message = "peptobProgress";
-        } else if (percent > 5) {
-            message = "Almost at the bottom Mr. Fors FeelsOkayMan 👍";
-        } else {
-            message = "TrollDespair can't go any lower right peptobProgress";
-        }
-        message += " " + percent.toFixed(2) + "%";
-    } catch (e) {
-        message = "Failed to check progress APU";
-    }
-
-    sendMessageRetry(channel, message);
-    // sendMessageRetry(channel, "TrollDespair progress meter comming soon™");
-}
-
 function moderation(channel, tags, message) {
 
     bigfollows(channel, tags, message);
@@ -1934,6 +1882,20 @@ async function streamInfo(channel, message) {
     sendMessageRetry(channel, reply);
 }
 
+function tosToString(str) {
+    switch (str) {
+        case "TOS_TEMPORARY":
+            return "account temporarily suspended";
+        case "TOS_INDEFINITE":
+            return "account indefinitely suspended";
+        case "DEACTIVATED":
+            return "account deactivated by the user";
+        default:
+            console.log("unknown tos_status: " + str);
+            return str;
+    }
+}
+
 async function userId(channel, message, username) {
     let params = splitNoEmptyNoPrefix(message);
     let target = username;
@@ -2015,62 +1977,5 @@ async function logsSize(channel, channelName) {
         sendMessageRetry(channel, `Current logs size (updated every hour) : ${formattedBytes}`);
     } catch (e) {
         console.log(e);
-    }
-}
-
-// get progress every few seconds
-setInterval(checkProgress, 5000);
-let progressChannels = ["#pepto__bismol"];
-async function checkProgress() {
-    try {
-        let response = await fetch(progressUrl, {});
-        let data = await response.json();
-        let percent = data["percent"];
-        if(percent > maxProgress) {
-            const message = `New max progress:  ${percent.toFixed(2)}% up from ${maxProgress.toFixed(2)}%`;
-            sendNotification(message);
-            console.log(message);
-            maxProgress = percent;
-            writeProgress();
-            for(let c in progressChannels) {
-                sendMessageRetry(c, message);
-            }
-        }
-    } catch (e) {
-        console.log("Failed to get progress: " + e);
-    }
-}
-
-function readProgress() {
-    try {
-        let data = fs.readFileSync(PROGRESS_FILE, 'utf8');
-        maxProgress = parseFloat(data);
-        console.log("Read progress file");
-    } catch (e) {
-        console.log("Could not read progress file " + e);
-    }
-}
-
-function writeProgress() {
-    try {
-        fs.writeFileSync(PROGRESS_FILE, String(maxProgress));
-        console.log("Wrote progress file");
-    } catch (e) {
-        console.log("error writing progress file" + e);
-    }
-}
-
-function tosToString(str) {
-    switch (str) {
-        case "TOS_TEMPORARY":
-            return "account temporarily suspended";
-        case "TOS_INDEFINITE":
-            return "account indefinitely suspended";
-        case "DEACTIVATED":
-            return "account deactivated by the user";
-        default:
-            console.log("unknown tos_status:");
-            console.log(str);
-            return "";
     }
 }
