@@ -8,7 +8,7 @@ import momentTZ from 'moment-timezone';
 import moment from 'moment';
 import util from 'util';
 import childProcess from 'child_process';
-import {isLive, getStream, usernameToId} from "./twitchapi.js";
+import {isLive, getStream, usernameToId, uidToUsername} from "./twitchapi.js";
 import prettyBytes from 'pretty-bytes';
 import { existsSync } from 'fs';
 
@@ -1904,20 +1904,32 @@ async function userId(channel, message, username) {
     }
     target = removeHashtag(target);
     let reply;
-    let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
-    if(!response.ok) {
-        reply = "could not find the specified user";
-    } else {
-        let userInfo = await response.json();
-        let uid = userInfo["id"];
-        let banned = userInfo["banned"];
-        let verifiedBot = userInfo["verifiedBot"];
-        let tosInfo = "";
-        if(banned) {
-            tosInfo = tosToString(userInfo["banReason"]);
+    let login = "";
+    if(/^\d+$/.test(target)) {
+        try {
+            login = uidToUsername(target);
+            reply = `${target} = ${login}`;
+        } catch (e) {
+            reply = e;
         }
-        reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
     }
+    if (login === "") {
+        let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
+        if(!response.ok) {
+            reply = "could not find the specified user";
+        } else {
+            let userInfo = await response.json();
+            let uid = userInfo["id"];
+            let banned = userInfo["banned"];
+            let verifiedBot = userInfo["verifiedBot"];
+            let tosInfo = "";
+            if(banned) {
+                tosInfo = tosToString(userInfo["banReason"]);
+            }
+            reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
+        }
+    }
+
     sendMessageRetry(channel, `@${username}, ${reply}`);
 }
 

@@ -89,3 +89,18 @@ export async function usernameToId(username) {
         return data["data"][0]["id"];
     }
 }
+
+export async function uidToUsername(uid) {
+    // TODO version taking multiple usernames uid
+    let response = await fetch(`${url}/users?id=${uid}`, {method : 'GET', headers : {
+            'Authorization' : "Bearer " + token,
+            'Client-Id' : process.env.TWITCH_CLIENT_ID
+        }});
+    let data = await response.json();
+    if(data["data"].length === 0) {
+        console.log(`Uid "${uid}" not found...`);
+        throw `Uid "${uid}" not found...`;
+    } else {
+        return data["data"][0]["login"];
+    }
+}
