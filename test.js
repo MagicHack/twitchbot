@@ -186,7 +186,8 @@ function saveBans() {
 let tmiLatency = NaN;
 
 client.on("pong", (latency) => {
-    tmiLatency = latency;
+    // latency given in seconds???
+    tmiLatency = Math.round(latency * 1000);
 });
 
 let joinNotifs = false;
@@ -272,7 +273,7 @@ client.on('message', (channel, tags, message, self) => {
 
     if (isCommand(cleanMessage.toLowerCase(), 'ping')) {
         let timeSeconds = process.uptime();
-        sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}, latency to tmi: ${tmiLatency}`);
+        sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}, latency to tmi: ${tmiLatency}ms`);
     }
     if (isCommand(cleanMessage.toLowerCase(), 'code')) {
         sendMessage(channel, `@${tags.username}, lidl code is here https://github.com/MagicHack/twitchbot`);
