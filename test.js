@@ -1955,18 +1955,7 @@ async function userId(channel, message, username) {
         let verifiedBot = userInfo["verifiedBot"];
         let tosInfo = "";
         if(banned) {
-            try {
-                if(tosCheckCount < 3) { // we don't wanna run more then 3 browser at the same time
-                    console.log(`Starting tosCheck count: ${tosCheckCount}`)
-                    tosCheckCount++;
-                    tosInfo = await tosCheck(target);
-                    tosCheckCount--;
-                }
-            } catch (e) {
-                // usually timeout error
-                tosCheckCount--;
-                console.log(e);
-            }
+            tosInfo = tosToString(userInfo["banReason"]);
         }
         reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
     }
@@ -2074,6 +2063,21 @@ function writeProgress() {
     }
 }
 
+
+function tosToString(str) {
+    switch (str) {
+        case "TOS_TEMPORARY":
+            return "account temporarily suspended";
+        case "TOS_INDEFINITE":
+            return "account indefinitely suspended";
+        case "DEACTIVATED":
+            return "account deactivated by the user";
+        default:
+            console.log("unknown tos_status:");
+            console.log(str);
+            return "";
+    }
+}
 
 async function tosCheck(username) {
     // super hacky
