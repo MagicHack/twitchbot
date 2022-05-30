@@ -1991,3 +1991,35 @@ async function logsSize(channel, channelName) {
         console.log(e);
     }
 }
+
+let banCheckInterval;
+
+try {
+    let id = await usernameToId("minusinsanity");
+    if(id === "17497365") {
+        // not banned so no checks
+        console.log("Not banned Okayga");
+    } else {
+        console.log("Starting bancheck dank");
+        banCheckInterval = setInterval(minus, 15000);
+    }
+} catch (e) {
+    // still banned
+    console.log("Starting bancheck e");
+    banCheckInterval = setInterval(minus, 15000);
+}
+
+async function minus() {
+    try {
+        let id = await usernameToId("minusinsanity");
+        if(id === "17497365") {
+            console.log("unbanned, remove interval");
+            clearInterval(banCheckInterval);
+            sendNotification("Minus unbanned");
+            sendMessageRetryPriority("#pepto__bismol", "DinkDonk @hackmagic minus unbanned");
+            sendMessageRetryPriority("#hackmagic", "DinkDonk @hackmagic minus unbanned");
+        }
+    } catch (e) {
+        // still banned
+    }
+}
