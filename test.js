@@ -1476,8 +1476,7 @@ function splitNoEmptyNoPrefix(message) {
 function bigfollows(channel, tags, message) {
     const enabledChannels = ["#minusinsanity", "#hackmagic", "#pepto__bismol", "#liptongod", "#prog0ldfish"];
 
-    // const bigfollowsRE = /(Want\s*to\s*become\s*famous\s*\?\s*Buy\s*followers\s*and\s*viewers\s*on)|(Buy\s*followers.\s*primes\s*and\s*viewers\s*on)/ig;
-    const bigfollowsRE = /(Buy|Best)\s*(follower.?s|prime.?s|viewer.?s)(.\s*follower.?s|.\s*prime.?s|viewer.?s)?\s*and\s*(follower.?s|prime.?s|viewer.?s).?\s*on/ig;
+    const bigfollowsRE = /(Buy|Best).?\s*(and\s*)?(viewers?|primes?|followers?).?\s*(and\s*)?(viewers?|primes?|followers?).?\s*(and\s*)?(viewers?|primes?|followers?)/ig;
 
     let firstMessage = false;
     if(tags["first-msg"] !== undefined) {
