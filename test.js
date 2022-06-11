@@ -1364,25 +1364,9 @@ function moderation(channel, tags, message) {
     bigfollows(channel, tags, message);
 
     const hossRe = /\b@?(\S*[h]+[0o]+[s]+[t_]*[o0-9]+\S*)\b/gi;
-    let enableChannels = ['#hackmagic', '#pepto__bismol'];
+    let enableChannels = ['#hackmagic', '#pepto__bismol', "#minusinsanity"];
     if (!enableChannels.includes(channel)) {
         return;
-    }
-    // hoss bots follows annouced by streamelements
-    if (tags.username === "streamelements") {
-        let match = hossRe.exec(message);
-        if (match !== null) {
-            let user = match[1];
-            sendMessageRetry(channel, "/ban " + user + " automated bot ban");
-        }
-    } else if (tags.username === "doo_dul") {
-        if (/has followed/gi.test(message)) {
-            let match = hossRe.exec(message);
-            if (match !== null) {
-                let user = match[1];
-                sendMessageRetry(channel, "/ban " + user + " automated bot ban");
-            }
-        }
     }
 
     if(channel === "#minusinsanity") {
