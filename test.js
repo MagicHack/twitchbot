@@ -374,7 +374,15 @@ client.on('message', (channel, tags, message, self) => {
         } else if (isCommand(cleanMessage.toLowerCase(), "lastraid")) {
             if (lastRaid !== null) {
                 let timeSinceRaidSeconds = (Date.now() - new Date(lastRaid["ts"])) / 1000;
-                sendMessage(channel, "Last raid " + prettySeconds(timeSinceRaidSeconds) + " ago. (level " + lastRaid["level"] + ")");
+                let status = "in progress.";
+                if(lastRaid["won"] !== undefined) {
+                    if(lastRaid["won"]) {
+                        status = "won";
+                    } else {
+                        status = "lost";
+                    }
+                }
+                sendMessage(channel, "Last raid " + prettySeconds(timeSinceRaidSeconds) + " ago. Status: " + status + " (level " + lastRaid["level"] + ")");
             } else {
                 sendMessage(channel, "No raids recorded yet");
             }
