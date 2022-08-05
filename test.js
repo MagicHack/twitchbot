@@ -11,6 +11,7 @@ import childProcess from 'child_process';
 import {isLive, getStream, usernameToId, uidToUsername} from "./twitchapi.js";
 import prettyBytes from 'pretty-bytes';
 import { existsSync } from 'fs';
+import { transliterate as transliterate, slugify } from 'transliteration';
 
 const exec = util.promisify(childProcess.exec);
 
@@ -1474,13 +1475,13 @@ function splitNoEmptyNoPrefix(message) {
 function bigfollows(channel, tags, message) {
     const enabledChannels = ["#minusinsanity", "#hackmagic", "#pepto__bismol", "#liptongod", "#prog0ldfish"];
 
-    const bigfollowsRE = /(get now|Buy|Best)(\s(and\s)?(viewers,?|followers,?|(primes,?))){2,}/ig;
+    const bigfollowsRE = /(get now|Bu[yu]|Best)(\s+(and\s+)?(viewers,?|followers,?|primes,?)){2,}/ig;
 
     let firstMessage = false;
     if(tags["first-msg"] !== undefined) {
         firstMessage = tags["first-msg"];
     }
-    if(firstMessage && enabledChannels.includes(channel) && bigfollowsRE.test(message)) {
+    if(firstMessage && enabledChannels.includes(channel) && bigfollowsRE.test(transliterate(message))) {
         let message = "Banned user : " + tags.username + " in channel " + channel + " for bigfollows";
         console.log(message);
         sendMessageRetryPriority(channel, `/ban ${tags.username} bigfollows (automated)`);

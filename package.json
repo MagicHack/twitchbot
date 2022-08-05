@@ -26,6 +26,7 @@
     "pretty-bytes": "^6.0.0",
     "pushover-notifications": "^1.2.2",
     "sync-fetch": "^0.4.1",
-    "tmi.js": "^1.8.5"
+    "tmi.js": "^1.8.5",
+    "transliteration": "^2.3.5"
   }
 }
