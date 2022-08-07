@@ -24,6 +24,7 @@ function saveTokenToFile() {
 }
 
 export async function getStream(streamer_login) {
+    const max_retries = 3;
     let retryCounter = 0;
     let response;
     do {
@@ -36,8 +37,11 @@ export async function getStream(streamer_login) {
             // refresh token
             await getAuthToken();
         }
-    } while(!response.ok && response <= 3);
+    } while(!response.ok && retryCounter <= max_retries);
 
+    if(!response.ok && retryCounter > max_retries) {
+        throw "Error fetching stream info";
+    }
     let data = await response.json();
     console.log(data);
     return data;

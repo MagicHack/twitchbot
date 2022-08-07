@@ -1845,8 +1845,10 @@ async function streamInfo(channel, message) {
         target = params[1].toLowerCase();
     }
     target = removeHashtag(target);
-
-    let info = await getStream(target);
+    let info = {data : ""};
+    try {
+        info = await getStream(target);
+    } catch (e) {}
     let reply = "";
     if(info["data"].length === 0) {
         let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
