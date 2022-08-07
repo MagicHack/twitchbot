@@ -1371,7 +1371,7 @@ function moderation(channel, tags, message) {
     }
 
     if(channel === "#minusinsanity") {
-        if(/(￼)/.test(message)) {
+        if(/(￼){3,}/.test(message)) {
             sendMessageRetry(channel, `/timeout ${tags.username} 1 too much obj`);
         }
     }
