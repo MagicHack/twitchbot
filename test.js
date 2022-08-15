@@ -1472,6 +1472,10 @@ function splitNoEmptyNoPrefix(message) {
     return message.split(" ").filter(x => (x !== prefix && x.length !== 0));
 }
 
+function removeWhiteSpace(string) {
+    return string.replace(/\s/g,'');
+}
+
 function bigfollows(channel, tags, message) {
     const enabledChannels = ["#minusinsanity", "#hackmagic", "#pepto__bismol", "#liptongod", "#prog0ldfish"];
 
@@ -1483,6 +1487,8 @@ function bigfollows(channel, tags, message) {
     const nonAsciiRE = /[^\x00-\x7F]/ig;
     const maxNonAsciiFirstMsg = 3;
 
+    const veryBadAscii = ["⢰⣦⠀⢰⡆⢰⠀⣠⠴⠲⠄⢀⡴⠒⠆⠀⡶⠒⠀⣶⠲⣦⠀⠀ ⢸⡏⢧⣸⡇⢸⠀⣏⠀⠶⡆⣾⠀⠶⣶⠀⡷⠶⠀⣿⢶⡋⠀⠀ ⠸⠇⠀⠻⠇⠸⠀⠙⠦⠴⠃⠘⠳⠤⠟⠀⠷⠤⠄⠿⠀⠻"];
+
 
     let firstMessage = false;
     if(tags["first-msg"] !== undefined) {
@@ -1491,11 +1497,22 @@ function bigfollows(channel, tags, message) {
     if(firstMessage && enabledChannels.includes(channel)) {
         // bigfollows and variations
         if(bigfollowsRE.test(transliterate(message))) {
-            let message = "Banned user : " + tags.username + " in channel " + channel + " for bigfollows";
-            console.log(message);
+            let notifMessage = "Banned user : " + tags.username + " in channel " + channel + " for bigfollows";
+            console.log(notifMessage);
             sendMessageRetryPriority(channel, `/ban ${tags.username} bigfollows (automated)`);
-            sendNotification(message);
+            sendNotification(notifMessage);
             return;
+        }
+        const messageNoWhiteSpace = removeWhiteSpace(message);
+        // very bad ascii check, maybe move out of first message and check on every message
+        for(let bad of veryBadAscii) {
+            // remove whitespace of both to compare
+            if(messageNoWhiteSpace.includes(removeWhiteSpace(bad))) {
+                console.log("Matched very bad ascii:" + message + "\n\"" + bad +"\"");
+                sendMessageRetryPriority(channel, `/ban ${tags.username} bad ascii (automated)`);
+                sendNotification(`Banned ${tags.username} for very bad ascii: ${message}`);
+                return;
+            }
         }
 
         // first message contains many braille chars = very snus
