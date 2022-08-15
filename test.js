@@ -1480,6 +1480,9 @@ function bigfollows(channel, tags, message) {
     const brailleRE = /[\u2801-\u28FF\u2580-\u259F]/ig;
     const maxBrailleFirstMsg = 4; // idk
 
+    const nonAsciiRE = /[^\x00-\x7F]/ig;
+    const maxNonAsciiFirstMsg = 3;
+
 
     let firstMessage = false;
     if(tags["first-msg"] !== undefined) {
@@ -1494,12 +1497,20 @@ function bigfollows(channel, tags, message) {
             sendNotification(message);
         }
 
-        // first message contains many braille chars = snus
+        // first message contains many braille chars = very snus
         if((message.match(brailleRE) || []).length > maxBrailleFirstMsg) {
             console.log(message);
             console.log("matched too many braille for first message");
             sendMessageRetryPriority(channel, `/timeout ${tags.username} 30 too many braille characters in first message`);
             sendNotification("First message with braille!!!: " + message);
+        }
+
+        // first message contains many non ascii chars = a bit snus
+        if((message.match(nonAsciiRE) || []).length > maxNonAsciiFirstMsg) {
+            console.log(message);
+            console.log("matched too many non ascii for first message");
+            sendMessageRetryPriority(channel, `/timeout ${tags.username} 10 too many non ascii characters in first message`);
+            sendNotification("First message with with non ascii: " + message);
         }
     }
 }
