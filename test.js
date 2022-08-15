@@ -1477,15 +1477,30 @@ function bigfollows(channel, tags, message) {
 
     const bigfollowsRE = /(get now|Bu[yu]|Best)(\s+(and\s+)?(viewers,?|followers,?|primes,?)){2,}/ig;
 
+    const brailleRE = /[\u2801-\u28FF\u2580-\u259F]/ig;
+    const maxBrailleFirstMsg = 4; // idk
+
+
     let firstMessage = false;
     if(tags["first-msg"] !== undefined) {
         firstMessage = tags["first-msg"];
     }
-    if(firstMessage && enabledChannels.includes(channel) && bigfollowsRE.test(transliterate(message))) {
-        let message = "Banned user : " + tags.username + " in channel " + channel + " for bigfollows";
-        console.log(message);
-        sendMessageRetryPriority(channel, `/ban ${tags.username} bigfollows (automated)`);
-        sendNotification(message);
+    if(firstMessage && enabledChannels.includes(channel)) {
+        // bigfollows and variations
+        if(bigfollowsRE.test(transliterate(message))) {
+            let message = "Banned user : " + tags.username + " in channel " + channel + " for bigfollows";
+            console.log(message);
+            sendMessageRetryPriority(channel, `/ban ${tags.username} bigfollows (automated)`);
+            sendNotification(message);
+        }
+
+        // first message contains many braille chars = snus
+        if((message.match(brailleRE) || []).length > maxBrailleFirstMsg) {
+            console.log(message);
+            console.log("matched too many braille for first message");
+            sendMessageRetryPriority(channel, `/timeout ${tags.username} 30 too many braille characters in first message`);
+            sendNotification("First message with braille!!!: " + message);
+        }
     }
 }
 
