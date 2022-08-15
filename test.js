@@ -1495,6 +1495,7 @@ function bigfollows(channel, tags, message) {
             console.log(message);
             sendMessageRetryPriority(channel, `/ban ${tags.username} bigfollows (automated)`);
             sendNotification(message);
+            return;
         }
 
         // first message contains many braille chars = very snus
@@ -1503,6 +1504,7 @@ function bigfollows(channel, tags, message) {
             console.log("matched too many braille for first message");
             sendMessageRetryPriority(channel, `/timeout ${tags.username} 30 too many braille characters in first message`);
             sendNotification("First message with braille!!!: " + message);
+            return;
         }
 
         // first message contains many non ascii chars = a bit snus
@@ -1511,6 +1513,7 @@ function bigfollows(channel, tags, message) {
             console.log("matched too many non ascii for first message");
             sendMessageRetryPriority(channel, `/timeout ${tags.username} 10 too many non ascii characters in first message`);
             sendNotification("First message with with non ascii: " + message);
+            return;
         }
     }
 }
