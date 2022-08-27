@@ -278,7 +278,11 @@ client.on('message', (channel, tags, message, self) => {
     if (singleCharReply.includes(cleanMessage)) {
         if(Date.now() - lastSingleReply > spamReplyCoolDown * 1000) {
             lastSingleReply = Date.now();
-            sendMessage(channel, cleanMessage);
+            if(channel === "#pajlada" && cleanMessage === "!") {
+                sendMessage(channel, "!!");
+            } else {
+                sendMessage(channel, cleanMessage);
+            }
         }
     }
 
