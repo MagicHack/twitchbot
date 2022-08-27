@@ -279,7 +279,8 @@ client.on('message', (channel, tags, message, self) => {
         if(Date.now() - lastSingleReply > spamReplyCoolDown * 1000) {
             lastSingleReply = Date.now();
             if(channel === "#pajlada" && cleanMessage === "!") {
-                sendMessage(channel, "!!");
+                client.raw(`@client-nonce=xd;reply-parent-msg-id=${tags["id"]} PRIVMSG ${channel} :!!`);
+                sentMessagesTS.push(Date.now());
             } else {
                 sendMessage(channel, cleanMessage);
             }
