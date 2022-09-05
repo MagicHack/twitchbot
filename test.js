@@ -1369,7 +1369,6 @@ function moderation(channel, tags, message) {
 
     bigfollows(channel, tags, message);
 
-    const hossRe = /\b@?(\S*[h]+[0o]+[s]+[t_]*[o0-9]+\S*)\b/gi;
     let enableChannels = ['#hackmagic', '#pepto__bismol', "#minusinsanity"];
     if (!enableChannels.includes(channel)) {
         return;
@@ -1482,7 +1481,7 @@ function removeWhiteSpace(string) {
 }
 
 function bigfollows(channel, tags, message) {
-    const enabledChannels = ["#minusinsanity", "#hackmagic", "#pepto__bismol", "#liptongod", "#prog0ldfish"];
+    const enabledChannels = ["#minusinsanity", "#hackmagic", "#pepto__bismol", "#liptongod", "#prog0ldfish", "#chubbss_"];
 
     const bigfollowsRE = /(get now|Bu[yu]|Best)(\s+(and\s+)?(viewers,?|followers,?|primes,?)){2,}/ig;
 
@@ -1494,6 +1493,11 @@ function bigfollows(channel, tags, message) {
 
     const veryBadAscii = ["⢰⣦⠀⢰⡆⢰⠀⣠⠴⠲⠄⢀⡴⠒⠆⠀⡶⠒⠀⣶⠲⣦⠀⠀ ⢸⡏⢧⣸⡇⢸⠀⣏⠀⠶⡆⣾⠀⠶⣶⠀⡷⠶⠀⣿⢶⡋⠀⠀ ⠸⠇⠀⠻⠇⠸⠀⠙⠦⠴⠃⠘⠳⠤⠟⠀⠷⠤⠄⠿⠀⠻"];
 
+    if(channel === "#chubbss_") {
+        if ((message.match(brailleRE) || []).length > 110) {
+            sendMessageRetryPriority(channel, `/timeout ${tags.username} 120 too many braille chars`);
+        }
+    }
 
     let firstMessage = false;
     if(tags["first-msg"] !== undefined) {
