@@ -19,7 +19,7 @@
   "homepage": "https://github.com/MagicHack/twitchbot#readme",
   "dependencies": {
     "dotenv": "^16.0.2",
-    "humanize-duration": "^3.27.2",
+    "humanize-duration": "^3.27.3",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.37",
     "node-fetch": "^3.2.10",
