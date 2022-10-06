@@ -70,7 +70,7 @@ try {
 }
 
 // channel where we can mod/vip spam
-let modSpamChannels = ['#pepto__bismol', "#sunephef", "#hackmagic"];
+let modSpamChannels = ['#pepto__bismol', "#sunephef", "#hackmagic", "#lzackhdl"];
 
 // Weird char in twitch messages
 const blankchar = '󠀀';
