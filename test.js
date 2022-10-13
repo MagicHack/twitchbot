@@ -1906,22 +1906,26 @@ async function streamInfo(channel, message) {
     } catch (e) {}
     let reply = "";
     if(info["data"].length === 0) {
-        let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
-        if(!response.ok) {
-            reply = "could not find the specified user";
-        } else {
-            let streamInfo = await response.json();
-            let name = streamInfo["displayName"];
-            let lastDate = streamInfo["lastBroadcast"]["startedAt"];
-            let formattedDate;
-            if(lastDate !== null) {
-                let lastStreamDate = new Date(streamInfo["lastBroadcast"]["startedAt"]);
-                let title = streamInfo["lastBroadcast"]["title"];
-                formattedDate = prettySeconds(Math.round((Date.now() - lastStreamDate) / 1000)) + " ago";
-                reply = `${name} last streamed ${formattedDate}: ${title}`;
+        try {
+            let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
+            if(!response.ok) {
+                reply = "could not find the specified user";
             } else {
-                reply = `${name} has never streamed.`;
+                let streamInfo = await response.json();
+                let name = streamInfo["displayName"];
+                let lastDate = streamInfo["lastBroadcast"]["startedAt"];
+                let formattedDate;
+                if(lastDate !== null) {
+                    let lastStreamDate = new Date(streamInfo["lastBroadcast"]["startedAt"]);
+                    let title = streamInfo["lastBroadcast"]["title"];
+                    formattedDate = prettySeconds(Math.round((Date.now() - lastStreamDate) / 1000)) + " ago";
+                    reply = `${name} last streamed ${formattedDate}: ${title}`;
+                } else {
+                    reply = `${name} has never streamed.`;
+                }
             }
+        } catch (e) {
+            reply= "Error fetching info, try again later";
         }
     } else {
         let streamInfo = info["data"][0];
@@ -1969,20 +1973,25 @@ async function userId(channel, message, username) {
         }
     }
     if (login === "") {
-        let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
-        if(!response.ok) {
-            reply = "could not find the specified user";
-        } else {
-            let userInfo = await response.json();
-            let uid = userInfo["id"];
-            let banned = userInfo["banned"];
-            let verifiedBot = userInfo["verifiedBot"];
-            let tosInfo = "";
-            if(banned) {
-                tosInfo = tosToString(userInfo["banReason"]);
+        try {
+            let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
+            if(!response.ok) {
+                reply = "could not find the specified user";
+            } else {
+                let userInfo = await response.json();
+                let uid = userInfo["id"];
+                let banned = userInfo["banned"];
+                let verifiedBot = userInfo["verifiedBot"];
+                let tosInfo = "";
+                if(banned) {
+                    tosInfo = tosToString(userInfo["banReason"]);
+                }
+                reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
             }
-            reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
+        } catch (e) {
+            reply = "Error fetching information, try again later";
         }
+
     }
 
     sendMessageRetry(channel, `@${username}, ${reply}`);
