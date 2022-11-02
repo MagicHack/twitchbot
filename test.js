@@ -1836,8 +1836,8 @@ const shortEnglishHumanizer = humanizeDuration.humanizer({
 function numPings(message) {
     let pingCount = 0;
     // get each unique words of the message
-    const words = message.toLowerCase().match(/\w+/g).filter((x, i, a) => a.indexOf(x) === i);
-    words.forEach((w) => {
+    const words = message.toLowerCase().match(/\w+/g)?.filter((x, i, a) => a.indexOf(x) === i);
+    words?.forEach((w) => {
         if(uniqueChatters.includes(w)) {
             pingCount++;
         }
