@@ -43,7 +43,7 @@ export async function getStream(streamer_login) {
         throw "Error fetching stream info";
     }
     let data = await response.json();
-    console.log(data);
+    // console.log(data);
     return data;
 }
 
