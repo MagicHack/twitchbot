@@ -120,8 +120,8 @@ try {
 }
 
 
-const donkRepliesPriority = ['g0ldfishbot', 'doo_dul', 'ron__bot']
-const trusted = ['hackmagic']
+const donkRepliesPriority = ['g0ldfishbot', 'doo_dul', 'ron__bot'];
+const trusted = ['hackmagic'];
 
 const pushover = new Push({user: pushoverUser, token: pushoverToken});
 
@@ -149,8 +149,23 @@ let lastSentMessage = '';
 let messageQueue = [];
 let messagePriorityQueue = [];
 
+let liveChannels = [];
+
+async function refreshLiveChannels() {
+    let newLive = [];
+    for(let c of channels) {
+        if(await isLive(c)) {
+            newLive.push(c);
+        }
+    }
+    liveChannels = newLive;
+}
+
 // refresh all chatters peridically
 setInterval(getAllChatters, delayChatterRefresh * 1000);
+
+// refresh live every minute
+setInterval(refreshLiveChannels, 60 * 1000);
 
 client.connect().catch(console.error);
 
@@ -1394,8 +1409,8 @@ function moderation(channel, tags, message) {
         }
     }
 
-    if(channel === "#elis") {
-        let maxNum = 6;
+    if(channel === "#elis" && !liveChannels.includes("#elis")) {
+        let maxNum = 7;
         let removeDelay = 1000 * 60 * 60 * 24 * 3; // reset after 3 days (in ms)
         let num = numPings(message);
         if (num > maxNum) {
