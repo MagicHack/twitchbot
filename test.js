@@ -1390,13 +1390,13 @@ function moderation(channel, tags, message) {
         let maxNum = 6;
         let num = numPings(message);
         if (num > maxNum) {
-            let numberOfMassPings = 1;
+            let numberOfMassPings = 0;
             for(let chatter of massPingersElis) {
                 if(chatter === tags.username) {
                     numberOfMassPings++;
                 }
             }
-            let timeoutLength = 10 * 60 * numberOfMassPings; // 10 mins * time number of offenses
+            let timeoutLength = 10 * 60 * numberOfMassPings * Math.pow(2, numberOfMassPings); // 10 mins * time number of offenses
             sendMessageRetry(channel, `/timeout ${tags.username} ${timeoutLength} pinged too many chatters (${num})`);
             massPingersElis.push(tags.username);
         }
