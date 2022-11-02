@@ -268,6 +268,10 @@ client.on('message', (channel, tags, message, self) => {
         let timeSeconds = process.uptime();
         sendMessage(channel, `@${tags.username}, 👋 Okayeg running for ${prettySeconds(timeSeconds)}, latency to tmi: ${tmiLatency}ms`);
     }
+    if (channel === "#elis") {
+        // disable commands for that channel
+        return;
+    }
     if (isCommand(cleanMessage.toLowerCase(), 'code')) {
         sendMessage(channel, `@${tags.username}, lidl code is here https://github.com/MagicHack/twitchbot`);
     }
