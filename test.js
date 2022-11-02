@@ -1365,6 +1365,8 @@ async function pingPajbotApi(url) {
     return elapsed;
 }
 
+let massPingersElis = [];
+
 function moderation(channel, tags, message) {
 
     bigfollows(channel, tags, message);
@@ -1377,6 +1379,22 @@ function moderation(channel, tags, message) {
     if(channel === "#minusinsanity") {
         if(/(￼){3,}/.test(message)) {
             sendMessageRetry(channel, `/timeout ${tags.username} 1 too much obj`);
+        }
+    }
+
+    if(channel === "#elis") {
+        let maxNum = 6;
+        let num = numPings(message);
+        if (num > maxNum) {
+            let numberOfMassPings = 1;
+            for(let chatter of massPingersElis) {
+                if(chatter === tags.username) {
+                    numberOfMassPings++;
+                }
+            }
+            let timeoutLength = 10 * 60 * numberOfMassPings; // 10 mins * time number of offenses
+            sendMessageRetry(channel, `/timeout ${tags.username} ${timeoutLength} pinged too many chatters (${num})`);
+            massPingersElis.push(tags.username);
         }
     }
 }
