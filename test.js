@@ -1371,7 +1371,7 @@ function moderation(channel, tags, message) {
 
     bigfollows(channel, tags, message);
 
-    let enableChannels = ['#hackmagic', '#pepto__bismol', "#minusinsanity"];
+    let enableChannels = ['#hackmagic', '#pepto__bismol', "#minusinsanity", "#elis"];
     if (!enableChannels.includes(channel)) {
         return;
     }
