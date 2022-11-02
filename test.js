@@ -1,17 +1,16 @@
 import fetch from 'node-fetch';
 import sfetch from 'sync-fetch';
 import tmi from 'tmi.js';
-import fs from 'fs';
+import fs, {existsSync} from 'fs';
 import humanizeDuration from 'humanize-duration';
 import Push from 'pushover-notifications';
 import momentTZ from 'moment-timezone';
 import moment from 'moment';
 import util from 'util';
 import childProcess from 'child_process';
-import {isLive, getStream, usernameToId, uidToUsername} from "./twitchapi.js";
+import {getStream, isLive, uidToUsername, usernameToId} from "./twitchapi.js";
 import prettyBytes from 'pretty-bytes';
-import { existsSync } from 'fs';
-import { transliterate as transliterate, slugify } from 'transliteration';
+import {transliterate as transliterate} from 'transliteration';
 
 const exec = util.promisify(childProcess.exec);
 
@@ -1371,6 +1370,15 @@ async function pingPajbotApi(url) {
 
 let massPingersElis = [];
 
+function removeOnePingCount(user) {
+    let index = massPingersElis.indexOf(user);
+    if(index !== -1) {
+        massPingersElis[index] = massPingersElis[massPingersElis.length - 1];
+        massPingersElis.pop();
+        console.log("Removed timeout for user " + user);
+    }
+}
+
 function moderation(channel, tags, message) {
 
     bigfollows(channel, tags, message);
@@ -1388,6 +1396,7 @@ function moderation(channel, tags, message) {
 
     if(channel === "#elis") {
         let maxNum = 6;
+        let removeDelay = 1000 * 60 * 60 * 24 * 3; // reset after 3 days (in ms)
         let num = numPings(message);
         if (num > maxNum) {
             let numberOfMassPings = 0;
@@ -1399,6 +1408,8 @@ function moderation(channel, tags, message) {
             let timeoutLength = 10 * 60 * numberOfMassPings * Math.pow(2, numberOfMassPings); // 10 mins * time number of offenses
             sendMessageRetry(channel, `/timeout ${tags.username} ${timeoutLength} pinged too many chatters (${num})`);
             massPingersElis.push(tags.username);
+            // remove the ping counter after a while
+            setTimeout(removeOnePingCount, removeDelay, tags.username);
         }
     }
 }
