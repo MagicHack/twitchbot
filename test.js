@@ -1815,7 +1815,7 @@ const shortEnglishHumanizer = humanizeDuration.humanizer({
     },
 });
 
-function isMassPing(message) {
+function numPings(message) {
     let pingCount = 0;
     // get each unique words of the message
     const words = message.toLowerCase().match(/\w+/g).filter((x, i, a) => a.indexOf(x) === i);
@@ -1824,7 +1824,11 @@ function isMassPing(message) {
             pingCount++;
         }
     });
-    return pingCount >= massPingNum;
+    return pingCount;
+}
+
+function isMassPing(message) {
+    return numPings(message) >= massPingNum;
 }
 
 function addMultipleUniqueChatters(chatters) {
