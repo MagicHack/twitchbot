@@ -154,8 +154,12 @@ let liveChannels = [];
 async function refreshLiveChannels() {
     let newLive = [];
     for(let c of channels) {
-        if(await isLive(c)) {
-            newLive.push(c);
+        try {
+            if(await isLive(c)) {
+                newLive.push(c);
+            }
+        } catch (e) {
+            console.log(`Failed to check if channel ${c} is live`);
         }
     }
     liveChannels = newLive;
