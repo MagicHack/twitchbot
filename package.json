@@ -21,7 +21,7 @@
     "dotenv": "^16.0.3",
     "humanize-duration": "^3.27.3",
     "moment": "^2.29.4",
-    "moment-timezone": "^0.5.38",
+    "moment-timezone": "^0.5.39",
     "node-fetch": "^3.2.10",
     "pretty-bytes": "^6.0.0",
     "pushover-notifications": "^1.2.2",
