@@ -33,7 +33,7 @@ export async function getStream(streamer_login) {
                 'Client-Id' : process.env.TWITCH_CLIENT_ID
             }});
         retryCounter++;
-        if(!response.ok) {
+        if(response.status === 401) {
             // refresh token
             await getAuthToken();
         }
