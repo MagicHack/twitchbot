@@ -1398,6 +1398,7 @@ function removeOnePingCount(user) {
     }
 }
 
+const brailleRE = /[\u2801-\u28FF\u2580-\u259F]/ig;
 function moderation(channel, tags, message) {
 
     bigfollows(channel, tags, message);
@@ -1410,6 +1411,12 @@ function moderation(channel, tags, message) {
     if(channel === "#minusinsanity") {
         if(/(￼){3,}/.test(message)) {
             sendMessageRetry(channel, `/timeout ${tags.username} 1 too much obj`);
+        }
+
+
+        // TODO: remove when pb2 gets fixed
+        if ((message.match(brailleRE) || []).length > 200) {
+            sendMessageRetryPriority(channel, `/timeout ${tags.username} 30 too many braille chars (ASCII)`);
         }
     }
 
@@ -1537,7 +1544,7 @@ function bigfollows(channel, tags, message) {
 
     const bigfollowsRE = /(get now|Bu[yu]|Best)(\s+(and\s+)?(viewers,?|followers,?|primes,?)){2,}/ig;
 
-    const brailleRE = /[\u2801-\u28FF\u2580-\u259F]/ig;
+
     const maxBrailleFirstMsg = 4; // idk
 
     const nonAsciiRE = /[^\x00-\x7F]/ig;
