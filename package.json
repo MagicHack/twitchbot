@@ -23,7 +23,7 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.40",
     "node-fetch": "^3.3.0",
-    "pretty-bytes": "^6.0.0",
+    "pretty-bytes": "^6.1.0",
     "pushover-notifications": "^1.2.2",
     "sync-fetch": "^0.4.2",
     "tmi.js": "^1.8.5",
