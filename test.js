@@ -1,16 +1,22 @@
 import fetch from 'node-fetch';
 import sfetch from 'sync-fetch';
 import tmi from 'tmi.js';
-import fs, {existsSync} from 'fs';
 import humanizeDuration from 'humanize-duration';
 import Push from 'pushover-notifications';
 import momentTZ from 'moment-timezone';
 import moment from 'moment';
 import util from 'util';
 import childProcess from 'child_process';
-import {getStream, isLive, uidToUsername, usernameToId} from "./twitchapi.js";
+import {getCurrentToken, getStream, isLive, setCurrentToken, uidToUsername, usernameToId} from "./twitchapi.js";
 import prettyBytes from 'pretty-bytes';
 import {transliterate as transliterate} from 'transliteration';
+import 'dotenv/config';
+
+// twurple
+import { RefreshingAuthProvider } from '@twurple/auth';
+import { promises as fs } from 'fs';
+import { ApiClient } from '@twurple/api';
+
 
 const exec = util.promisify(childProcess.exec);
 
@@ -32,7 +38,7 @@ let prefix = '&';
 const RAID_FILE = 'raid.json';
 let raidData = [];
 try {
-    raidData = readDataJson(RAID_FILE);
+    raidData = await readDataJson(RAID_FILE);
     console.log("Successfully read ping file");
 } catch (e) {
     console.log(e);
@@ -41,7 +47,7 @@ try {
 const RAID_HISTORY_FILE = "raidHistory.json";
 let raidHistory = [];
 try {
-    raidHistory = readDataJson(RAID_HISTORY_FILE);
+    raidHistory = await readDataJson(RAID_HISTORY_FILE);
     console.log("Successfully read history file");
 } catch (e) {
     console.log(e);
@@ -53,7 +59,7 @@ if (raidHistory.length > 0) {
 const IGNORE_FILE = 'ignore.json';
 let peopleToIgnore = [];
 try {
-    peopleToIgnore = readDataJson(IGNORE_FILE);
+    peopleToIgnore = await readDataJson(IGNORE_FILE);
     console.log("Successfully read ignore file");
 } catch (e) {
     console.log(e);
@@ -62,7 +68,7 @@ try {
 const PING_CHANNELS_FILE = 'pingChannels.json';
 let raidPingChannels = [];
 try {
-    raidPingChannels = readDataJson(PING_CHANNELS_FILE);
+    raidPingChannels = await readDataJson(PING_CHANNELS_FILE);
     console.log("Successfully read ping channels file");
 } catch (e) {
     console.log(e);
@@ -78,7 +84,7 @@ const blankchar = '󠀀';
 const TIMEOUTS_FILE = "timeouts.json";
 let timeoutList = [];
 try {
-    timeoutList = readDataJson(TIMEOUTS_FILE);
+    timeoutList = await readDataJson(TIMEOUTS_FILE);
     console.log("read timeout file");
 } catch (e) {
     console.log(e);
@@ -99,15 +105,15 @@ let ignoreUsersPing = [];
 const IGNORE_PING_FILE = 'ignorePings.json';
 
 try {
-    ignoreUsersPing = readDataJson(IGNORE_PING_FILE);
+    ignoreUsersPing = await readDataJson(IGNORE_PING_FILE);
     console.log("Raid ingore pings file");
 } catch (e) {
     console.log(e);
 }
 
 try {
-    let configData = readDataJson(configFilePath);
-    channels = readDataJson(channelsFilePath);
+    let configData = await readDataJson(configFilePath);
+    channels = await readDataJson(channelsFilePath);
     username = configData["username"];
     password = configData["token"];
     weatherApiKey = configData["weatherKey"];
@@ -118,7 +124,35 @@ try {
     console.log("Error, could not read config/channels file. Quitting");
     process.exit(1);
 }
+try {
+    await fs.access("tokens.json");
+} catch (e) {
+    console.log(e);
+    await fs.writeFile('tokens.json', JSON.stringify({
+        accessToken: getCurrentToken(),
+        refreshToken: getCurrentToken(),
+        expiresIn: 0,
+        obtainmentTimestamp: 0
+    }, null, 4), 'UTF-8');
+}
 
+const tokenData = JSON.parse(await fs.readFile('tokens.json', 'UTF-8'));
+const authProvider = new RefreshingAuthProvider(
+    {
+        clientId: process.env.TWITCH_CLIENT_ID,
+        clientSecret: process.env.TWITCH_CLIENT_SECRET,
+        onRefresh: async newTokenData => {
+            await fs.writeFile('tokens.json', JSON.stringify(newTokenData, null, 4), 'UTF-8');
+            setCurrentToken(newTokenData.accessToken);
+        }
+    },
+    tokenData
+);
+
+
+const apiClient = new ApiClient({ authProvider });
+
+const selfUserData = await apiClient.users.getUserByName(username);
 
 const donkRepliesPriority = ['g0ldfishbot', 'doo_dul', 'ron__bot'];
 const trusted = ['hackmagic'];
@@ -175,7 +209,7 @@ client.connect().catch(console.error);
 
 let bans = [];
 try {
-    bans = readDataJson("bans.json");
+    bans = await readDataJson("bans.json");
 } catch (e) {
     console.log(e);
 }
@@ -1411,6 +1445,7 @@ function moderation(channel, tags, message) {
     if(channel === "#minusinsanity") {
         if(/(￼){3,}/.test(message)) {
             sendMessageRetry(channel, `/timeout ${tags.username} 1 too much obj`);
+            timeout()
         }
 
 
@@ -1440,7 +1475,7 @@ function moderation(channel, tags, message) {
     }
 }
 
-function runList(channel, tags, message) {
+async function runList(channel, tags, message) {
     if (!trusted.includes(tags.username)) {
         console.log("ERROR untrusted user tried to run a list " + tags.username);
         return;
@@ -1451,7 +1486,7 @@ function runList(channel, tags, message) {
         let path = params[1];
         let lines = [];
         try {
-            let data = fs.readFileSync(path, 'utf8');
+            let data = await fs.readFile(path, 'utf8');
             lines = data.split('\n');
         } catch (e) {
             console.log(e);
@@ -1479,12 +1514,12 @@ function runList(channel, tags, message) {
     }
 }
 
-function saveDataJson(data, filePath) {
-    fs.writeFileSync(filePath, JSON.stringify(data), 'utf8');
+async function saveDataJson(data, filePath) {
+    await fs.writeFile(filePath, JSON.stringify(data), 'utf8');
 }
 
-function readDataJson(filePath) {
-    let data = fs.readFileSync(filePath, 'utf8');
+async function readDataJson(filePath) {
+    let data = await fs.readFile(filePath, 'utf8');
     return JSON.parse(data);
 }
 
@@ -2101,7 +2136,10 @@ async function logsSize(channel, channelName) {
         try {
             let id = await usernameToId(channelName);
             logsDir += "/" + id;
-            if(!existsSync(logsDir)) {
+            try {
+                await fs.access(logsDir)
+            } catch(e) {
+                console.log(e);
                 throw "xd"; // xdddd
             }
         } catch (e) {
@@ -2117,4 +2155,9 @@ async function logsSize(channel, channelName) {
     } catch (e) {
         console.log(e);
     }
+}
+
+async function timeout(channel, userid, length, reason) {
+    const streamer = await apiClient.users.getUserByName(removeHashtag(channel));
+    await apiClient.moderation.banUser(streamer, selfUserData, {duration: length, reason, userId: userid})
 }

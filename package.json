@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/MagicHack/twitchbot#readme",
   "dependencies": {
+    "@twurple/api": "^5.3.4",
+    "@twurple/auth": "^5.3.4",
     "dotenv": "^16.0.3",
     "humanize-duration": "^3.28.0",
     "moment": "^2.29.4",
