@@ -50,8 +50,6 @@ export async function getStream(streamer_login) {
 }
 
 async function getAuthToken() {
-    // disabled to not conflict with twurple refresh
-    /*
     console.log("Getting new token from twitch");
     const apiUrl = "https://id.twitch.tv/oauth2/token";
     const params = new URLSearchParams();
@@ -63,7 +61,7 @@ async function getAuthToken() {
     let data = await response.json();
     console.log(data);
     token = data["access_token"];
-    saveTokenToFile(); */
+    saveTokenToFile();
     return token;
 }
 
