@@ -11,7 +11,6 @@ import {getCurrentToken, getStream, isLive, setCurrentToken, uidToUsername, user
 import prettyBytes from 'pretty-bytes';
 import {transliterate as transliterate} from 'transliteration';
 import 'dotenv/config';
-import {app} from "./oauth.js";
 
 // twurple
 import {RefreshingAuthProvider, StaticAuthProvider} from '@twurple/auth';
@@ -126,7 +125,15 @@ try {
     process.exit(1);
 }
 
-const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, process.env.TWITCH_USER_TOKEN);
+const tokenData = JSON.parse(await fs.readFile('tokens.json', 'UTF-8'));
+const authProvider = new RefreshingAuthProvider(
+    {
+        clientId: process.env.TWITCH_CLIENT_ID,
+        clientSecret: process.env.TWITCH_CLIENT_SECRET,
+        onRefresh: async newTokenData => await fs.writeFile('tokens.json', JSON.stringify(newTokenData, null, 4), 'UTF-8')
+    },
+    tokenData
+);
 
 const apiClient = new ApiClient({ authProvider });
 
@@ -2150,6 +2157,3 @@ async function timeout(channel, userid, length, reason, retry= true) {
 }
 
 // TODO : implement ban function
-
-// uncomment to get webserver to generate oauth token
-// app.listen(3000);
