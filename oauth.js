@@ -1,7 +1,10 @@
 import express from "express";
 import crypto from "crypto";
 import fetch from "node-fetch";
-export const app = express();
+import { promises as fs } from 'fs';
+import 'dotenv/config';
+
+const app = express();
 
 // dank oauth code to get inital token
 
@@ -27,18 +30,20 @@ let scopes = [
 
 // redirect_uri ends up here
 app.get('/auth-callback', async (req, res) => {
-    console.log(req.url);
     const req_data = new URLSearchParams(req.url.split('?')[1]);
-    console.log(req_data);
+
     if(req_data.has("error")) {
         res.send(req_data.get("error") + "<br>" + req_data["error_description"]);
         return;
     }
 
     const code = req_data.get('code');
-    console.log(code);
-    const state = req_data.get('state');
-    console.log(state);
+
+    if(state !== req_data.get('state')) {
+        console.log("received state doesn't correspond, aborting");
+        res.send("received state doesn't correspond, aborting");
+        return;
+    }
 
     let body = {
         client_id : process.env.TWITCH_CLIENT_ID,
@@ -54,12 +59,17 @@ app.get('/auth-callback', async (req, res) => {
             method: 'post'
         });
     let data = await result.json();
-    console.log(data);
-    console.log(data["access_token"]);
-    res.send("Code :" + res.statusCode);
+    await fs.writeFile('tokens.json', JSON.stringify(data, null, 4), 'UTF-8');
+    if(result.status !== 200) {
+        res.send("Error code : " +  result.statusCode);
+    } else {
+        res.send("Wrote tokens.json");
+    }
 });
 
 app.get('/', async (req, res) => {
     const link = `<a href="https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&redirect_uri=${process.env.REDIRECT_URI}&response_type=code&scope=${scopes.join(" ")}&state=${state}">Connect with Twitch</a>`;
     res.send(link);
 });
+app.listen(3000, () => {console.log("Running at: https://localhost:3000")});
+
