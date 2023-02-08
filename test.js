@@ -2135,9 +2135,18 @@ async function logsSize(channel, channelName) {
     }
 }
 
-async function timeout(channel, userid, length, reason) {
-    const streamer = await apiClient.users.getUserByName(removeHashtag(channel));
-    await apiClient.moderation.banUser(streamer, selfUserData, {duration: length, reason, userId: userid})
+async function timeout(channel, userid, length, reason, retry= true) {
+    try {
+        const streamer = await apiClient.users.getUserByName(removeHashtag(channel));
+        await apiClient.moderation.banUser(streamer, selfUserData, {duration: length, reason, userId: userid});
+    } catch (e) {
+        console.log(e);
+        sendMessage("#"+username, "Failed to timeout " + userId + " in channel " + channel + " with code " + e.statusCode);
+        if(retry && e.statusCode !== 403) {
+            // try a second time only
+            timeout(channel, userid, length, reason, false).then();
+        }
+    }
 }
 
 // TODO : implement ban function
