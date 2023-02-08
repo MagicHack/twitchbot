@@ -11,9 +11,10 @@ import {getCurrentToken, getStream, isLive, setCurrentToken, uidToUsername, user
 import prettyBytes from 'pretty-bytes';
 import {transliterate as transliterate} from 'transliteration';
 import 'dotenv/config';
+import {app} from "./oauth.js";
 
 // twurple
-import { RefreshingAuthProvider } from '@twurple/auth';
+import {RefreshingAuthProvider, StaticAuthProvider} from '@twurple/auth';
 import { promises as fs } from 'fs';
 import { ApiClient } from '@twurple/api';
 
@@ -124,35 +125,13 @@ try {
     console.log("Error, could not read config/channels file. Quitting");
     process.exit(1);
 }
-try {
-    await fs.access("tokens.json");
-} catch (e) {
-    console.log(e);
-    await fs.writeFile('tokens.json', JSON.stringify({
-        accessToken: getCurrentToken(),
-        refreshToken: getCurrentToken(),
-        expiresIn: 0,
-        obtainmentTimestamp: 0
-    }, null, 4), 'UTF-8');
-}
 
-const tokenData = JSON.parse(await fs.readFile('tokens.json', 'UTF-8'));
-const authProvider = new RefreshingAuthProvider(
-    {
-        clientId: process.env.TWITCH_CLIENT_ID,
-        clientSecret: process.env.TWITCH_CLIENT_SECRET,
-        onRefresh: async newTokenData => {
-            await fs.writeFile('tokens.json', JSON.stringify(newTokenData, null, 4), 'UTF-8');
-            setCurrentToken(newTokenData.accessToken);
-        }
-    },
-    tokenData
-);
-
+const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, process.env.TWITCH_USER_TOKEN);
 
 const apiClient = new ApiClient({ authProvider });
 
 const selfUserData = await apiClient.users.getUserByName(username);
+
 
 const donkRepliesPriority = ['g0ldfishbot', 'doo_dul', 'ron__bot'];
 const trusted = ['hackmagic'];
@@ -291,7 +270,7 @@ client.on('message', (channel, tags, message, self) => {
 
     // Anti weeb tech
     if (channel === "#pepto__bismol") {
-        timeouts(channel, cleanMessage, tags.username);
+        timeouts(channel, cleanMessage, tags);
     }
 
     if (channel === "#pajlada") {
@@ -1444,14 +1423,13 @@ function moderation(channel, tags, message) {
 
     if(channel === "#minusinsanity") {
         if(/(￼){3,}/.test(message)) {
-            sendMessageRetry(channel, `/timeout ${tags.username} 1 too much obj`);
-            timeout()
+            timeout(channel, tags["user-id"], 1, "too much obj").then();
         }
 
 
         // TODO: remove when pb2 gets fixed
         if ((message.match(brailleRE) || []).length > 200) {
-            sendMessageRetryPriority(channel, `/timeout ${tags.username} 30 too many braille chars (ASCII)`);
+            timeout(channel, tags["user-id"], 30, "too many braille chars (ASCII)").then();
         }
     }
 
@@ -1467,7 +1445,7 @@ function moderation(channel, tags, message) {
                 }
             }
             let timeoutLength = 10 * 60 * Math.pow(2, numberOfMassPings); // 10 mins * time number of offenses
-            sendMessageRetry(channel, `/timeout ${tags.username} ${timeoutLength} pinged too many chatters (${num})`);
+            timeout(channel, tags["user-id"], timeoutLength, `pinged too many chatters (${num})`).then();
             massPingersElis.push(tags.username);
             // remove the ping counter after a while
             setTimeout(removeOnePingCount, removeDelay, tags.username);
@@ -1523,13 +1501,13 @@ async function readDataJson(filePath) {
     return JSON.parse(data);
 }
 
-function timeouts(channel, message, username) {
+function timeouts(channel, message, tags) {
     try {
-        let timeout = timeoutList.find(user => user.username === username);
+        let timeout = timeoutList.find(user => user.username === tags.username);
         if (timeout !== undefined) {
             if(message !== "!roll" && !message.startsWith("!roll ")) {
                 if (Math.random() <= timeout["probability"]) {
-                    sendMessageRetryPriority(channel, `/timeout ${timeout.username} ${timeout.duration} ${timeout.reason}`);
+                    timeout(channel, tags["user-id"], timeout.duration, timeout.reason).then();
                 }
             }
         }
@@ -1589,7 +1567,7 @@ function bigfollows(channel, tags, message) {
 
     if(channel === "#chubbss_") {
         if ((message.match(brailleRE) || []).length > 110) {
-            sendMessageRetryPriority(channel, `/timeout ${tags.username} 120 too many braille chars`);
+            timeout(channel, tags["user-id"], 120, "too many braille chars").then();
         }
     }
 
@@ -1622,7 +1600,7 @@ function bigfollows(channel, tags, message) {
         if((message.match(brailleRE) || []).length > maxBrailleFirstMsg) {
             console.log(message);
             console.log("matched too many braille for first message");
-            sendMessageRetryPriority(channel, `/timeout ${tags.username} 30 too many braille characters in first message`);
+            timeout(channel, tags["user-id"], 30, "too many braille characters in first message").then();
             sendNotification("First message with braille!!!: " + message);
             return;
         }
@@ -1631,7 +1609,7 @@ function bigfollows(channel, tags, message) {
         if((message.match(nonAsciiRE) || []).length > maxNonAsciiFirstMsg) {
             console.log(message);
             console.log("matched too many non ascii for first message");
-            sendMessageRetryPriority(channel, `/timeout ${tags.username} 10 too many non ascii characters in first message`);
+            timeout(channel, tags["user-id"], 10, "too many non ascii characters in first message").then();
             sendNotification("First message with with non ascii: " + message);
             return;
         }
@@ -2161,3 +2139,8 @@ async function timeout(channel, userid, length, reason) {
     const streamer = await apiClient.users.getUserByName(removeHashtag(channel));
     await apiClient.moderation.banUser(streamer, selfUserData, {duration: length, reason, userId: userid})
 }
+
+// TODO : implement ban function
+
+// uncomment to get webserver to generate oauth token
+// app.listen(3000);
