@@ -75,7 +75,7 @@ try {
 }
 
 // channel where we can mod/vip spam
-let modSpamChannels = ['#pepto__bismol', "#sunephef", "#hackmagic", "#lzackhdl"];
+let modSpamChannels = ['#pepto__bismol', "#sunephef", "#hackmagic", "#lzackhdl", "#jayhilaneh"];
 
 // Weird char in twitch messages
 const blankchar = '󠀀';
@@ -1510,11 +1510,11 @@ async function readDataJson(filePath) {
 
 function timeouts(channel, message, tags) {
     try {
-        let timeout = timeoutList.find(user => user.username === tags.username);
-        if (timeout !== undefined) {
+        let userTimeout = timeoutList.find(user => user.username === tags.username);
+        if (userTimeout !== undefined) {
             if(message !== "!roll" && !message.startsWith("!roll ")) {
-                if (Math.random() <= timeout["probability"]) {
-                    timeout(channel, tags["user-id"], timeout.duration, timeout.reason).then();
+                if (Math.random() <= userTimeout["probability"]) {
+                    timeout(channel, tags["user-id"], userTimeout.duration, userTimeout.reason).then();
                 }
             }
         }
