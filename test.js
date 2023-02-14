@@ -299,6 +299,7 @@ client.on('message', (channel, tags, message, self) => {
 
     checkIfRaid(tags, cleanMessage).then();
     moderation(channel, tags, cleanMessage);
+    dankmod(channel, cleanMessage, tags);
 
     asd(channel, cleanMessage);
 
@@ -2157,3 +2158,46 @@ async function timeout(channel, userid, length, reason, retry= true) {
 }
 
 // TODO : implement ban function
+
+
+function dankmod(channel, message, tags) {
+    // TODO check if better way to do with pb2 already
+    let allowedUsers = ["sternutate", "hackmagic"];
+    if(!allowedUsers.includes(tags.username)) {
+        return;
+    }
+    const maxTimeout = 2 * 7 * 24 * 60 * 60; // 2 weeks
+    if(message.startsWith("&timeout")) {
+        let params = splitNoEmptyNoPrefix(message);
+        if(params.length >= 3) {
+            let targetUser = params[1];
+            let reason = "";
+            let duration = parseInt(params[2]);
+            if(isNaN(duration)) {
+                sendMessage(channel, "invalid duration provided");
+                return;
+            }
+            if(duration < 0) {
+                duration = Math.abs(duration);
+            }
+            if(params[2].endsWith("m")) {
+                duration *= 60;
+            } else if(params[2].endsWith("h")) {
+                duration *= 60 * 60;
+            } else if(params[2].endsWith("d")) {
+                duration *= 60 * 60 * 24;
+            } else if(params[2].endsWith("w")) {
+                duration *= 60 * 60 * 24 * 7;
+            }
+            if(duration > maxTimeout) {
+                duration = maxTimeout;
+            }
+            if(params.length >= 4) {
+                reason = params[3];
+            }
+            timeout("#minusinsanity", targetUser, duration, reason);
+        } else {
+            sendMessage(channel, "usage: &timeout user duration reason");
+        }
+    }
+}
