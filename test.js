@@ -2160,7 +2160,7 @@ async function timeout(channel, userid, length, reason, retry= true) {
 // TODO : implement ban function
 
 
-function dankmod(channel, message, tags) {
+async function dankmod(channel, message, tags) {
     // TODO check if better way to do with pb2 already
     let allowedUsers = ["sternutate", "hackmagic"];
     if(!allowedUsers.includes(tags.username)) {
@@ -2195,7 +2195,7 @@ function dankmod(channel, message, tags) {
             if(params.length >= 4) {
                 reason = params[3];
             }
-            timeout("#minusinsanity", targetUser, duration, reason);
+            await timeout("#minusinsanity", await apiClient.users.getUserByName(targetUser), duration, reason);
         } else {
             sendMessage(channel, "usage: &timeout user duration reason");
         }
