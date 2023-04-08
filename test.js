@@ -193,6 +193,7 @@ async function refreshLiveChannels() {
 }
 
 // refresh all chatters peridically
+// TODO use new twitch api
 setInterval(getAllChatters, delayChatterRefresh * 1000);
 
 // save unique chatters every 30 sec
@@ -968,6 +969,8 @@ function sendMessage(channel, message) {
     let isMod = false;
     let isVip = false;
 
+    // TODO use roomstate or other twitch feature for mod detection
+
     try {
         if (typeof chattersRoles[channel]["chatters"]["moderators"] !== 'undefined') {
             isMod = chattersRoles[channel]["chatters"]["moderators"].includes(client.getUsername());
@@ -1055,11 +1058,14 @@ function getAllChatters() {
 }
 
 function getChatters(channelName) {
+    // TODO update to new chatters api
+    return;
+
     // console.log("Updating chatter list for " + channelName);
-    let url = `https://tmi.twitch.tv/group/user/${channelName.substring(1)}/chatters`
+    let url = `https://tmi.twitch.tv/group/user/${channelName.substring(1)}/chatters`;
 
     let settings = {method: "Get"};
-    let chatters = []
+    let chatters = [];
     fetch(url, settings)
         .then(res => res.json())
         .then((json) => {
