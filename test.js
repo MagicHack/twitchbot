@@ -161,7 +161,14 @@ const client = new tmi.Client({
 let channelsChatters = {};
 let chattersRoles = {};
 
+
 let uniqueChatters = [];
+let newChattersToSave = false;
+try {
+    uniqueChatters = await readDataJson("chatters.json");
+} catch (e) {
+    console.log(e);
+}
 let massPingNum = 3;
 
 let lastMessageTimeStampMs = 0;
@@ -187,6 +194,9 @@ async function refreshLiveChannels() {
 
 // refresh all chatters peridically
 setInterval(getAllChatters, delayChatterRefresh * 1000);
+
+// save unique chatters every 30 sec
+setInterval(saveChatters, 30 * 1000);
 
 // refresh live every minute
 setInterval(refreshLiveChannels, 60 * 1000);
@@ -265,6 +275,10 @@ client.on('message', (channel, tags, message, self) => {
         console.log("ignored whisper");
         return;
     }
+
+    // TODO:  maybe be smarter about adding chatters?, use a set or other data struct instead of array to not have
+    //  O(n) lookup every message
+    addUniqueChatter(tags.username);
 
     // remove chatterino char and extra spaces
     let cleanMessage = message.replace(blankchar, '').trim();
@@ -1452,7 +1466,7 @@ function moderation(channel, tags, message) {
                     numberOfMassPings++;
                 }
             }
-            let timeoutLength = 10 * 60 * Math.pow(2, numberOfMassPings); // 10 mins * time number of offenses
+            let timeoutLength = 60 * 60 * Math.pow(2, numberOfMassPings); // 10 mins * time number of offenses
             timeout(channel, tags["user-id"], timeoutLength, `pinged too many chatters (${num})`).then();
             massPingersElis.push(tags.username);
             // remove the ping counter after a while
@@ -1920,6 +1934,7 @@ function addMultipleUniqueChatters(chatters) {
 function addUniqueChatter(username) {
     if(!uniqueChatters.includes(username)) {
         uniqueChatters.push(username);
+        newChattersToSave = true;
     }
 }
 
@@ -2199,5 +2214,11 @@ async function dankmod(channel, message, tags) {
         } else {
             sendMessage(channel, "usage: &timeout user duration reason");
         }
+    }
+}
+
+function saveChatters() {
+    if(newChattersToSave) {
+        saveDataJson(uniqueChatters, "chatters.json").then(() => {newChattersToSave = false;})
     }
 }
