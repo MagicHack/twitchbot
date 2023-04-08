@@ -346,6 +346,7 @@ client.on('message', (channel, tags, message, self) => {
     }
 
     if (tags.username !== client.getUsername()) {
+        // TODO: remove or find alternative without the user list
         let channelsNoPriority = ['#pepto__bismol'];
         let donkUsername = '';
         if (!channelsNoPriority.includes(channel)) {
@@ -356,7 +357,7 @@ client.on('message', (channel, tags, message, self) => {
                         break;
                     }
                 } else {
-                    console.log("chatter list not present yet");
+                    // console.log("chatter list not present yet");
                 }
             }
         }
@@ -985,7 +986,7 @@ function sendMessage(channel, message) {
         }
     } catch (e) {
         console.error("Failed to check chatter list");
-        console.error(e);
+        // console.error(e);
     }
 
 
