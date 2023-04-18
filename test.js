@@ -1473,7 +1473,7 @@ function moderation(channel, tags, message) {
                     numberOfMassPings++;
                 }
             }
-            let timeoutLength = 60 * 60 * Math.pow(2, numberOfMassPings); // 10 mins * time number of offenses
+            let timeoutLength = 5 * 60 * 60 * Math.pow(2, numberOfMassPings); // 5 hours * time number of offenses
             timeout(channel, tags["user-id"], timeoutLength, `pinged too many chatters (${num})`).then();
             massPingersElis.push(tags.username);
             // remove the ping counter after a while
