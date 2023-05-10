@@ -277,6 +277,13 @@ let donkCoolDown = 5;
 let spamReplyCoolDown = 30;
 let lastAnnouceA = Date.now();
 
+
+client.on("userstate", (channel, state) => {
+    // check userstate
+    modState[channel] = state.mod;
+    vipState[channel] = (state["user-type"] === ";vip=1");
+
+});
 client.on('message', (channel, tags, message, self) => {
     if (self) {
         // check userstate
