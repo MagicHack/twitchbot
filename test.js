@@ -143,6 +143,14 @@ const selfUserData = await apiClient.users.getUserByName(username);
 const donkRepliesPriority = ['g0ldfishbot', 'doo_dul', 'ron__bot'];
 const trusted = ['hackmagic'];
 
+// TODO implement better userstate tracking
+let modState = {};
+let vipState = {};
+for(let c of channels) {
+    modState[c] = false;
+    vipState[c] = false;
+}
+
 const pushover = new Push({user: pushoverUser, token: pushoverToken});
 
 const client = new tmi.Client({
@@ -270,7 +278,13 @@ let spamReplyCoolDown = 30;
 let lastAnnouceA = Date.now();
 
 client.on('message', (channel, tags, message, self) => {
-    if (self) return;
+    if (self) {
+        // check userstate
+        modState[channel] = tags.mod;
+        vipState[channel] = (tags["user-type"] === ";vip=1");
+
+        return;
+    }
     // ignore whispers for now
     if (tags['message-type'] === 'whisper') {
         console.log("ignored whisper");
@@ -967,27 +981,13 @@ function sendMessage(channel, message) {
     sentMessagesTS = sentMessagesTS.filter(ts => Date.now() - ts < (30 + 1) * 1000);
     let messageCounter = sentMessagesTS.length;
 
-    let isMod = false;
-    let isVip = false;
-
     // TODO use roomstate or other twitch feature for mod detection
 
-    try {
-        if (typeof chattersRoles[channel]["chatters"]["moderators"] !== 'undefined') {
-            isMod = chattersRoles[channel]["chatters"]["moderators"].includes(client.getUsername());
-        } else {
-            console.log("Couldn't check role");
-        }
+    let isMod = modState[channel];
+    let isVip = vipState[channel];
 
-        if (typeof chattersRoles[channel]["chatters"]["vips"] !== 'undefined') {
-            isVip = chattersRoles[channel]["chatters"]["vips"].includes(client.getUsername());
-        } else {
-            console.log("Couldn't check role");
-        }
-    } catch (e) {
-        console.error("Failed to check chatter list");
-        // console.error(e);
-    }
+
+
 
 
     let modSpam = false;
