@@ -2087,19 +2087,24 @@ async function userId(channel, message, username) {
     }
     if (login === "") {
         try {
-            let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
+            let response = await fetch("https://api.ivr.fi/v2/twitch/user?login=" + target);
             if(!response.ok) {
                 reply = "could not find the specified user";
             } else {
-                let userInfo = await response.json();
-                let uid = userInfo["id"];
-                let banned = userInfo["banned"];
-                let verifiedBot = userInfo["verifiedBot"];
-                let tosInfo = "";
-                if(banned) {
-                    tosInfo = tosToString(userInfo["banReason"]);
+                let usersInfo = await response.json();
+                if(usersInfo.length > 0) {
+                    let userInfo = usersInfo[0];
+                    let uid = userInfo["id"];
+                    let banned = userInfo["banned"];
+                    let verifiedBot = userInfo["verifiedBot"];
+                    let tosInfo = "";
+                    if(banned) {
+                        tosInfo = tosToString(userInfo["banReason"]);
+                    }
+                    reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
+                } else {
+                    reply = "could not find the specified user";
                 }
-                reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
             }
         } catch (e) {
             reply = "Error fetching information, try again later";
