@@ -2020,22 +2020,29 @@ async function streamInfo(channel, message) {
     let reply = "";
     if(info["data"].length === 0) {
         try {
-            let response = await fetch("https://api.ivr.fi/v2/twitch/user/" + target);
+            let response = await fetch("https://api.ivr.fi/v2/twitch/user?login=" + target);
             if(!response.ok) {
                 reply = "could not find the specified user";
             } else {
-                let streamInfo = await response.json();
-                let name = streamInfo["displayName"];
-                let lastDate = streamInfo["lastBroadcast"]["startedAt"];
-                let formattedDate;
-                if(lastDate !== null) {
-                    let lastStreamDate = new Date(streamInfo["lastBroadcast"]["startedAt"]);
-                    let title = streamInfo["lastBroadcast"]["title"];
-                    formattedDate = prettySeconds(Math.round((Date.now() - lastStreamDate) / 1000)) + " ago";
-                    reply = `${name} last streamed ${formattedDate}: ${title}`;
+                let streamsInfo = await response.json();
+                if(streamsInfo.length > 0) {
+                    let streamInfo = streamsInfo[0];
+                    let name = streamInfo["displayName"];
+                    let lastDate = streamInfo["lastBroadcast"]["startedAt"];
+                    let formattedDate;
+                    if(lastDate !== null) {
+                        let lastStreamDate = new Date(streamInfo["lastBroadcast"]["startedAt"]);
+                        let title = streamInfo["lastBroadcast"]["title"];
+                        formattedDate = prettySeconds(Math.round((Date.now() - lastStreamDate) / 1000)) + " ago";
+                        reply = `${name} last streamed ${formattedDate}: ${title}`;
+                    } else {
+                        reply = `${name} has never streamed.`;
+                    }
+
                 } else {
-                    reply = `${name} has never streamed.`;
+                    reply = "could not find the specified user";
                 }
+
             }
         } catch (e) {
             reply= "Error fetching info, try again later";
