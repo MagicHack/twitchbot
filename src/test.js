@@ -2197,6 +2197,8 @@ const dirSize = async dir => {
 }
 
 async function logsSize(channel, channelName) {
+    sendMessageRetry(channel, "Command temporarily disabled due to performance issues");
+    return;
     if(channelName === "channel") {
         channelName = channel;
     }
