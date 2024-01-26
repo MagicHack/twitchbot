@@ -16,6 +16,9 @@ import 'dotenv/config';
 import {RefreshingAuthProvider, StaticAuthProvider} from '@twurple/auth';
 import { promises as fs } from 'fs';
 import { ApiClient } from '@twurple/api';
+import * as Path from "path";
+
+const configDir = "/config";
 
 
 const exec = util.promisify(childProcess.exec);
@@ -32,7 +35,7 @@ const rateLimitDelayMod = 30 / rateLimitMessagesMod;
 const delayChatterRefresh = 120;
 
 // Prefix for commands, ex: &ping
-let prefix = '&';
+let prefix = process.env['PREFIX'] || '&';
 
 // name of file storing raid users
 const RAID_FILE = 'raid.json';
@@ -125,12 +128,15 @@ try {
     process.exit(1);
 }
 
-const tokenData = JSON.parse(await fs.readFile('tokens.json', 'UTF-8'));
+const tokenFile = Path.join(configDir, 'tokens.json');
+
+const tokenData = JSON.parse(await fs.readFile(tokenFile, 'UTF-8'));
+
 const authProvider = new RefreshingAuthProvider(
     {
         clientId: process.env.TWITCH_CLIENT_ID,
         clientSecret: process.env.TWITCH_CLIENT_SECRET,
-        onRefresh: async newTokenData => await fs.writeFile('tokens.json', JSON.stringify(newTokenData, null, 4), 'UTF-8')
+        onRefresh: async newTokenData => await fs.writeFile(tokenFile, JSON.stringify(newTokenData, null, 4), 'UTF-8')
     },
     tokenData
 );
@@ -266,7 +272,7 @@ client.on("ban", (channel, username) => {
 });
 
 client.on("connected", () => {
-    client.say("#" + username, "connected " + (new Date()).toISOString());
+    client.say("#" + username, `connected " ${(new Date()).toISOString()}. Prefix: ${prefix}`);
     client.raw("CAP REQ :twitch.tv/commands twitch.tv/tags twitch.tv/membership");
     sentMessagesTS.push(Date.now());
 });
@@ -975,7 +981,8 @@ function sendMessageRetry(channel, message) {
 }
 
 // We assume normal bucket is half full on start, 30 seconds before being able to send messages on startup
-let sentMessagesTS = new Array(Math.round(rateLimitMessagesMod / 2)).fill(Date.now());
+let startLimit = process.env.START_BUCKET !== undefined ? parseInt(process.env.START_BUCKET) : Math.round(rateLimitMessagesMod / 2);
+let sentMessagesTS = new Array(startLimit).fill(Date.now());
 let logSendMessages = false;
 
 function sendMessage(channel, message) {
@@ -1528,11 +1535,17 @@ async function runList(channel, tags, message) {
     }
 }
 
-async function saveDataJson(data, filePath) {
+async function saveDataJson(data, filePath, config = true) {
+    if(config) {
+        filePath = Path.join(configDir, filePath);
+    }
     await fs.writeFile(filePath, JSON.stringify(data), 'utf8');
 }
 
-async function readDataJson(filePath) {
+async function readDataJson(filePath, config = true) {
+    if(config) {
+        filePath = Path.join(configDir, filePath);
+    }
     let data = await fs.readFile(filePath, 'utf8');
     return JSON.parse(data);
 }
@@ -1555,19 +1568,28 @@ function timeouts(channel, message, tags) {
 async function update(channel) {
     // pull repo
     sendMessageRetry(channel, "Pulling repo...");
-    let {stdout: gitOut} = await exec('git pull', {encoding: 'utf8'});
-    console.log(gitOut);
-    if (gitOut.includes("Already up to date.")) {
-        sendMessageRetry(channel, "No new commits to pull FeelsDankMan");
-    } else {
-        if (gitOut.includes("package-lock.json") || gitOut.includes("package.json")) {
-            sendMessageRetry(channel, "Updating npm packages...");
-            // update npm packages
-            let {stdout: npmOut} = await exec("npm ci", {encoding: 'utf8'});
-            console.log(npmOut);
+    try {
+        let {stdout: gitOut, status: code} = await exec('git pull', {encoding: 'utf8'});
+        if (code !== 0) {
+            sendMessageRetry(channel, `Failed with exit code ${code}.`);
+            return;
         }
-        sendMessageRetry(channel, "restarting...");
-        setTimeout(process.exit(), 3000);
+        console.log(gitOut);
+        if (gitOut.includes("Already up to date.")) {
+            sendMessageRetry(channel, "No new commits to pull FeelsDankMan");
+        } else {
+            if (gitOut.includes("package-lock.json") || gitOut.includes("package.json")) {
+                sendMessageRetry(channel, "Updating npm packages...");
+                // update npm packages
+                let {stdout: npmOut} = await exec("npm ci", {encoding: 'utf8'});
+                console.log(npmOut);
+            }
+            sendMessageRetry(channel, "restarting...");
+            setTimeout(process.exit(), 3000);
+        }
+    } catch (e) {
+        console.log(e);
+        sendMessageRetry(channel, `Operation failed, check console logs (update doesn't work in docker)`);
     }
 }
 
@@ -2154,6 +2176,26 @@ function whereIsHack(channel) {
     sendMessageRetry(channel, `HackMagic last typed in chat ${prettyMs(Date.now() - lastMessage)} ago.`);
 }
 
+const dirSize = async dir => {
+    const files = await fs.readdir( dir, { withFileTypes: true } );
+
+    const paths = files.map( async file => {
+        const path = Path.join( dir, file.name );
+
+        if ( file.isDirectory() ) return await dirSize( path );
+
+        if ( file.isFile() ) {
+            const { size } = await fs.stat( path );
+
+            return size;
+        }
+
+        return 0;
+    } );
+
+    return ( await Promise.all( paths ) ).flat( Infinity ).reduce( ( i, size ) => i + size, 0 );
+}
+
 async function logsSize(channel, channelName) {
     if(channelName === "channel") {
         channelName = channel;
@@ -2176,7 +2218,7 @@ async function logsSize(channel, channelName) {
         }
     }
     try {
-        let bytes = parseInt(childProcess.execSync("du -s --block-size=1 " + logsDir, {'encoding': 'UTF-8'}).split("\t")[0]);
+        let bytes = await dirSize(logsDir); //parseInt(childProcess.execSync("du -s --block-size=1 " + logsDir, {'encoding': 'UTF-8'}).split("\t")[0]);
         let formattedBytes = prettyBytes(bytes, {minimumFractionDigits: 3});
         sendMessageRetry(channel, `Current logs size (updated every hour) : ${formattedBytes}`);
     } catch (e) {

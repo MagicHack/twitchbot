@@ -3,5 +3,5 @@ node_modules/
 .env
 .idea/
 token.txt
-*.json
-
+config/*.json
+compose.yaml

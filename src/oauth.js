@@ -3,8 +3,11 @@ import crypto from "crypto";
 import fetch from "node-fetch";
 import { promises as fs } from 'fs';
 import 'dotenv/config';
+import path from "path";
 
 const app = express();
+
+const tokenFile = path.join("/config", 'tokens.json');
 
 // dank oauth code to get inital token
 
@@ -59,7 +62,8 @@ app.get('/auth-callback', async (req, res) => {
             method: 'post'
         });
     let data = await result.json();
-    await fs.writeFile('tokens.json', JSON.stringify(data, null, 4), 'UTF-8');
+
+    await fs.writeFile(tokenFile, JSON.stringify(data, null, 4), 'UTF-8');
     if(result.status !== 200) {
         res.send("Error code : " +  result.statusCode);
     } else {
