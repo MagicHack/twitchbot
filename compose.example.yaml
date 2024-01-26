@@ -1,0 +1,10 @@
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - config:/config
+      - logs:/home/pi/backups/logs
+    environment:
+      - TWITCH_CLIENT_ID=id
+      - TWITCH_CLIENT_SECRET=secret
