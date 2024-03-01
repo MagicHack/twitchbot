@@ -272,7 +272,7 @@ client.on("ban", (channel, username) => {
 });
 
 client.on("connected", () => {
-    client.say("#" + username, `connected " ${(new Date()).toISOString()}. Prefix: ${prefix}`);
+    client.say("#" + username, `connected ${(new Date()).toISOString()}. Prefix: ${prefix}`);
     client.raw("CAP REQ :twitch.tv/commands twitch.tv/tags twitch.tv/membership");
     sentMessagesTS.push(Date.now());
 });
