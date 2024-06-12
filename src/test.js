@@ -7,17 +7,30 @@ import momentTZ from 'moment-timezone';
 import moment from 'moment';
 import util from 'util';
 import childProcess from 'child_process';
-import {getCurrentToken, getStream, isLive, setCurrentToken, uidToUsername, usernameToId} from "./twitchapi.js";
+import {getStream, isLive, uidToUsername, usernameToId} from "./twitchapi.js";
 import prettyBytes from 'pretty-bytes';
 import {transliterate as transliterate} from 'transliteration';
 import 'dotenv/config';
 
 // twurple
-import {RefreshingAuthProvider, StaticAuthProvider} from '@twurple/auth';
-import { promises as fs } from 'fs';
-import { ApiClient } from '@twurple/api';
+import {RefreshingAuthProvider} from '@twurple/auth';
+import {promises as fs} from 'fs';
+import {ApiClient} from '@twurple/api';
 import * as Path from "path";
+import { all, create } from 'mathjs'
 
+const math = create(all)
+
+const limitedEvaluate = math.evaluate
+
+math.import({
+    import: function () { throw new Error('Function import is disabled') },
+    createUnit: function () { throw new Error('Function createUnit is disabled') },
+    evaluate: function () { throw new Error('Function evaluate is disabled') },
+    parse: function () { throw new Error('Function parse is disabled') },
+    simplify: function () { throw new Error('Function simplify is disabled') },
+    derivative: function () { throw new Error('Function derivative is disabled') }
+}, { override: true })
 const configDir = "/config";
 
 
@@ -141,7 +154,7 @@ const authProvider = new RefreshingAuthProvider(
     tokenData
 );
 
-const apiClient = new ApiClient({ authProvider });
+const apiClient = new ApiClient({authProvider});
 
 const selfUserData = await apiClient.users.getUserByName(username);
 
@@ -152,7 +165,7 @@ const trusted = ['hackmagic'];
 // TODO implement better userstate tracking
 let modState = {};
 let vipState = {};
-for(let c of channels) {
+for (let c of channels) {
     modState[c] = false;
     vipState[c] = false;
 }
@@ -194,9 +207,9 @@ let liveChannels = [];
 
 async function refreshLiveChannels() {
     let newLive = [];
-    for(let c of channels) {
+    for (let c of channels) {
         try {
-            if(await isLive(c)) {
+            if (await isLive(c)) {
                 newLive.push(c);
             }
         } catch (e) {
@@ -249,18 +262,18 @@ client.on("pong", (latency) => {
 let joinNotifs = false;
 // join messages
 client.on("join", (channel, username, self) => {
-    if(self || !joinNotifs) return;
+    if (self || !joinNotifs) return;
     // Do your stuff.
-    if(channel === "#hackmagic") {
+    if (channel === "#hackmagic") {
         sendMessageRetry(channel, `${username} joined the channel :)`);
     }
 });
 
 // leave
 client.on("part", (channel, username, self) => {
-    if(self || !joinNotifs) return;
+    if (self || !joinNotifs) return;
     // Do your stuff.
-    if(channel === "#hackmagic") {
+    if (channel === "#hackmagic") {
         sendMessageRetry(channel, `${username} left the channel :(`);
     }
 });
@@ -326,11 +339,11 @@ client.on('message', (channel, tags, message, self) => {
         if (tags["user-id"] === "82008718" && tags["message-type"] === "action" && cleanMessage === "pajaS 🚨 ALERT") {
             sendMessageRetry(channel, "/me DANKNAD 🚨 ALERTE");
             console.log("pajaS 🚨 ALERT");
-        } else if(tags["user-id"] === "82008718" && cleanMessage === "/announce a") {
+        } else if (tags["user-id"] === "82008718" && cleanMessage === "/announce a") {
             lastAnnouceA = Date.now();
         }
         // mldsbt (list)  https://gist.github.com/treuks/fead3312bf0d0284c0dd8dff4f51d30b  less then 60s since pajbot annouce
-        if(tags["user-id"] === "743355647" && cleanMessage.startsWith("/announce") && Date.now() - lastAnnouceA < 60 * 1000) {
+        if (tags["user-id"] === "743355647" && cleanMessage.startsWith("/announce") && Date.now() - lastAnnouceA < 60 * 1000) {
             console.log("y");
             let possibilities = ["z", "ⓩ", "𝔃", "𝕫", "🆉", "𝐳", "peepoZ", ":-z", ":Z", "FrankerZ", "ZULUL"];
             sendMessageRetry(channel, ` /announce ${possibilities[Math.floor(Math.random() * possibilities.length)]} 💤`);
@@ -361,9 +374,9 @@ client.on('message', (channel, tags, message, self) => {
     }
     const singleCharReply = ['!', prefix];
     if (singleCharReply.includes(cleanMessage)) {
-        if(Date.now() - lastSingleReply > spamReplyCoolDown * 1000) {
+        if (Date.now() - lastSingleReply > spamReplyCoolDown * 1000) {
             lastSingleReply = Date.now();
-            if(channel === "#pajlada" && cleanMessage === "!") {
+            if (channel === "#pajlada" && cleanMessage === "!") {
                 client.raw(`@client-nonce=xd;reply-parent-msg-id=${tags["id"]} PRIVMSG ${channel} :!!`);
                 sentMessagesTS.push(Date.now());
             } else {
@@ -389,20 +402,20 @@ client.on('message', (channel, tags, message, self) => {
             }
         }
 
-        if(Date.now() - lastDonkReply > donkCoolDown * 1000) {
+        if (Date.now() - lastDonkReply > donkCoolDown * 1000) {
             const donkCombos = [["FeelsDonkMan", "TeaTimeU"], ["FeelsDonkMan", "TeaTime"], ["FeelsDonkMan", "bigTeaTime"],
                 ["WIDEGIGADONK", "TeaTime"], ["WIDEGIGADONK", "bigTeaTime"], ["FeelsDonkMan", "MiniTeaTime"],
                 ["Donki", "TeaTimeU"], ["Donki", "TeaTime"], ["Donki", "bigTeaTime"]];
 
             if (donkUsername === '' || tags.username === donkUsername) {
-                for(let donk of donkCombos) {
+                for (let donk of donkCombos) {
                     const donk1 = `${donk[0]} ${donk[1]}`;
                     const donk2 = `${donk[1]} ${donk[0]}`;
 
-                    if(cleanMessage === donk1) {
+                    if (cleanMessage === donk1) {
                         sendMessage(channel, donk2);
                         lastDonkReply = Date.now();
-                    } else if(cleanMessage === donk2) {
+                    } else if (cleanMessage === donk2) {
                         sendMessage(channel, donk1);
                         lastDonkReply = Date.now();
                     }
@@ -412,7 +425,7 @@ client.on('message', (channel, tags, message, self) => {
 
         const newCommand = 'I made a new command HeyGuys';
         if (cleanMessage.startsWith(newCommand)) {
-            if(Date.now() - lastNewCommandReply > spamReplyCoolDown * 1000) {
+            if (Date.now() - lastNewCommandReply > spamReplyCoolDown * 1000) {
                 lastNewCommandReply = Date.now();
                 sendMessage(channel, newCommand);
             }
@@ -447,9 +460,9 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessageRetry(channel, response);
                 })
             }
-        } else if(isCommand(cleanMessage.toLowerCase(), "logssize") || isCommand(cleanMessage.toLowerCase(), "logsize")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "logssize") || isCommand(cleanMessage.toLowerCase(), "logsize")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
-            if(params.length >= 2) {
+            if (params.length >= 2) {
                 logsSize(channel, params[1]).then();
             } else {
                 logsSize(channel, "").then();
@@ -467,8 +480,8 @@ client.on('message', (channel, tags, message, self) => {
             if (lastRaid !== null) {
                 let timeSinceRaidSeconds = (Date.now() - new Date(lastRaid["ts"])) / 1000;
                 let status = "in progress";
-                if(lastRaid["won"] !== undefined) {
-                    if(lastRaid["won"]) {
+                if (lastRaid["won"] !== undefined) {
+                    if (lastRaid["won"]) {
                         status = "won";
                     } else {
                         status = "lost";
@@ -478,7 +491,7 @@ client.on('message', (channel, tags, message, self) => {
             } else {
                 sendMessage(channel, "No raids recorded yet");
             }
-        }else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "flashbang")) {
             let amount = 1;
             let params = cleanMessage.split(" ").filter(x => x.length !== 0);
             if (params.length >= 2) {
@@ -520,59 +533,70 @@ client.on('message', (channel, tags, message, self) => {
                     sendMessageRetry(channel, "error pinging the pajbotapi provided");
                 });
             }
-        } else if(isCommand(cleanMessage.toLowerCase(), "rq") || isCommand(cleanMessage.toLowerCase(), "randomquote")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "rq") || isCommand(cleanMessage.toLowerCase(), "randomquote")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
             let target = tags.username;
-            if(params.length >= 2) {
+            if (params.length >= 2) {
                 target = params[1];
             }
             rq(channel, tags.username, target).then(message => {
-                if(message.length > 0) {
+                if (message.length > 0) {
                     sendMessageRetry(channel, message);
                 }
             });
-        } else if(isCommand(cleanMessage.toLowerCase(), "rl") || isCommand(cleanMessage.toLowerCase(), "randomline")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "rl") || isCommand(cleanMessage.toLowerCase(), "randomline")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
             // TODO make it actually random and not just a person in chat
             let target = channelsChatters[channel][Math.floor(Math.random() * channelsChatters[channel].length)];
-            if(params.length >= 2) {
+            if (params.length >= 2) {
                 target = params[1];
             }
             rq(channel, tags.username, target).then(message => {
-                if(message.length > 0) {
+                if (message.length > 0) {
                     sendMessageRetry(channel, message);
                 }
             });
-        } else if(isCommand(cleanMessage.toLowerCase(), "fl")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "fl")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
             let target = tags.username;
-            if(params.length >= 2) {
+            if (params.length >= 2) {
                 target = params[1];
             }
             fl(channel, tags.username, target).then(message => {
-                if(message.length > 0) {
+                if (message.length > 0) {
                     sendMessageRetry(channel, message);
                 }
             });
-        } else if(isCommand(cleanMessage.toLowerCase(), "ll") || isCommand(cleanMessage.toLowerCase(), "lastline")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "ll") || isCommand(cleanMessage.toLowerCase(), "lastline")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
             let target = tags.username;
-            if(params.length >= 2) {
+            if (params.length >= 2) {
                 target = params[1];
             }
             lastLine(channel, tags.username, target).then(message => {
-                if(message.length > 0) {
+                if (message.length > 0) {
                     sendMessageRetry(channel, message);
                 }
             });
-        } else if(isCommand(cleanMessage.toLowerCase(), "random")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "random")) {
             random(channel, cleanMessage);
-        } else if(isCommand(cleanMessage.toLowerCase(), "si") || isCommand(cleanMessage.toLowerCase(), "streaminfo")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "si") || isCommand(cleanMessage.toLowerCase(), "streaminfo")) {
             streamInfo(channel, cleanMessage).then();
-        } else if(isCommand(cleanMessage.toLowerCase(), "uid") || isCommand(cleanMessage.toLowerCase(), "userid")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "uid") || isCommand(cleanMessage.toLowerCase(), "userid")) {
             userId(channel, cleanMessage, tags.username).then();
-        } else if(isCommand(cleanMessage.toLowerCase(), "stalkhack") || isCommand(cleanMessage.toLowerCase(), "whereishack")) {
+        } else if (isCommand(cleanMessage.toLowerCase(), "stalkhack") || isCommand(cleanMessage.toLowerCase(), "whereishack")) {
             whereIsHack(channel);
+        } else if (isCommand(cleanMessage.toLowerCase(), "math") || isCommand(cleanMessage.toLowerCase(), "evaluate") || isCommand(cleanMessage.toLowerCase(), "convert")) {
+            const index = cleanMessage.indexOf(" ");
+            if (index >= 0 && index < cleanMessage.length - 1) {
+                const expression = cleanMessage.substring(index);
+                try {
+                    const result = limitedEvaluate(expression);
+                    sendMessageRetry(channel, result.toString());
+                } catch (e) {
+                    sendMessageRetry(channel, "Failed to evaluate provided expression");
+                }
+            }
         }
 
         // Broadcaster and admin command
@@ -682,16 +706,16 @@ client.on('message', (channel, tags, message, self) => {
                 process.exit();
             } else if (isCommand(cleanMessage.toLowerCase(), "update")) {
                 update(channel).then();
-            } else if(isCommand(cleanMessage.toLowerCase(), "join")) {
+            } else if (isCommand(cleanMessage.toLowerCase(), "join")) {
                 let params = splitNoEmptyNoPrefix(cleanMessage);
-                if(params.length >= 2) {
+                if (params.length >= 2) {
                     join(channel, params[1]);
                 } else {
                     sendMessageRetry(channel, "Specify a channel to join FeelsDankMan");
                 }
-            }else if(isCommand(cleanMessage.toLowerCase(), "leave")) {
+            } else if (isCommand(cleanMessage.toLowerCase(), "leave")) {
                 let params = splitNoEmptyNoPrefix(cleanMessage);
-                if(params.length >= 2) {
+                if (params.length >= 2) {
                     leave(channel, params[1]);
                 } else {
                     sendMessageRetry(channel, "Specify a channel to leave FeelsDankMan");
@@ -708,7 +732,7 @@ function getPlayers(game, trusted) {
     const apiUrl = "https://api.magichack.xyz/steam/players/";
     let elapsedTime = (Date.now() - lastTS) / 1000;
 
-    if(game.toLowerCase().startsWith('id:') || game.toLowerCase().startsWith('appid:')) {
+    if (game.toLowerCase().startsWith('id:') || game.toLowerCase().startsWith('appid:')) {
         return new Promise((resolve) => {
             let id = 0;
             try {
@@ -999,9 +1023,6 @@ function sendMessage(channel, message) {
 
     let isMod = modState[channel];
     let isVip = vipState[channel];
-
-
-
 
 
     let modSpam = false;
@@ -1431,10 +1452,10 @@ async function pingPajbotApi(url) {
     }
     let decoded = await result.json();
 
-    if(decoded["input_message"] === undefined || decoded["input_message"] !== testPhrase) {
+    if (decoded["input_message"] === undefined || decoded["input_message"] !== testPhrase) {
         throw "input message doesn't match test phrase";
     }
-    if(decoded["banned"] === undefined || !(decoded["banned"] === true || decoded["banned"] === false)) {
+    if (decoded["banned"] === undefined || !(decoded["banned"] === true || decoded["banned"] === false)) {
         throw "bad banned value from pajbot api";
     }
 
@@ -1447,7 +1468,7 @@ let massPingersElis = [];
 
 function removeOnePingCount(user) {
     let index = massPingersElis.indexOf(user);
-    if(index !== -1) {
+    if (index !== -1) {
         massPingersElis[index] = massPingersElis[massPingersElis.length - 1];
         massPingersElis.pop();
         console.log("Removed timeout for user " + user);
@@ -1455,6 +1476,7 @@ function removeOnePingCount(user) {
 }
 
 const brailleRE = /[\u2801-\u28FF\u2580-\u259F]/ig;
+
 function moderation(channel, tags, message) {
 
     bigfollows(channel, tags, message);
@@ -1464,8 +1486,8 @@ function moderation(channel, tags, message) {
         return;
     }
 
-    if(channel === "#minusinsanity") {
-        if(/(￼){3,}/.test(message)) {
+    if (channel === "#minusinsanity") {
+        if (/(￼){3,}/.test(message)) {
             timeout(channel, tags["user-id"], 1, "too much obj").then();
         }
 
@@ -1476,14 +1498,14 @@ function moderation(channel, tags, message) {
         }
     }
 
-    if(channel === "#elis" && !liveChannels.includes("#elis")) {
+    if (channel === "#elis" && !liveChannels.includes("#elis")) {
         let maxNum = 7;
         let removeDelay = 1000 * 60 * 60 * 24 * 3; // reset after 3 days (in ms)
         let num = numPings(message);
         if (num > maxNum) {
             let numberOfMassPings = 0;
-            for(let chatter of massPingersElis) {
-                if(chatter === tags.username) {
+            for (let chatter of massPingersElis) {
+                if (chatter === tags.username) {
                     numberOfMassPings++;
                 }
             }
@@ -1536,14 +1558,14 @@ async function runList(channel, tags, message) {
 }
 
 async function saveDataJson(data, filePath, config = true) {
-    if(config) {
+    if (config) {
         filePath = Path.join(configDir, filePath);
     }
     await fs.writeFile(filePath, JSON.stringify(data), 'utf8');
 }
 
 async function readDataJson(filePath, config = true) {
-    if(config) {
+    if (config) {
         filePath = Path.join(configDir, filePath);
     }
     let data = await fs.readFile(filePath, 'utf8');
@@ -1554,7 +1576,7 @@ function timeouts(channel, message, tags) {
     try {
         let userTimeout = timeoutList.find(user => user.username === tags.username);
         if (userTimeout !== undefined) {
-            if(message !== "!roll" && !message.startsWith("!roll ")) {
+            if (message !== "!roll" && !message.startsWith("!roll ")) {
                 if (Math.random() <= userTimeout["probability"]) {
                     timeout(channel, tags["user-id"], userTimeout.duration, userTimeout.reason).then();
                 }
@@ -1607,7 +1629,7 @@ function splitNoEmptyNoPrefix(message) {
 }
 
 function removeWhiteSpace(string) {
-    return string.replace(/\s/g,'');
+    return string.replace(/\s/g, '');
 }
 
 function bigfollows(channel, tags, message) {
@@ -1623,19 +1645,19 @@ function bigfollows(channel, tags, message) {
 
     const veryBadAscii = ["⢰⣦⠀⢰⡆⢰⠀⣠⠴⠲⠄⢀⡴⠒⠆⠀⡶⠒⠀⣶⠲⣦⠀⠀ ⢸⡏⢧⣸⡇⢸⠀⣏⠀⠶⡆⣾⠀⠶⣶⠀⡷⠶⠀⣿⢶⡋⠀⠀ ⠸⠇⠀⠻⠇⠸⠀⠙⠦⠴⠃⠘⠳⠤⠟⠀⠷⠤⠄⠿⠀⠻"];
 
-    if(channel === "#chubbss_") {
+    if (channel === "#chubbss_") {
         if ((message.match(brailleRE) || []).length > 110) {
             timeout(channel, tags["user-id"], 120, "too many braille chars").then();
         }
     }
 
     let firstMessage = false;
-    if(tags["first-msg"] !== undefined) {
+    if (tags["first-msg"] !== undefined) {
         firstMessage = tags["first-msg"];
     }
-    if(firstMessage && enabledChannels.includes(channel)) {
+    if (firstMessage && enabledChannels.includes(channel)) {
         // bigfollows and variations
-        if(bigfollowsRE.test(transliterate(message))) {
+        if (bigfollowsRE.test(transliterate(message))) {
             let notifMessage = "Banned user : " + tags.username + " in channel " + channel + " for bigfollows";
             console.log(notifMessage);
             sendMessageRetryPriority(channel, `/ban ${tags.username} bigfollows (automated)`);
@@ -1644,10 +1666,10 @@ function bigfollows(channel, tags, message) {
         }
         const messageNoWhiteSpace = removeWhiteSpace(message);
         // very bad ascii check, maybe move out of first message and check on every message
-        for(let bad of veryBadAscii) {
+        for (let bad of veryBadAscii) {
             // remove whitespace of both to compare
-            if(messageNoWhiteSpace.includes(removeWhiteSpace(bad))) {
-                console.log("Matched very bad ascii:" + message + "\n\"" + bad +"\"");
+            if (messageNoWhiteSpace.includes(removeWhiteSpace(bad))) {
+                console.log("Matched very bad ascii:" + message + "\n\"" + bad + "\"");
                 sendMessageRetryPriority(channel, `/ban ${tags.username} bad ascii (automated)`);
                 sendNotification(`Banned ${tags.username} for very bad ascii: ${message}`);
                 return;
@@ -1655,7 +1677,7 @@ function bigfollows(channel, tags, message) {
         }
 
         // first message contains many braille chars = very snus
-        if((message.match(brailleRE) || []).length > maxBrailleFirstMsg) {
+        if ((message.match(brailleRE) || []).length > maxBrailleFirstMsg) {
             console.log(message);
             console.log("matched too many braille for first message");
             timeout(channel, tags["user-id"], 30, "too many braille characters in first message").then();
@@ -1664,7 +1686,7 @@ function bigfollows(channel, tags, message) {
         }
 
         // first message contains many non ascii chars = a bit snus
-        if((message.match(nonAsciiRE) || []).length > maxNonAsciiFirstMsg) {
+        if ((message.match(nonAsciiRE) || []).length > maxNonAsciiFirstMsg) {
             console.log(message);
             console.log("matched too many non ascii for first message");
             timeout(channel, tags["user-id"], 10, "too many non ascii characters in first message").then();
@@ -1680,28 +1702,28 @@ let rqCd = [];
 // users that can't be rled/rq/fled
 let invalidTargets = ["magichackbot", "cleobotra", "minusibot", "harrybottah"];
 
-async function rq(channel, user, target){
-    if(rqCd.includes(user)) {
+async function rq(channel, user, target) {
+    if (rqCd.includes(user)) {
         // cooldown
         return "";
     }
     //
     rqCd.push(user);
     setTimeout(removeRqCd, 15000, user);
-    if(target === undefined) {
+    if (target === undefined) {
         target = user;
     }
     target = target.toLowerCase();
-    while(target.startsWith("@")) {
+    while (target.startsWith("@")) {
         target = target.substring(1);
     }
 
     // don't rq/fl bot that pings a lot of people
-    if(invalidTargets.includes(target)) {
+    if (invalidTargets.includes(target)) {
         target = user;
     }
 
-    if(channel.startsWith('#')) {
+    if (channel.startsWith('#')) {
         channel = channel.substring(1);
     }
     const logsUrl = "https://logs.magichack.xyz";
@@ -1709,15 +1731,15 @@ async function rq(channel, user, target){
 
     const response = await fetch(callUrl);
 
-    if(!response.ok) {
+    if (!response.ok) {
         return "No logs found for this channel/user";
     }
     const message = await response.text();
-    if(message.length === 0) {
+    if (message.length === 0) {
         return "Error fetching logs";
     }
     const randomLine = formatJustlog(message);
-    if(checkUserMessage(randomLine)) {
+    if (checkUserMessage(randomLine)) {
         return randomLine;
     } else {
         return "Banphrase detected monkaS";
@@ -1726,38 +1748,39 @@ async function rq(channel, user, target){
 
 function removeRqCd(user) {
     let index = rqCd.indexOf(user);
-    if(index !== -1) {
+    if (index !== -1) {
         rqCd.splice(index, 1);
     }
 }
 
 let cdFl = [];
+
 async function fl(channel, user, target) {
-    if(cdFl.includes(user)) {
+    if (cdFl.includes(user)) {
         // cooldown
         return "";
     }
     cdFl.push(user);
     setTimeout(removeCdFl, 60000, user);
-    if(target === undefined) {
+    if (target === undefined) {
         target = user;
     }
     target = target.toLowerCase();
-    while(target.startsWith("@")) {
+    while (target.startsWith("@")) {
         target = target.substring(1);
     }
 
     // don't rq/fl bot that pings a lot of people
-    if(invalidTargets.includes(target)) {
+    if (invalidTargets.includes(target)) {
         target = user;
     }
 
-    if(channel.startsWith('#')) {
+    if (channel.startsWith('#')) {
         channel = channel.substring(1);
     }
     const url = `https://logs.magichack.xyz/list?channel=${channel}&user=${target}`;
     const response = await fetch(url);
-    if(!response.ok) {
+    if (!response.ok) {
         return "No logs found for this channel/user";
     }
     const dates = await response.json();
@@ -1766,12 +1789,12 @@ async function fl(channel, user, target) {
     const firstMonthLogsUrl = `https://logs.magichack.xyz/channel/${channel}/user/${target}/${earliestDate["year"]}/${earliestDate["month"]}`;
     const responseLogs = await fetch(firstMonthLogsUrl);
 
-    if(!responseLogs.ok) {
+    if (!responseLogs.ok) {
         return "Error fetching logs";
     }
     let firstLine = formatJustlog((await responseLogs.text()).split('\n', 1)[0]);
 
-    if(checkUserMessage(firstLine)) {
+    if (checkUserMessage(firstLine)) {
         return firstLine;
     } else {
         return "Banphrase detected monkaS";
@@ -1780,38 +1803,39 @@ async function fl(channel, user, target) {
 
 function removeCdFl(user) {
     let index = cdFl.indexOf(user);
-    if(index !== -1) {
+    if (index !== -1) {
         cdFl.splice(index, 1);
     }
 }
 
 let cdLl = [];
+
 async function lastLine(channel, user, target) {
-    if(cdLl.includes(user)) {
+    if (cdLl.includes(user)) {
         // cooldown
         return "";
     }
     cdLl.push(user);
     setTimeout(removeCdLl, 15000, user);
-    if(target === undefined) {
+    if (target === undefined) {
         target = user;
     }
     target = target.toLowerCase();
-    while(target.startsWith("@")) {
+    while (target.startsWith("@")) {
         target = target.substring(1);
     }
 
     // don't rq/fl bot that pings a lot of people
-    if(invalidTargets.includes(target)) {
+    if (invalidTargets.includes(target)) {
         target = user;
     }
 
-    if(channel.startsWith('#')) {
+    if (channel.startsWith('#')) {
         channel = channel.substring(1);
     }
     const url = `https://logs.magichack.xyz/list?channel=${channel}&user=${target}`;
     const response = await fetch(url);
-    if(!response.ok) {
+    if (!response.ok) {
         return "No logs found for this channel/user";
     }
     const dates = await response.json();
@@ -1820,12 +1844,12 @@ async function lastLine(channel, user, target) {
     const lastMonthLogsUrl = `https://logs.magichack.xyz/channel/${channel}/user/${target}/${latestDate["year"]}/${latestDate["month"]}?reverse`;
     const responseLogs = await fetch(lastMonthLogsUrl);
 
-    if(!responseLogs.ok) {
+    if (!responseLogs.ok) {
         return "Error fetching logs";
     }
     let lastLine = formatJustlog((await responseLogs.text()).split('\n', 1)[0]);
 
-    if(checkUserMessage(lastLine)) {
+    if (checkUserMessage(lastLine)) {
         return lastLine;
     } else {
         return "Banphrase detected monkaS";
@@ -1834,7 +1858,7 @@ async function lastLine(channel, user, target) {
 
 function removeCdLl(user) {
     let index = cdLl.indexOf(user);
-    if(index !== -1) {
+    if (index !== -1) {
         cdLl.splice(index, 1);
     }
 }
@@ -1845,14 +1869,14 @@ function formatJustlog(message) {
 
     // fix leading zero on day returned by justlog
     let date = words[0].split('-');
-    if(date.length>= 3 && date[2].length === 1) {
+    if (date.length >= 3 && date[2].length === 1) {
         date[2] = "0" + date[2];
         words[0] = date.join('-');
     }
 
-    for(let i in words) {
+    for (let i in words) {
         // Remove channel from message
-        if(words[i].startsWith("#")) {
+        if (words[i].startsWith("#")) {
             words.splice(i, 1);
             break;
         }
@@ -1861,7 +1885,7 @@ function formatJustlog(message) {
     return replaceDateByTimeAgo(words.join(" "));
 }
 
-function replaceDateByTimeAgo (message) {
+function replaceDateByTimeAgo(message) {
     // [2021-11-1 00:04:08] #minusinsanity hackmagic: BatChest
     try {
         let date = message.split("[")[1].split("]")[0];
@@ -1869,7 +1893,7 @@ function replaceDateByTimeAgo (message) {
         date += ".000Z";
         let messageDate = new Date(date);
         return "(" + shortEnglishHumanizer((Math.round((Date.now() - messageDate) / 1000) * 1000),
-            { units: ["y", "d", "h", "m", "s"] }).split(" ").join("").split(",").join(" ") + " ago) "
+                {units: ["y", "d", "h", "m", "s"]}).split(" ").join("").split(",").join(" ") + " ago) "
             + message.slice(message.indexOf("]") + 1);
     } catch (e) {
         console.error(e);
@@ -1885,11 +1909,11 @@ function checkUserMessage(message) {
 
 function join(channel, newChannel) {
     newChannel = newChannel.toLowerCase();
-    if(!newChannel.startsWith("#")) {
+    if (!newChannel.startsWith("#")) {
         newChannel = "#" + newChannel;
     }
     const index = channels.indexOf(newChannel);
-    if(index !== -1) {
+    if (index !== -1) {
         sendMessageRetry(channel, "I'm already in this channel FeelsDonkMan");
         return;
     }
@@ -1908,15 +1932,15 @@ function join(channel, newChannel) {
 
 function leave(channel, channelToRemove) {
     channelToRemove = channelToRemove.toLowerCase();
-    if(!channelToRemove.startsWith("#")) {
+    if (!channelToRemove.startsWith("#")) {
         channelToRemove = "#" + channelToRemove;
     }
     const index = channels.indexOf(channelToRemove);
-    if(index === -1) {
+    if (index === -1) {
         sendMessageRetry(channel, "I'm not in this channel FeelsDonkMan");
         return;
     }
-    channels.splice(index,1);
+    channels.splice(index, 1);
     saveDataJson(channels, channelsFilePath);
     client.part(channelToRemove)
         .then(() => {
@@ -1950,7 +1974,7 @@ function numPings(message) {
     // get each unique words of the message
     const words = message.toLowerCase().match(/\w+/g)?.filter((x, i, a) => a.indexOf(x) === i);
     words?.forEach((w) => {
-        if(uniqueChatters.includes(w)) {
+        if (uniqueChatters.includes(w)) {
             pingCount++;
         }
     });
@@ -1962,20 +1986,20 @@ function isMassPing(message) {
 }
 
 function addMultipleUniqueChatters(chatters) {
-    for(let c of chatters) {
+    for (let c of chatters) {
         addUniqueChatter(c);
     }
 }
 
 function addUniqueChatter(username) {
-    if(!uniqueChatters.includes(username)) {
+    if (!uniqueChatters.includes(username)) {
         uniqueChatters.push(username);
         newChattersToSave = true;
     }
 }
 
 function getRndInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) ) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function random(channel, message) {
@@ -1983,7 +2007,7 @@ function random(channel, message) {
     let min = 1;
     let max = 0;
     try {
-        if(params.length >= 3) {
+        if (params.length >= 3) {
             min = parseInt(params[1]);
             max = parseInt(params[2]);
         } else if (params.length >= 2) {
@@ -2022,7 +2046,7 @@ async function asyncEvalCommand(channel, message) {
 }
 
 function removeHashtag(channel) {
-    if(channel.startsWith('#')) {
+    if (channel.startsWith('#')) {
         return channel.substring(1);
     }
     return channel;
@@ -2031,28 +2055,29 @@ function removeHashtag(channel) {
 async function streamInfo(channel, message) {
     let params = splitNoEmptyNoPrefix(message);
     let target = channel;
-    if(params.length >= 2) {
+    if (params.length >= 2) {
         target = params[1].toLowerCase();
     }
     target = removeHashtag(target);
-    let info = {data : ""};
+    let info = {data: ""};
     try {
         info = await getStream(target);
-    } catch (e) {}
+    } catch (e) {
+    }
     let reply = "";
-    if(info["data"].length === 0) {
+    if (info["data"].length === 0) {
         try {
             let response = await fetch("https://api.ivr.fi/v2/twitch/user?login=" + target);
-            if(!response.ok) {
+            if (!response.ok) {
                 reply = "could not find the specified user";
             } else {
                 let streamsInfo = await response.json();
-                if(streamsInfo.length > 0) {
+                if (streamsInfo.length > 0) {
                     let streamInfo = streamsInfo[0];
                     let name = streamInfo["displayName"];
                     let lastDate = streamInfo["lastBroadcast"]["startedAt"];
                     let formattedDate;
-                    if(lastDate !== null) {
+                    if (lastDate !== null) {
                         let lastStreamDate = new Date(streamInfo["lastBroadcast"]["startedAt"]);
                         let title = streamInfo["lastBroadcast"]["title"];
                         formattedDate = prettySeconds(Math.round((Date.now() - lastStreamDate) / 1000)) + " ago";
@@ -2067,7 +2092,7 @@ async function streamInfo(channel, message) {
 
             }
         } catch (e) {
-            reply= "Error fetching info, try again later";
+            reply = "Error fetching info, try again later";
         }
     } else {
         let streamInfo = info["data"][0];
@@ -2100,13 +2125,13 @@ function tosToString(str) {
 async function userId(channel, message, username) {
     let params = splitNoEmptyNoPrefix(message);
     let target = username;
-    if(params.length >= 2) {
+    if (params.length >= 2) {
         target = params[1].toLowerCase();
     }
     target = removeHashtag(target);
     let reply;
     let login = "";
-    if(/^\d+$/.test(target)) {
+    if (/^\d+$/.test(target)) {
         try {
             login = await uidToUsername(target);
             reply = `${target} = ${login}`;
@@ -2117,17 +2142,17 @@ async function userId(channel, message, username) {
     if (login === "") {
         try {
             let response = await fetch("https://api.ivr.fi/v2/twitch/user?login=" + target);
-            if(!response.ok) {
+            if (!response.ok) {
                 reply = "could not find the specified user";
             } else {
                 let usersInfo = await response.json();
-                if(usersInfo.length > 0) {
+                if (usersInfo.length > 0) {
                     let userInfo = usersInfo[0];
                     let uid = userInfo["id"];
                     let banned = userInfo["banned"];
                     let verifiedBot = userInfo["verifiedBot"];
                     let tosInfo = "";
-                    if(banned) {
+                    if (banned) {
                         tosInfo = tosToString(userInfo["banReason"]);
                     }
                     reply = `${uid} ${banned ? '⛔ ' + tosInfo : ''} ${verifiedBot ? 'verified bot: true' : ''}`;
@@ -2146,8 +2171,8 @@ async function userId(channel, message, username) {
 
 function asd(channel, message) {
     const reply = "Wideg WideFBCatch WideEgg"
-    if(channel === "#liptongod") {
-        if(message.startsWith("asd")) {
+    if (channel === "#liptongod") {
+        if (message.startsWith("asd")) {
             sendMessage(channel, reply);
         }
     }
@@ -2157,13 +2182,13 @@ function massPing(channel, message) {
     let params = splitNoEmptyNoPrefix(message);
     let pingMessage = '';
 
-    if(params.length >= 2) {
+    if (params.length >= 2) {
         params.shift();
         pingMessage = params.join(' ');
     }
 
     try {
-        for(let c of channelsChatters[channel]) {
+        for (let c of channelsChatters[channel]) {
             sendMessageRetry(channel, `@${c} ${pingMessage}`)
         }
     } catch (e) {
@@ -2177,39 +2202,39 @@ function whereIsHack(channel) {
 }
 
 const dirSize = async dir => {
-    const files = await fs.readdir( dir, { withFileTypes: true } );
+    const files = await fs.readdir(dir, {withFileTypes: true});
 
-    const paths = files.map( async file => {
-        const path = Path.join( dir, file.name );
+    const paths = files.map(async file => {
+        const path = Path.join(dir, file.name);
 
-        if ( file.isDirectory() ) return await dirSize( path );
+        if (file.isDirectory()) return await dirSize(path);
 
-        if ( file.isFile() ) {
-            const { size } = await fs.stat( path );
+        if (file.isFile()) {
+            const {size} = await fs.stat(path);
 
             return size;
         }
 
         return 0;
-    } );
+    });
 
-    return ( await Promise.all( paths ) ).flat( Infinity ).reduce( ( i, size ) => i + size, 0 );
+    return (await Promise.all(paths)).flat(Infinity).reduce((i, size) => i + size, 0);
 }
 
 async function logsSize(channel, channelName) {
     sendMessageRetry(channel, "Command temporarily disabled due to performance issues");
     return;
-    if(channelName === "channel") {
+    if (channelName === "channel") {
         channelName = channel;
     }
     let logsDir = '/home/pi/backups/logs';
-    if(channelName !== "") {
+    if (channelName !== "") {
         try {
             let id = await usernameToId(channelName);
             logsDir += "/" + id;
             try {
                 await fs.access(logsDir)
-            } catch(e) {
+            } catch (e) {
                 console.log(e);
                 throw "xd"; // xdddd
             }
@@ -2228,14 +2253,14 @@ async function logsSize(channel, channelName) {
     }
 }
 
-async function timeout(channel, userid, length, reason, retry= true) {
+async function timeout(channel, userid, length, reason, retry = true) {
     try {
         const streamer = await apiClient.users.getUserByName(removeHashtag(channel));
         await apiClient.moderation.banUser(streamer, selfUserData, {duration: length, reason, userId: userid});
     } catch (e) {
         console.log(e);
-        sendMessage("#"+username, "Failed to timeout " + userId + " in channel " + channel + " with code " + e.statusCode);
-        if(retry && e.statusCode !== 403) {
+        sendMessage("#" + username, "Failed to timeout " + userId + " in channel " + channel + " with code " + e.statusCode);
+        if (retry && e.statusCode !== 403) {
             // try a second time only
             timeout(channel, userid, length, reason, false).then();
         }
@@ -2248,36 +2273,36 @@ async function timeout(channel, userid, length, reason, retry= true) {
 async function dankmod(channel, message, tags) {
     // TODO check if better way to do with pb2 already
     let allowedUsers = ["sternutate", "hackmagic"];
-    if(!allowedUsers.includes(tags.username)) {
+    if (!allowedUsers.includes(tags.username)) {
         return;
     }
     const maxTimeout = 2 * 7 * 24 * 60 * 60; // 2 weeks
-    if(message.startsWith("&timeout")) {
+    if (message.startsWith("&timeout")) {
         let params = splitNoEmptyNoPrefix(message);
-        if(params.length >= 3) {
+        if (params.length >= 3) {
             let targetUser = params[1];
             let reason = "";
             let duration = parseInt(params[2]);
-            if(isNaN(duration)) {
+            if (isNaN(duration)) {
                 sendMessage(channel, "invalid duration provided");
                 return;
             }
-            if(duration < 0) {
+            if (duration < 0) {
                 duration = Math.abs(duration);
             }
-            if(params[2].endsWith("m")) {
+            if (params[2].endsWith("m")) {
                 duration *= 60;
-            } else if(params[2].endsWith("h")) {
+            } else if (params[2].endsWith("h")) {
                 duration *= 60 * 60;
-            } else if(params[2].endsWith("d")) {
+            } else if (params[2].endsWith("d")) {
                 duration *= 60 * 60 * 24;
-            } else if(params[2].endsWith("w")) {
+            } else if (params[2].endsWith("w")) {
                 duration *= 60 * 60 * 24 * 7;
             }
-            if(duration > maxTimeout) {
+            if (duration > maxTimeout) {
                 duration = maxTimeout;
             }
-            if(params.length >= 4) {
+            if (params.length >= 4) {
                 reason = params[3];
             }
             await timeout("#minusinsanity", await apiClient.users.getUserByName(targetUser), duration, reason);
@@ -2288,7 +2313,9 @@ async function dankmod(channel, message, tags) {
 }
 
 function saveChatters() {
-    if(newChattersToSave) {
-        saveDataJson(uniqueChatters, "chatters.json").then(() => {newChattersToSave = false;})
+    if (newChattersToSave) {
+        saveDataJson(uniqueChatters, "chatters.json").then(() => {
+            newChattersToSave = false;
+        })
     }
 }
