@@ -547,7 +547,9 @@ client.on('message', (channel, tags, message, self) => {
         } else if (isCommand(cleanMessage.toLowerCase(), "rl") || isCommand(cleanMessage.toLowerCase(), "randomline")) {
             let params = splitNoEmptyNoPrefix(cleanMessage);
             // TODO make it actually random and not just a person in chat
-            let target = channelsChatters[channel][Math.floor(Math.random() * channelsChatters[channel].length)];
+            // TODO 2: find a way to do it without tmi chatters endpoint since its dead
+            //let target = channelsChatters[channel][Math.floor(Math.random() * channelsChatters[channel].length)];
+            let target = tags.username;
             if (params.length >= 2) {
                 target = params[1];
             }
