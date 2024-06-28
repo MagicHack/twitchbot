@@ -534,11 +534,7 @@ client.on('message', (channel, tags, message, self) => {
                 });
             }
         } else if (isCommand(cleanMessage.toLowerCase(), "rq") || isCommand(cleanMessage.toLowerCase(), "randomquote")) {
-            let params = splitNoEmptyNoPrefix(cleanMessage);
             let target = tags.username;
-            if (params.length >= 2) {
-                target = params[1];
-            }
             rq(channel, tags.username, target).then(message => {
                 if (message.length > 0) {
                     sendMessageRetry(channel, message);
