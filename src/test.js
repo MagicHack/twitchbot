@@ -172,16 +172,22 @@ for (let c of channels) {
 
 const pushover = new Push({user: pushoverUser, token: pushoverToken});
 
-const client = new tmi.Client({
+
+
+const clientConnected = new tmi.Client({
     options: {debug: false, messagesLogLevel: "info"},
     connection: {
         reconnect: true,
         secure: true
     },
     identity: {
-        username: username,
+        username: username,d
         password: password
     },
+    // channels: channels
+});
+
+const clientAnon = new tmi.Client({
     channels: channels
 });
 
@@ -229,7 +235,8 @@ setInterval(saveChatters, 30 * 1000);
 // refresh live every minute
 setInterval(refreshLiveChannels, 60 * 1000);
 
-client.connect().catch(console.error);
+clientAnon.connect().catch(console.error);
+clientConnected.connect().catch(console.error);
 
 let bans = [];
 try {
@@ -254,14 +261,14 @@ function saveBans() {
 
 let tmiLatency = NaN;
 
-client.on("pong", (latency) => {
+clientAnon.on("pong", (latency) => {
     // latency given in seconds???
     tmiLatency = Math.round(latency * 1000);
 });
 
 let joinNotifs = false;
 // join messages
-client.on("join", (channel, username, self) => {
+clientAnon.on("join", (channel, username, self) => {
     if (self || !joinNotifs) return;
     // Do your stuff.
     if (channel === "#hackmagic") {
@@ -270,7 +277,7 @@ client.on("join", (channel, username, self) => {
 });
 
 // leave
-client.on("part", (channel, username, self) => {
+clientAnon.on("part", (channel, username, self) => {
     if (self || !joinNotifs) return;
     // Do your stuff.
     if (channel === "#hackmagic") {
@@ -278,17 +285,24 @@ client.on("part", (channel, username, self) => {
     }
 });
 
-client.on("ban", (channel, username) => {
+clientAnon.on("ban", (channel, username) => {
     // Log all bans
     let user = {channel: channel, username: username, ts: Date.now()};
     bans.push(user);
 });
 
-client.on("connected", () => {
-    client.say("#" + username, `connected ${(new Date()).toISOString()}. Prefix: ${prefix}`);
-    client.raw("CAP REQ :twitch.tv/commands twitch.tv/tags twitch.tv/membership");
+clientAnon.on("connected", () => {
+    clientConnected.say("#" + username, `connected with anon user ${(new Date()).toISOString()}. Prefix: ${prefix}`);
+    clientAnon.raw("CAP REQ :twitch.tv/commands twitch.tv/tags twitch.tv/membership");
     sentMessagesTS.push(Date.now());
 });
+
+clientConnected.on("connected", () => {
+    clientConnected.say("#" + username, `connected ${(new Date()).toISOString()}. Prefix: ${prefix}`);
+    // clientConnected.raw("CAP REQ :twitch.tv/commands twitch.tv/tags twitch.tv/membership");
+    sentMessagesTS.push(Date.now());
+});
+
 let lastSingleReply = Date.now();
 let lastNewCommandReply = Date.now();
 let lastDonkReply = Date.now();
@@ -297,13 +311,13 @@ let spamReplyCoolDown = 30;
 let lastAnnouceA = Date.now();
 
 
-client.on("userstate", (channel, state) => {
+clientAnon.on("userstate", (channel, state) => {
     // check userstate
     modState[channel] = state.mod;
     vipState[channel] = (state["user-type"] === ";vip=1");
 
 });
-client.on('message', (channel, tags, message, self) => {
+clientAnon.on('message', (channel, tags, message, self) => {
     if (self) {
         // check userstate
         modState[channel] = tags.mod;
@@ -377,7 +391,7 @@ client.on('message', (channel, tags, message, self) => {
         if (Date.now() - lastSingleReply > spamReplyCoolDown * 1000) {
             lastSingleReply = Date.now();
             if (channel === "#pajlada" && cleanMessage === "!") {
-                client.raw(`@client-nonce=xd;reply-parent-msg-id=${tags["id"]} PRIVMSG ${channel} :!!`);
+                clientConnected.raw(`@client-nonce=xd;reply-parent-msg-id=${tags["id"]} PRIVMSG ${channel} :!!`);
                 sentMessagesTS.push(Date.now());
             } else {
                 sendMessage(channel, cleanMessage);
@@ -385,7 +399,7 @@ client.on('message', (channel, tags, message, self) => {
         }
     }
 
-    if (tags.username !== client.getUsername()) {
+    if (tags.username !== clientConnected.getUsername()) {
         // TODO: remove or find alternative without the user list
         let channelsNoPriority = ['#pepto__bismol'];
         let donkUsername = '';
@@ -799,7 +813,7 @@ function getPlayers(game, trusted) {
     }
 }
 
-client.on("join", (channel) => {
+clientAnon.on("join", (channel) => {
     if (typeof channelsChatters[channel] === 'undefined') {
         getChatters(channel);
     }
@@ -1075,13 +1089,13 @@ function sendMessage(channel, message) {
             console.log("Message too long (" + message.length + " chars), truncating it");
             message = message.substring(0, charLimit - 5) + ' ...';
         }
-        client.say(channel, message);
+        clientConnected.say(channel, message);
         return true;
     }
 }
 
 function getAllChatters() {
-    let channels = client.getChannels();
+    let channels = clientAnon.getChannels();
     // delay each channel refresh to space them out in the delay
     let delay = delayChatterRefresh / channels.length;
     for (let i in channels) {
@@ -1917,7 +1931,7 @@ function join(channel, newChannel) {
     }
     channels.push(newChannel);
     saveDataJson(channels, channelsFilePath);
-    client.join(newChannel)
+    clientAnon.join(newChannel)
         .then(() => {
             sendMessageRetryPriority(newChannel, "Joined channel");
             sendMessageRetryPriority(channel, "Successfully joined new channel");
@@ -1940,7 +1954,7 @@ function leave(channel, channelToRemove) {
     }
     channels.splice(index, 1);
     saveDataJson(channels, channelsFilePath);
-    client.part(channelToRemove)
+    clientAnon.part(channelToRemove)
         .then(() => {
             sendMessageRetryPriority(channel, "Successfully left channel FeelsBadMan");
         }).catch((err) => {
