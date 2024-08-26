@@ -17,20 +17,27 @@ import {RefreshingAuthProvider} from '@twurple/auth';
 import {promises as fs} from 'fs';
 import {ApiClient} from '@twurple/api';
 import * as Path from "path";
-import { all, create } from 'mathjs'
+import {all, create} from 'mathjs'
 
 const math = create(all)
 
 const limitedEvaluate = math.evaluate
 
 math.import({
-    import: function () { throw new Error('Function import is disabled') },
-    createUnit: function () { throw new Error('Function createUnit is disabled') },
-    evaluate: function () { throw new Error('Function evaluate is disabled') },
-    parse: function () { throw new Error('Function parse is disabled') },
-    simplify: function () { throw new Error('Function simplify is disabled') },
-    derivative: function () { throw new Error('Function derivative is disabled') }
-}, { override: true })
+    import: function () {
+        throw new Error('Function import is disabled')
+    }, createUnit: function () {
+        throw new Error('Function createUnit is disabled')
+    }, evaluate: function () {
+        throw new Error('Function evaluate is disabled')
+    }, parse: function () {
+        throw new Error('Function parse is disabled')
+    }, simplify: function () {
+        throw new Error('Function simplify is disabled')
+    }, derivative: function () {
+        throw new Error('Function derivative is disabled')
+    }
+}, {override: true})
 const configDir = "/config";
 
 
@@ -145,14 +152,11 @@ const tokenFile = Path.join(configDir, 'tokens.json');
 
 const tokenData = JSON.parse(await fs.readFile(tokenFile, 'UTF-8'));
 
-const authProvider = new RefreshingAuthProvider(
-    {
-        clientId: process.env.TWITCH_CLIENT_ID,
-        clientSecret: process.env.TWITCH_CLIENT_SECRET,
-        onRefresh: async newTokenData => await fs.writeFile(tokenFile, JSON.stringify(newTokenData, null, 4), 'UTF-8')
-    },
-    tokenData
-);
+const authProvider = new RefreshingAuthProvider({
+    clientId: process.env.TWITCH_CLIENT_ID,
+    clientSecret: process.env.TWITCH_CLIENT_SECRET,
+    onRefresh: async newTokenData => await fs.writeFile(tokenFile, JSON.stringify(newTokenData, null, 4), 'UTF-8')
+}, tokenData);
 
 const apiClient = new ApiClient({authProvider});
 
@@ -173,16 +177,11 @@ for (let c of channels) {
 const pushover = new Push({user: pushoverUser, token: pushoverToken});
 
 const client = new tmi.Client({
-    options: {debug: false, messagesLogLevel: "info"},
-    connection: {
-        reconnect: true,
-        secure: true
-    },
-    identity: {
-        username: username,
-        password: password
-    },
-    channels: channels
+    options: {debug: false, messagesLogLevel: "info"}, connection: {
+        reconnect: true, secure: true
+    }, identity: {
+        username: username, password: password
+    }, channels: channels
 });
 
 let channelsChatters = {};
@@ -403,9 +402,7 @@ client.on('message', (channel, tags, message, self) => {
         }
 
         if (Date.now() - lastDonkReply > donkCoolDown * 1000) {
-            const donkCombos = [["FeelsDonkMan", "TeaTimeU"], ["FeelsDonkMan", "TeaTime"], ["FeelsDonkMan", "bigTeaTime"],
-                ["WIDEGIGADONK", "TeaTime"], ["WIDEGIGADONK", "bigTeaTime"], ["FeelsDonkMan", "MiniTeaTime"],
-                ["Donki", "TeaTimeU"], ["Donki", "TeaTime"], ["Donki", "bigTeaTime"]];
+            const donkCombos = [["FeelsDonkMan", "TeaTimeU"], ["FeelsDonkMan", "TeaTime"], ["FeelsDonkMan", "bigTeaTime"], ["WIDEGIGADONK", "TeaTime"], ["WIDEGIGADONK", "bigTeaTime"], ["FeelsDonkMan", "MiniTeaTime"], ["Donki", "TeaTimeU"], ["Donki", "TeaTime"], ["Donki", "bigTeaTime"]];
 
             if (donkUsername === '' || tags.username === donkUsername) {
                 for (let donk of donkCombos) {
@@ -431,8 +428,7 @@ client.on('message', (channel, tags, message, self) => {
             }
         }
         let sameRepliesChannel = ['#hackmagic', '#pepto__bismol'];
-        let sameReplies = ['DinkDonk', 'YEAHBUTBTTV', 'TrollDespair', 'MODS', 'monkaE', 'POGGERS', 'VeryPog',
-            'MegaLUL FBBlock', 'hackerCD', ':)'];
+        let sameReplies = ['DinkDonk', 'YEAHBUTBTTV', 'TrollDespair', 'MODS', 'monkaE', 'POGGERS', 'VeryPog', 'MegaLUL FBBlock', 'hackerCD', ':)'];
         if (sameRepliesChannel.includes(channel)) {
             for (let reply of sameReplies) {
                 if (cleanMessage.startsWith(reply)) {
@@ -473,8 +469,7 @@ client.on('message', (channel, tags, message, self) => {
             raidUnPing(channel, tags.username);
         } else if (isCommand(cleanMessage.toLowerCase(), "raidstats")) {
             sendMessageRetry(channel, raidStats());
-        } else if (isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(),
-            'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
+        } else if (isCommand(cleanMessage.toLowerCase(), 'help') || isCommand(cleanMessage.toLowerCase(), 'command') || isCommand(cleanMessage.toLowerCase(), 'commands')) {
             help(channel, tags.username);
         } else if (isCommand(cleanMessage.toLowerCase(), "lastraid")) {
             if (lastRaid !== null) {
@@ -1231,8 +1226,7 @@ function raidUnPing(channel, user) {
 }
 
 function help(channel, user) {
-    const helpText = "&raidping to get notified of raids, &players to check the current online player count of a steam game," +
-        " &fl, &rq, &raidstats, &lastraid and &enable/disableraid (mod only)";
+    const helpText = "&raidping to get notified of raids, &players to check the current online player count of a steam game," + " &fl, &rq, &raidstats, &lastraid and &enable/disableraid (mod only)";
     sendMessageRetry(channel, `@${user}, ${helpText}`);
 }
 
@@ -1442,8 +1436,7 @@ async function pingPajbotApi(url) {
         url = https + url.trim();
     }
     let result = await fetch(url + "/api/v1/banphrases/test", {
-        method: 'POST', body:
-            JSON.stringify({message: testPhrase}), headers: {'Content-Type': 'application/json'}
+        method: 'POST', body: JSON.stringify({message: testPhrase}), headers: {'Content-Type': 'application/json'}
     });
     if (result.status !== 200) {
         throw "Response code not 200 from api";
@@ -1726,21 +1719,25 @@ async function rq(channel, user, target) {
     }
     const logsUrl = "https://logs.magichack.xyz";
     const callUrl = `${logsUrl}/channel/${channel}/user/${target}/random`;
+    try {
+        const response = await fetch(callUrl);
 
-    const response = await fetch(callUrl);
-
-    if (!response.ok) {
-        return "No logs found for this channel/user";
-    }
-    const message = await response.text();
-    if (message.length === 0) {
-        return "Error fetching logs";
-    }
-    const randomLine = formatJustlog(message);
-    if (checkUserMessage(randomLine)) {
-        return randomLine;
-    } else {
-        return "Banphrase detected monkaS";
+        if (!response.ok) {
+            return "No logs found for this channel/user";
+        }
+        const message = await response.text();
+        if (message.length === 0) {
+            return "Error fetching logs";
+        }
+        const randomLine = formatJustlog(message);
+        if (checkUserMessage(randomLine)) {
+            return randomLine;
+        } else {
+            return "Banphrase detected monkaS";
+        }
+    } catch (e) {
+        console.error(e);
+        return "Connection to log server failed";
     }
 }
 
@@ -1890,9 +1887,7 @@ function replaceDateByTimeAgo(message) {
         // Add utc indicator
         date += ".000Z";
         let messageDate = new Date(date);
-        return "(" + shortEnglishHumanizer((Math.round((Date.now() - messageDate) / 1000) * 1000),
-                {units: ["y", "d", "h", "m", "s"]}).split(" ").join("").split(",").join(" ") + " ago) "
-            + message.slice(message.indexOf("]") + 1);
+        return "(" + shortEnglishHumanizer((Math.round((Date.now() - messageDate) / 1000) * 1000), {units: ["y", "d", "h", "m", "s"]}).split(" ").join("").split(",").join(" ") + " ago) " + message.slice(message.indexOf("]") + 1);
     } catch (e) {
         console.error(e);
         return "Error formatting date ...";
@@ -1952,8 +1947,7 @@ function leave(channel, channelToRemove) {
 
 
 const shortEnglishHumanizer = humanizeDuration.humanizer({
-    language: "shortEn",
-    languages: {
+    language: "shortEn", languages: {
         shortEn: {
             y: () => "y",
             mo: () => "mo",
