@@ -21,7 +21,7 @@
     "@twurple/api": "^5.3.4",
     "@twurple/auth": "^5.3.4",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2",
+    "express": "^5.1.0",
     "humanize-duration": "^3.32.1",
     "mathjs": "^14.0.1",
     "moment": "^2.30.1",
