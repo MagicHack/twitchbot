@@ -20,7 +20,7 @@
   "dependencies": {
     "@twurple/api": "^5.3.4",
     "@twurple/auth": "^5.3.4",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.2.4",
     "express": "^5.2.1",
     "humanize-duration": "^3.33.2",
     "mathjs": "^15.1.0",
