@@ -29,7 +29,7 @@
     "node-fetch": "^3.3.2",
     "pretty-bytes": "^7.1.0",
     "pushover-notifications": "^1.2.3",
-    "sync-fetch": "^0.5.2",
+    "sync-fetch": "^0.6.0",
     "tmi.js": "^1.8.5",
     "transliteration": "^2.6.0"
   }
